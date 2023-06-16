@@ -1,0 +1,54 @@
+# Direct questions to StackOverflow.
+question:
+  close: true
+  comment: >
+    Hi @{issue-author},
+
+    Thank you for your question!
+
+    We appreciate your engagement with the Ju SDK development. However, to ensure the best management of issues related to the Ju SDK itself, we kindly request that you post your question on Stack Overflow, a dedicated Q&A forum for technical questions.
+
+    Posting your question on Stack Overflow will make it more searchable and encourage community participation, enabling others to benefit from the answers.
+
+    If you haven't already, please submit your question to the Solana Stack Exchange using the following link: [https://solana.stackexchange.com/questions/ask?tags=ju](https://solana.stackexchange.com/questions/ask?tags=ju)
+
+    After posting your question, we would greatly appreciate it if you could share the link to the newly created question here, allowing others to easily access and contribute to the discussion.
+
+    ---
+
+    _This [automated message](https://github.com/ju-social/sdk/tree/main/.github/configs/issue-label-automations.yml) is generated as a result of adding the "question" label._
+
+# Direct feature requests to Canny.
+'feature request':
+  close: true
+  comment: >
+    Hi @{issue-author},
+
+    Thank you for raising this feature request!
+
+    We value your input in the development of the Ju SDK. However, to ensure effective issue management, we kindly request that you submit feature requests through our dedicated Feature Request boards.
+
+    Our Feature Request boards provide a platform for creating new posts and upvoting existing ones. To submit or review feature requests related to the Ju SDK, please visit: [https://ju.social](https://ju.social)
+
+    After submitting your feature request, it would be helpful if you could share the link to the relevant post here, allowing others to follow and contribute to the discussion.
+
+    ---
+
+    _This [automated message](https://github.com/ju-social/sdk/tree/main/.github/configs/issue-label-automations.yml) is generated as a result of adding the "feature request" label._
+
+# Ask for community contributions.
+'community contribution':
+  comment: >
+    Hi there,
+
+    We would like to ask for community contributions on this issue. This presents an excellent opportunity for anyone to contribute to the Social dApps ecosystem of Solana.
+
+    We have provided a detailed set of requirements that we believe would benefit the community. If you have any questions or require clarification before starting to work on this issue, please feel free to ask.
+
+    If you are currently working on this issue and are confident in your ability to fully implement it, please state your intention clearly in this thread to avoid duplication of efforts.
+
+    Thank you in advance for your contribution to the Ju ecosystem!
+
+    ---
+
+    _This [automated message](https://github.com/ju-social/sdk/tree/main/.github/configs/issue-label-automations.yml) is generated as a result of adding the "community contribution" label._
