@@ -28,7 +28,7 @@ import { OperationOptions, PublicKey } from '@/types';
  * const subspaceClient = ju.core().subspace;
  * ```
  *
- * @see {@link Core} The `Core` model
+ * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class SubspaceClient {

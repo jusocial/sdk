@@ -19,7 +19,7 @@ import { OperationOptions, PublicKey } from '@/types';
  * const appClient = ju.core().app;
  * ```
  *
- * @see {@link Core} The `Core` model
+ * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class AppClient {

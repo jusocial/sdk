@@ -22,7 +22,6 @@ import type { Ju } from '@/Ju';
  * const coreClient = ju.core();
  * ```
  *
- * @see {@link Core} The `Core` model
  * @group Modules
  */
 export class CoreClient {

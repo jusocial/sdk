@@ -24,7 +24,7 @@ interface SearchResultItem {
  * const aliasClient = ju.core().common;
  * ```
  *
- * @see {@link Core} The `Core` model
+ * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class CommonClient {

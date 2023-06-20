@@ -27,7 +27,7 @@ import { OperationOptions, PublicKey } from '@/types';
  * const publicationClient = ju.core();
  * ```
  *
- * @see {@link Core} The `Core` model
+ * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class PublicationClient {

@@ -21,7 +21,7 @@ import { OperationOptions, PublicKey } from '@/types';
  * const connectionClient = ju.core().connection;
  * ```
  *
- * @see {@link Core} The `Core` model
+ * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class ConnectionClient {

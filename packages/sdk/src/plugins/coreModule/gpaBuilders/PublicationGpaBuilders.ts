@@ -2,8 +2,8 @@ import {
   publicationDiscriminator,
 } from '@ju-protocol/ju-core';
 import { PublicKey, PUBLIC_KEY_LENGTH } from '@solana/web3.js';
-import { GpaBuilder } from '@/utils';
 import { MAX_URI_LENGTH, UUID_LENGTH } from '../constants';
+import { GpaBuilder } from '@/utils';
 
 type AccountDiscriminator = [
   number,

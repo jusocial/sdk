@@ -29,7 +29,7 @@ import { OperationOptions, PublicKey } from '@/types';
  * const profileClient = ju.core().profile;
  * ```
  *
- * @see {@link Core} The `Core` model
+ * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class ProfileClient {

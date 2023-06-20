@@ -19,7 +19,7 @@ import { OperationOptions } from '@/types';
  * const reportClient = ju.core().report;
  * ```
  *
- * @see {@link Core} The `Core` model
+ * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class ReportClient {

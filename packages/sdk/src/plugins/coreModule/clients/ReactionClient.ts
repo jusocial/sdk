@@ -21,7 +21,7 @@ import { OperationOptions } from '@/types';
  * const reactionClient = ju.core().reaction;
  * ```
  *
- * @see {@link Core} The `Core` model
+ * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class ReactionClient {
