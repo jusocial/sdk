@@ -4,7 +4,7 @@ import {
   ProfileAccount
 } from '../accounts';
 import { bytesArrToStr } from '../helpers';
-import { ProfileJsonMetadata } from './ProfileJsonMetadata';
+import { ProfileJsonMetadata } from './JsonMetadata';
 import { assert, Option } from '@/utils';
 
 

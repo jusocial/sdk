@@ -4,7 +4,7 @@ import {
   PublicationAccount
 } from '../accounts';
 import { bytesArrToStr } from '../helpers';
-import { PublicationJsonMetadata } from './PublicationJsonMetadata';
+import { PublicationJsonMetadata } from './JsonMetadata';
 import { assert, Option } from '@/utils';
 
 

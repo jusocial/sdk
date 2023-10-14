@@ -7,7 +7,3 @@ export * from './Reaction';
 export * from './Report';
 export * from './Subspace';
 export * from './JsonMetadata';
-export * from './AppJsonMetadata';
-export * from './ProfileJsonMetadata';
-export * from './SubspaceJsonMetadata';
-export * from './PublicationJsonMetadata';

@@ -1,10 +1,8 @@
 import { PublicKey } from '@solana/web3.js';
 import { SubspaceArgs } from '@ju-protocol/ju-core';
-import {
-  SubspaceAccount
-} from '../accounts';
+import { SubspaceAccount } from '../accounts';
 import { bytesArrToStr } from '../helpers';
-import { SubspaceJsonMetadata } from './SubspaceJsonMetadata';
+import { SubspaceJsonMetadata } from './JsonMetadata';
 import { assert, Option } from '@/utils';
 
 
