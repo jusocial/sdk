@@ -17,14 +17,14 @@ import {
   findPublicationsOperation
 } from '../operations/publication';
 import { Publication } from '../models';
+import { ExternalProcessors } from '../types';
 import type { Ju } from '@/Ju';
 import { OperationOptions, PublicKey } from '@/types';
-import { ExternalProcessors } from '../types';
 
 /**
  * This client helps to interact with the Ju Publications.
  *
- * You may access this client via the `core()` method of your `Ju` instance.
+ * You may access this client via the `core().publications(app)` method of your `Ju` instance.
  *
  * @example
  * ```ts

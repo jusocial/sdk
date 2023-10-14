@@ -15,7 +15,7 @@ import { OperationOptions, PublicKey } from '@/types';
 /**
  * This client helps to interact with the Ju Aplication Connections.
  *
- * You may access this client via the `core()` method of your `Ju` instance.
+ * You may access this client via the `core().connections(app)` method of your `Ju` instance.
  *
  * @example
  * ```ts
@@ -139,6 +139,29 @@ export class ConnectionClient {
     return this.ju
       .operations()
       .execute(findConnectionsByKeyListOperation(input), options);
+  }
+
+  /**
+   * Checks if Connection on Initializer and Target exist.
+   * @param {PublicKey} initializer - The initializer PublicKey
+   * @param {PublicKey} target - The given Target entity PublicKey
+   * @param {OperationOptions} options - The optional operation options
+   * @returns {Pomise<boolean>} Promise boolean
+   */
+  async isConnectionExist(
+    initializer: PublicKey,
+    target: PublicKey,
+    options?: OperationOptions
+  ) {
+    const connectionPda = this.ju.core().pdas().connection(
+      {
+        app: this.app,
+        target,
+        initializer
+      }
+    )
+
+    return await this.ju.rpc().accountExists(connectionPda, options?.commitment);
   }
 
 }

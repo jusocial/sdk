@@ -15,7 +15,7 @@ import { OperationOptions, PublicKey } from '@/types';
 /**
  * This client helps to interact with the Ju Aplication Reactions.
  *
- * You may access this client via the `core()` method of your `Ju` instance.
+ * You may access this client via the `core().reactions(app)` method of your `Ju` instance.
  *
  * @example
  * ```ts
@@ -112,6 +112,29 @@ export class ReactionClient {
     return this.ju
       .operations()
       .execute(findReactionsByKeyListOperation(input), options);
+  }
+
+  /**
+   * Checks if Reaction on Initializer and Target exist.
+   * @param {PublicKey} initializer - The initializer PublicKey
+   * @param {PublicKey} target - The given Target entity PublicKey
+   * @param {OperationOptions} options - The optional operation options
+   * @returns {Pomise<boolean>} Promise boolean
+   */
+  async isReactionsExist(
+    initializer: PublicKey,
+    target: PublicKey,
+    options?: OperationOptions
+  ) {
+    const reactionPda = this.ju.core().pdas().reaction(
+      {
+        app: this.app,
+        target,
+        initializer
+      }
+    )
+
+    return await this.ju.rpc().accountExists(reactionPda, options?.commitment);
   }
 
 }

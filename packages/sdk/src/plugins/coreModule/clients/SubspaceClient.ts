@@ -28,7 +28,7 @@ import { OperationOptions, PublicKey } from '@/types';
 /**
  * This client helps to interact with the Ju Aplication Subspaces.
  *
- * You may access this client via the `core()` method of your `Ju` instance.
+ * You may access this client via the `core().subspaces(app)` method of your `Ju` instance.
  *
  * @example
  * ```ts

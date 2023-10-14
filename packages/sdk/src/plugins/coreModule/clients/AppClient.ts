@@ -16,7 +16,7 @@ import { OperationOptions, PublicKey } from '@/types';
 /**
  * This client helps to interact with the Ju Aplications.
  *
- * You may access this client via the `core()` method of your `Ju` instance.
+ * You may access this client via the `core().apps()` method of your `Ju` instance.
  *
  * @example
  * ```ts
