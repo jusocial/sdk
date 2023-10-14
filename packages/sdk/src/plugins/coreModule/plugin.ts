@@ -21,26 +21,26 @@ import {
   deleteSubspaceOperationHandler,
   findAliasByValueOperation,
   findAliasByValueOperationHandler,
-  findAllConnectionsByKeyListOperation,
-  findAllConnectionsByKeyListOperationHandler,
-  findAllConnectionsOperation,
-  findAllConnectionsOperationHandler,
-  findAllPublicationsByKeyListOperation,
-  findAllPublicationsByKeyListOperationHandler,
-  findAllPublicationsOperation,
-  findAllPublicationsOperationHandler,
-  findAllReactionsByKeyListOperation,
-  findAllReactionsByKeyListOperationHandler,
-  findAllReactionsOperation,
-  findAllReactionsOperationHandler,
-  findAllSubspacesByKeyListOperation,
-  findAllSubspacesByKeyListOperationHandler,
-  findAllSubspacesByConnectionInitializerOperation,
-  findAllSubspacesByConnectionInitializerOperationHandler,
-  findAllSubspacesByConnectionTargetOperation,
-  findAllSubspacesByConnectionTargetOperationHandler,
-  findAllSubspacesOperation,
-  findAllSubspacesOperationHandler,
+  findConnectionsByKeyListOperation,
+  findConnectionsByKeyListOperationHandler,
+  findConnectionsOperation,
+  findConnectionsOperationHandler,
+  findPublicationsByKeyListOperation,
+  findPublicationsByKeyListOperationHandler,
+  findPublicationsOperation,
+  findPublicationsOperationHandler,
+  findReactionsByKeyListOperation,
+  findReactionsByKeyListOperationHandler,
+  findReactionsOperation,
+  findReactionsOperationHandler,
+  findSubspacesByKeyListOperation,
+  findSubspacesByKeyListOperationHandler,
+  findSubspacesAsKeysByConnectionInitializerOperation,
+  findSubspacesAsKeysByConnectionInitializerOperationHandler,
+  findSubspacesAsKeysByConnectionTargetOperation,
+  findSubspacesAsKeysByConnectionTargetOperationHandler,
+  findSubspacesOperation,
+  findSubspacesOperationHandler,
   // uploadMetadataOperation,
   // uploadMetadataOperationHandler,
   findAppByAddressOperation,
@@ -58,11 +58,27 @@ import {
   updateSubspaceOperation,
   updateSubspaceOperationHandler,
   collectPublicationOperation,
-  collectPublicationOperationHandler
+  collectPublicationOperationHandler,
+  findSubspacesAsKeysOperation,
+  findSubspacesAsKeysOperationHandler,
+  findConnectionsAsKeysOperation,
+  findConnectionsAsKeysOperationHandler,
+  findPublicationsAsKeysOperation,
+  findPublicationsAsKeysOperationHandler,
+  findReactionsAsKeysOperation,
+  findReactionsAsKeysOperationHandler,
+  findReportsOperation,
+  findReportsOperationHandler,
+  findReportsAsKeysOperation,
+  findReportsAsKeysOperationHandler,
+  findReportsByKeyListOperation,
+  findReportsByKeyListOperationHandler
 } from './operations';
 import {
   createAppOperation,
   createAppOperationHandler,
+  findAppsOperation,
+  findAppsOperationHandler,
   updateAppOperation,
   updateAppOperationHandler
 } from './operations/app';
@@ -75,18 +91,26 @@ import {
   deleteProfileOperationHandler,
   findProfileByAddressOperation,
   findProfileByAddressOperationHandler,
-  findAllProfilesByKeyListOperation,
-  findAllProfilesByKeyListOperationHandler,
-  findAllProfilesOperation,
-  findAllProfilesOperationHandler,
-  findAllProfilesByConnectionInitializerOperation,
-  findAllProfilesByConnectionInitializerOperationHandler,
-  findAllProfilesByConnectionTargetOperation,
-  findAllProfilesByConnectionTargetOperationHandler,
+  findProfilesByKeyListOperation,
+  findProfilesByKeyListOperationHandler,
+  findProfilesOperation,
+  findProfilesOperationHandler,
+  findProfilesAsKeysByConnectionInitializerOperation,
+  findProfilesAsKeysByConnectionInitializerOperationHandler,
+  findProfilesAsKeysByConnectionTargetOperation,
+  findProfilesAsKeysByConnectionTargetOperationHandler,
+  findProfilesAsKeysOperation,
+  findProfilesAsKeysOperationHandler,
 } from './operations/profile';
+import { findAppsByKeyListOperation, findAppsByKeyListOperationHandler } from './operations/app/findAppsByKeyList';
+import { findAppsAsKeysOperation, findAppsAsKeysOperationHandler } from './operations/app/findAppsAsKeys';
 import { CoreClient } from './clients';
 import type { Ju } from '@/Ju';
 import { ErrorWithLogs, JuPlugin, Program } from '@/types';
+import { addSubspaceManagerOperation, addSubspaceManagerOperationHandler } from './operations/subspace/addSubspaceManager';
+import { updateSubspaceManagerOperation, updateSubspaceManagerOperationHandler } from './operations/subspace/updateSubspaceManager';
+import { deleteSubspaceManagerOperation, deleteSubspaceManagerOperationHandler } from './operations/subspace/deleteSubspaceManager';
+import { findSubspaceManagersOperation, findSubspaceManagersOperationHandler } from './operations/subspace/findSubspaceManagers';
 
 /** @group Plugins */
 export const coreModule = (): JuPlugin => ({
@@ -120,6 +144,19 @@ export const coreModule = (): JuPlugin => ({
       findAppByAddressOperation,
       findAppByAddressOperationHandler,
     );
+    op.register(
+      findAppsOperation,
+      findAppsOperationHandler,
+    );
+    op.register(
+      findAppsAsKeysOperation,
+      findAppsAsKeysOperationHandler,
+    );
+    op.register(
+      findAppsByKeyListOperation,
+      findAppsByKeyListOperationHandler,
+    );
+
 
     /** Profiles */
     op.register(
@@ -139,20 +176,24 @@ export const coreModule = (): JuPlugin => ({
       findProfileByAddressOperationHandler
     );
     op.register(
-      findAllProfilesOperation,
-      findAllProfilesOperationHandler
+      findProfilesOperation,
+      findProfilesOperationHandler
     );
     op.register(
-      findAllProfilesByKeyListOperation,
-      findAllProfilesByKeyListOperationHandler
+      findProfilesAsKeysOperation,
+      findProfilesAsKeysOperationHandler
     );
     op.register(
-      findAllProfilesByConnectionInitializerOperation,
-      findAllProfilesByConnectionInitializerOperationHandler
+      findProfilesByKeyListOperation,
+      findProfilesByKeyListOperationHandler
     );
     op.register(
-      findAllProfilesByConnectionTargetOperation,
-      findAllProfilesByConnectionTargetOperationHandler
+      findProfilesAsKeysByConnectionInitializerOperation,
+      findProfilesAsKeysByConnectionInitializerOperationHandler
+    );
+    op.register(
+      findProfilesAsKeysByConnectionTargetOperation,
+      findProfilesAsKeysByConnectionTargetOperationHandler
     );
 
     /** Subspaces */
@@ -169,24 +210,44 @@ export const coreModule = (): JuPlugin => ({
       deleteSubspaceOperationHandler,
     );
     op.register(
+      addSubspaceManagerOperation,
+      addSubspaceManagerOperationHandler
+    );
+    op.register(
+      updateSubspaceManagerOperation,
+      updateSubspaceManagerOperationHandler
+    );
+    op.register(
+      deleteSubspaceManagerOperation,
+      deleteSubspaceManagerOperationHandler
+    );
+    op.register(
+      findSubspaceManagersOperation,
+      findSubspaceManagersOperationHandler
+    );
+    op.register(
       findSubspaceByAddressOperation,
       findSubspaceByAddressOperationHandler
     );
     op.register(
-      findAllSubspacesOperation,
-      findAllSubspacesOperationHandler
+      findSubspacesOperation,
+      findSubspacesOperationHandler
     );
     op.register(
-      findAllSubspacesByConnectionInitializerOperation,
-      findAllSubspacesByConnectionInitializerOperationHandler
+      findSubspacesAsKeysOperation,
+      findSubspacesAsKeysOperationHandler
     );
     op.register(
-      findAllSubspacesByConnectionTargetOperation,
-      findAllSubspacesByConnectionTargetOperationHandler
+      findSubspacesAsKeysByConnectionInitializerOperation,
+      findSubspacesAsKeysByConnectionInitializerOperationHandler
     );
     op.register(
-      findAllSubspacesByKeyListOperation,
-      findAllSubspacesByKeyListOperationHandler
+      findSubspacesAsKeysByConnectionTargetOperation,
+      findSubspacesAsKeysByConnectionTargetOperationHandler
+    );
+    op.register(
+      findSubspacesByKeyListOperation,
+      findSubspacesByKeyListOperationHandler
     );
 
     /** Connections */
@@ -207,12 +268,16 @@ export const coreModule = (): JuPlugin => ({
     //   findConnectionByAddressOperationHandler
     // );
     op.register(
-      findAllConnectionsOperation,
-      findAllConnectionsOperationHandler
+      findConnectionsOperation,
+      findConnectionsOperationHandler
     );
     op.register(
-      findAllConnectionsByKeyListOperation,
-      findAllConnectionsByKeyListOperationHandler
+      findConnectionsAsKeysOperation,
+      findConnectionsAsKeysOperationHandler
+    );
+    op.register(
+      findConnectionsByKeyListOperation,
+      findConnectionsByKeyListOperationHandler
     );
 
     // Aliases
@@ -247,12 +312,16 @@ export const coreModule = (): JuPlugin => ({
       findPublicationByAddressOperationHandler
     );
     op.register(
-      findAllPublicationsOperation,
-      findAllPublicationsOperationHandler
+      findPublicationsOperation,
+      findPublicationsOperationHandler
     );
     op.register(
-      findAllPublicationsByKeyListOperation,
-      findAllPublicationsByKeyListOperationHandler
+      findPublicationsAsKeysOperation,
+      findPublicationsAsKeysOperationHandler
+    );
+    op.register(
+      findPublicationsByKeyListOperation,
+      findPublicationsByKeyListOperationHandler
     );
 
 
@@ -266,12 +335,16 @@ export const coreModule = (): JuPlugin => ({
       deleteReactionOperationHandler,
     );
     op.register(
-      findAllReactionsOperation,
-      findAllReactionsOperationHandler
+      findReactionsOperation,
+      findReactionsOperationHandler
     );
     op.register(
-      findAllReactionsByKeyListOperation,
-      findAllReactionsByKeyListOperationHandler
+      findReactionsAsKeysOperation,
+      findReactionsAsKeysOperationHandler
+    );
+    op.register(
+      findReactionsByKeyListOperation,
+      findReactionsByKeyListOperationHandler
     );
 
 
@@ -280,12 +353,19 @@ export const coreModule = (): JuPlugin => ({
       createReportOperation,
       createReportOperationHandler,
     );
+    op.register(
+      findReportsOperation,
+      findReportsOperationHandler
+    );
+    op.register(
+      findReportsAsKeysOperation,
+      findReportsAsKeysOperationHandler
+    );
+    op.register(
+      findReportsByKeyListOperation,
+      findReportsByKeyListOperationHandler
+    );
 
-    
-    // op.register(
-    //   uploadMetadataOperation,
-    //   uploadMetadataOperationHandler
-    // );
 
     ju.core = function () {
       return new CoreClient(this);

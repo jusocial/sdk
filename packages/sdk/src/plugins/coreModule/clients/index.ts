@@ -2,7 +2,7 @@ export * from './CoreBuildersClient';
 export * from './CorePdasClient';
 export * from './CoreClient';
 export * from './AppClient';
-export * from './CommonClient';
+export * from './CoreUtilsClient';
 export * from './ConnectionClient';
 export * from './ProfileClient';
 export * from './PublicationClient';

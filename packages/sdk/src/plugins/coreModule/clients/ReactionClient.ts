@@ -1,15 +1,16 @@
 import { ReactionType } from '@ju-protocol/ju-core';
 import {
-  findAllReactionsByKeyListOperation,
-  FindAllReactionsInput,
-  findAllReactionsOperation,
-  FindAllReactionsByKeyListInput,
+  findReactionsByKeyListOperation,
+  FindReactionsInput,
+  findReactionsOperation,
+  FindReactionsByKeyListInput,
   createReactionOperation,
   deleteReactionOperation,
+  FindReactionsAsKeysInput,
+  findReactionsAsKeysOperation,
 } from '../operations';
-import { Publication } from '../models';
 import type { Ju } from '@/Ju';
-import { OperationOptions } from '@/types';
+import { OperationOptions, PublicKey } from '@/types';
 
 /**
  * This client helps to interact with the Ju Aplication Reactions.
@@ -18,7 +19,7 @@ import { OperationOptions } from '@/types';
  *
  * @example
  * ```ts
- * const reactionClient = ju.core().reaction;
+ * const reactionClient = ju.core().reactions(app);
  * ```
  *
  * @see {@link CoreClient} The `Core` client
@@ -26,17 +27,17 @@ import { OperationOptions } from '@/types';
  */
 export class ReactionClient {
 
-  constructor(readonly ju: Ju) { }
+  constructor(readonly ju: Ju, readonly app: PublicKey) { }
 
   /**
    * Creates new Reaction with Target Publication given.
-   * @param {Publication} target - The given Publication instance
+   * @param {PublicKey} target - The given Target entity PublicKey
    * @param {ReactionType} reactionType - The reaction type
    * @param {OperationOptions} options - The optional operation options
    * @returns {Pomise<SendAndConfirmTransactionResponse>} The response of the Reaction creation.
    */
-  create(
-    target: Publication,
+  createReaction(
+    target: PublicKey,
     reactionType: ReactionType,
     options?: OperationOptions
   ) {
@@ -44,8 +45,8 @@ export class ReactionClient {
       .operations()
       .execute(createReactionOperation(
         {
-          app: target.app,
-          target: target.address,
+          app: this.app,
+          target,
           reactionType
         }
       ), options);
@@ -53,44 +54,64 @@ export class ReactionClient {
 
   /**
    * Delete the existing Reaction with Target Publication given.
-   * @param {Publication} target - The given Publication instance
+   * @param {PublicKey} target - The given Target entity PublicKey
    * @param {OperationOptions} options - The optional operation options
    * @returns {Pomise<SendAndConfirmTransactionResponse>} The response of the Reaction delete.
    */
-  delete(
-    target: Publication,
+  deleteReaction(
+    target: PublicKey,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
       .execute(deleteReactionOperation(
         {
-          app: target.app,
-          target: target.address,
+          app: this.app,
+          target,
         }
       ),
         options
       );
   }
 
-  /** {@inheritDoc findAllReactionsOperation} */
-  keysByFilter(
-    input: FindAllReactionsInput,
+  /** {@inheritDoc findReactionsOperation} */
+  findReactions(
+    filter: Omit<FindReactionsInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllReactionsOperation(input), options);
+      .execute(findReactionsOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
   }
 
-  /** {@inheritDoc findAllReactionsByKeyListOperation} */
-  findByKeyList(
-    input: FindAllReactionsByKeyListInput,
+  /** {@inheritDoc findReactionsOperation} */
+  findReactionsAsKeys(
+    filter: Omit<FindReactionsAsKeysInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllReactionsByKeyListOperation(input), options);
+      .execute(findReactionsAsKeysOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findReactionsByKeyListOperation} */
+  getReactionsByKeyList(
+    input: FindReactionsByKeyListInput,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findReactionsByKeyListOperation(input), options);
   }
 
 }

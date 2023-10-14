@@ -34,6 +34,8 @@ type UnderlyingProgramError = Error & { code?: number; logs?: string[] };
 /** @group Errors */
 export class ParsedProgramError extends ProgramError {
   readonly name: string = 'ParsedProgramError';
+
+  // @ts-ignore
   constructor(program: Program, cause: UnderlyingProgramError, logs: string[]) {
     const ofCode = cause.code ? ` of code [${cause.code}]` : '';
     const message =
@@ -48,6 +50,8 @@ export class ParsedProgramError extends ProgramError {
 /** @group Errors */
 export class UnknownProgramError extends ProgramError {
   readonly name: string = 'UnknownProgramError';
+
+  // @ts-ignore
   constructor(program: Program, cause: UnderlyingProgramError) {
     const ofCode = cause.code ? ` of code [${cause.code}]` : '';
     const message =

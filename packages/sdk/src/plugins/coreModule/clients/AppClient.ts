@@ -2,10 +2,14 @@ import { AppArgs } from '@ju-protocol/ju-core';
 import {
   CreateAppInput,
   createAppOperation,
+  findAppsOperation,
   findAppByAddressOperation,
   updateAppOperation,
+  FindAppsInput,
 } from '../operations';
 import { App } from '../models';
+import { FindAppsByKeyListInput, findAppsByKeyListOperation } from '../operations/app/findAppsByKeyList';
+import { FindAppsAsKeysInput, findAppsAsKeysOperation } from '../operations/app/findAppsAsKeys';
 import type { Ju } from '@/Ju';
 import { OperationOptions, PublicKey } from '@/types';
 
@@ -16,7 +20,7 @@ import { OperationOptions, PublicKey } from '@/types';
  *
  * @example
  * ```ts
- * const appClient = ju.core().app;
+ * const appClient = ju.core().apps();
  * ```
  *
  * @see {@link CoreClient} The `Core` client
@@ -32,7 +36,7 @@ export class AppClient {
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<App>} The App instance.
    */
-  get(
+  getApp(
     address: PublicKey,
     options?: OperationOptions
   ) {
@@ -47,7 +51,10 @@ export class AppClient {
   }
 
   /** {@inheritDoc createAppOperation} */
-  create(input: CreateAppInput, options?: OperationOptions) {
+  createApp(
+    input: CreateAppInput,
+    options?: OperationOptions
+  ) {
     return this.ju
       .operations()
       .execute(createAppOperation(input), options);
@@ -61,7 +68,7 @@ export class AppClient {
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<App>} Updated App instance.
    */
-  update(
+  updateApp(
     app: App,
     data: Partial<AppArgs>,
     options?: OperationOptions
@@ -73,15 +80,16 @@ export class AppClient {
           app: app.address,
           data: {
             metadataUri: data.metadataUri === undefined ? app.metadataUri : data.metadataUri,
-            profileNameRequired: data.profileNameRequired === undefined ? app.profileNameRequired : data.profileNameRequired,
-            profileSurnameRequired: data.profileSurnameRequired === undefined ? app.profileSurnameRequired : data.profileSurnameRequired,
+
+            profileGenderRequired: data.profileGenderRequired === undefined ? app.profileGenderRequired : data.profileGenderRequired,
+            profileFirstNameRequired: data.profileFirstNameRequired === undefined ? app.profileFirstNameRequired : data.profileFirstNameRequired,
+            profileLastNameRequired: data.profileLastNameRequired === undefined ? app.profileLastNameRequired : data.profileLastNameRequired,
             profileBirthdateRequired: data.profileBirthdateRequired === undefined ? app.profileBirthdateRequired : data.profileBirthdateRequired,
             profileCountryRequired: data.profileCountryRequired === undefined ? app.profileCountryRequired : data.profileCountryRequired,
             profileCityRequired: data.profileCityRequired === undefined ? app.profileCityRequired : data.profileCityRequired,
             profileMetadataUriRequired: data.profileMetadataUriRequired === undefined ? app.profileMetadataUriRequired : data.profileMetadataUriRequired,
-            subspaceNameRequired: data.subspaceNameRequired === undefined ? app.subspaceNameRequired : data.subspaceNameRequired,
             subspaceMetadataUriRequired: data.subspaceMetadataUriRequired === undefined ? app.subspaceMetadataUriRequired : data.subspaceMetadataUriRequired,
-            
+
             profileDeleteAllowed: data.profileDeleteAllowed === undefined ? app.profileDeleteAllowed : data.profileDeleteAllowed,
             subspaceDeleteAllowed: data.subspaceDeleteAllowed === undefined ? app.subspaceDeleteAllowed : data.subspaceDeleteAllowed,
             publicationDeleteAllowed: data.publicationDeleteAllowed === undefined ? app.publicationDeleteAllowed : data.publicationDeleteAllowed,
@@ -101,6 +109,36 @@ export class AppClient {
       ),
         options
       );
+  }
+
+  /** {@inheritDoc findAppsOperation} */
+  findApps(
+    input: FindAppsInput,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findAppsOperation(input), options);
+  }
+
+  /** {@inheritDoc findAppsAsKeysOperation} */
+  findAppsAsKeys(
+    input: FindAppsAsKeysInput,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findAppsAsKeysOperation(input), options);
+  }
+
+  /** {@inheritDoc findAppsByKeyListOperation} */
+  getAppsByKeyList(
+    input: FindAppsByKeyListInput,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findAppsByKeyListOperation(input), options);
   }
 
 }

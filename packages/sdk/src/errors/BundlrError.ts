@@ -11,6 +11,8 @@ export class BundlrError extends JuError {
 /** @group Errors */
 export class FailedToInitializeBundlrError extends BundlrError {
   readonly name: string = 'FailedToInitializeBundlrError';
+
+  // @ts-ignore
   constructor(cause: Error) {
     const message =
       'Bundlr could not be initialized. ' +
@@ -22,6 +24,8 @@ export class FailedToInitializeBundlrError extends BundlrError {
 /** @group Errors */
 export class FailedToConnectToBundlrAddressError extends BundlrError {
   readonly name: string = 'FailedToConnectToBundlrAddressError';
+
+  // @ts-ignore
   constructor(address: string, cause: Error) {
     const message =
       `Bundlr could not connect to the provided address [${address}]. ` +
@@ -34,6 +38,8 @@ export class FailedToConnectToBundlrAddressError extends BundlrError {
 /** @group Errors */
 export class AssetUploadFailedError extends BundlrError {
   readonly name: string = 'AssetUploadFailedError';
+
+  // @ts-ignore
   constructor(status: number) {
     const message =
       `The asset could not be uploaded to the Bundlr network and ` +
@@ -45,6 +51,8 @@ export class AssetUploadFailedError extends BundlrError {
 /** @group Errors */
 export class BundlrWithdrawError extends BundlrError {
   readonly name: string = 'BundlrWithdrawError';
+
+  // @ts-ignore
   constructor(status: number) {
     const message =
       `The balance could not be withdrawn from the Bundlr network and ` +

@@ -5,7 +5,7 @@ import {
   killStuckProcess,
   ju
 } from '../../helpers';
-import { toBirthDate, toJuFile } from '@/index';
+import { bytesArrToStr, toBirthDate, toJuFile } from '@/index';
 
 killStuckProcess();
 
@@ -21,7 +21,7 @@ test('[Setup]', async () => {
   const jp = await ju();
 
   /** App */
-  const appName = 'TestApp'
+  const appName = 'testapp'
   const appAuthority = jp.identity().publicKey;
 
   const testApp = jp.core().pdas().app({ appName });
@@ -30,9 +30,9 @@ test('[Setup]', async () => {
   const alice = {
     ju: await ju(),
     name: 'alice',
-    surname: 'Smith',
+    lastName: 'Smith',
     birthdate: [1990, 1, 21] as [number, number, number],
-    status: null,
+    status: '',
     json: {
       name: 'Alice',
       description: 'Alise is the 1st test user',
@@ -50,7 +50,7 @@ test('[Setup]', async () => {
   const bob = {
     ju: await ju(),
     name: 'bobb',
-    surname: 'Johnson',
+    lastName: 'Johnson',
     birthdate: [1991, 2, 23] as [number, number, number],
     status: 'Hey there!',
     json: {
@@ -62,7 +62,7 @@ test('[Setup]', async () => {
   const konrad = {
     ju: await ju(),
     name: 'konrad',
-    surname: 'Mikhelson',
+    lastName: 'Mikhelson',
     birthdate: [1992, 3, 29] as [number, number, number],
     status: 'LFG!!!',
     json: {
@@ -101,20 +101,20 @@ test('[Setup]', async () => {
       // Create a new App with minimum configuration.
       const {
         app
-      } = await jp.core().app.create(
+      } = await jp.core().apps().createApp(
         {
           appName,
           data: {
             metadataUri: uri,
 
-            profileNameRequired: true,
-            profileSurnameRequired: true,
+            profileGenderRequired: false,
+            profileFirstNameRequired: true,
+            profileLastNameRequired: true,
             profileBirthdateRequired: true,
             profileCountryRequired: false,
             profileCityRequired: false,
             profileMetadataUriRequired: true,
 
-            subspaceNameRequired: true,
             subspaceMetadataUriRequired: true,
 
             profileDeleteAllowed: false,
@@ -138,7 +138,7 @@ test('[Setup]', async () => {
 
       spok(t, app, {
         $topic: 'App test',
-        appName: 'TestApp',
+        appName,
         authority: jp.identity().publicKey,
         metadataUri: uri,
         registeringProcessor: null,
@@ -151,15 +151,15 @@ test('[Setup]', async () => {
 
     test('[Update] it can update an existing App', async (t: Test) => {
 
-      const updatedUri = 'https://example.com/app-updated-uri'
+      // const updatedUri = 'https://example.com/app-updated-uri'
 
-      const app = await jp.core().app.get(testApp);
+      const app = await jp.core().apps().getApp(testApp);
 
       // Update an existing App.
-      const updateResult = await jp.core().app.update(
+      const updateResult = await jp.core().apps().updateApp(
         app,
         {
-          metadataUri: updatedUri,
+          // metadataUri: updatedUri,
           profileDeleteAllowed: true,
           subspaceDeleteAllowed: true,
           publicationDeleteAllowed: true,
@@ -168,9 +168,9 @@ test('[Setup]', async () => {
 
       spok(t, updateResult.app, {
         $topic: 'App test',
-        appName: 'TestApp',
+        appName,
         authority: appAuthority,
-        metadataUri: updatedUri,
+        // metadataUri: updatedUri,
         profileDeleteAllowed: true,
         subspaceDeleteAllowed: true,
         publicationDeleteAllowed: true,
@@ -180,8 +180,8 @@ test('[Setup]', async () => {
 
   test('[Profiles]', async () => {
 
-    const updatedAlias1 = 'updatedAlias1';
-    const updatedAlias2 = 'updatedAlias2';
+    const updatedAlias1 = 'updated_alias1';
+    const updatedAlias2 = 'updated_alias2';
 
     test('[Create] it can create Profile 1 (Alice)', async (t: Test) => {
 
@@ -200,18 +200,18 @@ test('[Setup]', async () => {
       t.comment(`Alice metadata Avatar : ${metadata.avatar}`);
 
       // Create a new App Profile.
-      const { profile } = await alice.ju.core().profile.create(
+      const { profile } = await alice.ju.core().profiles(testApp).createProfile(
         {
-          app: testApp,
           data: {
             alias: alice.name,
             metadataUri: uri,
             statusText: alice.status,
-            name: alice.name,
-            surname: alice.surname,
+            gender: 1,
+            firstName: alice.name,
+            lastName: alice.lastName,
             birthDate: toBirthDate(...alice.birthdate),
-            countryCode: null,
-            cityCode: null,
+            countryCode: 0,
+            cityCode: 0,
             currentLocation: null
           }
         }
@@ -230,6 +230,9 @@ test('[Setup]', async () => {
         connectingProcessor: null,
       });
 
+      t.equal(profile.firstName, alice.name);
+      t.equal(profile.lastName, alice.lastName);
+
     });
 
     test('[Create] it can create Profile 2 (Bob)', async (t: Test) => {
@@ -239,18 +242,18 @@ test('[Setup]', async () => {
       // console.log('Bob uri :>> ', uri);
 
       // Create a new App Profile.
-      const { profile } = await bob.ju.core().profile.create(
+      const { profile } = await bob.ju.core().profiles(testApp).createProfile(
         {
-          app: testApp,
           data: {
             alias: bob.name,
             metadataUri: uri,
             statusText: bob.status,
-            name: bob.name,
-            surname: bob.surname,
+            gender: 0,
+            firstName: bob.name,
+            lastName: bob.lastName,
             birthDate: toBirthDate(...bob.birthdate),
-            countryCode: null,
-            cityCode: null,
+            countryCode: 0,
+            cityCode: 0,
             currentLocation: null
           }
         }
@@ -275,18 +278,18 @@ test('[Setup]', async () => {
       // console.log('Konrad uri :>> ', uri);
 
       // Create a new App Profile.
-      const { profile } = await konrad.ju.core().profile.create(
+      const { profile } = await konrad.ju.core().profiles(testApp).createProfile(
         {
-          app: testApp,
           data: {
             alias: konrad.name,
             metadataUri: uri,
             statusText: konrad.status,
-            name: konrad.name,
-            surname: konrad.surname,
+            gender: 0,
+            firstName: konrad.name,
+            lastName: konrad.lastName,
             birthDate: toBirthDate(...konrad.birthdate),
-            countryCode: null,
-            cityCode: null,
+            countryCode: 0,
+            cityCode: 0,
             currentLocation: null
           }
         }
@@ -306,10 +309,10 @@ test('[Setup]', async () => {
 
     test('[Update] it can delete Alias for Profile 1 (Alice)', async (t: Test) => {
 
-      const aliceProfile = await alice.ju.core().profile.get(aliceAddress);
+      const aliceProfile = await alice.ju.core().profiles(testApp).getProfile(aliceAddress);
 
       // Delete alias
-      const result = await alice.ju.core().profile.setAlias(aliceProfile, null);
+      const result = await alice.ju.core().profiles(testApp).updateProfile(aliceProfile, { alias: null });
 
       t.equal(result.profile.alias, null)
     });
@@ -317,13 +320,10 @@ test('[Setup]', async () => {
 
     test('[Update] it can register Alias for Profile 1 (Alice)', async (t: Test) => {
 
-      const profile = await alice.ju.core().profile.get(aliceAddress)
+      const profile = await alice.ju.core().profiles(testApp).getProfile(aliceAddress)
 
       // Update Status
-      const result = await alice.ju.core().profile.setAlias(
-        profile,
-        updatedAlias1
-      )
+      const result = await alice.ju.core().profiles(testApp).updateProfile(profile, { alias: updatedAlias1 })
 
       spok(t, result.profile, {
         $topic: 'Profile 1 Update test',
@@ -336,10 +336,10 @@ test('[Setup]', async () => {
 
       const updatedStatusText = 'updated status text';
 
-      const profile = await alice.ju.core().profile.get(aliceAddress)
+      const profile = await alice.ju.core().profiles(testApp).getProfile(aliceAddress)
 
       // Update Status
-      const result = await alice.ju.core().profile.update(
+      const result = await alice.ju.core().profiles(testApp).updateProfile(
         profile,
         {
           alias: updatedAlias2,
@@ -357,41 +357,41 @@ test('[Setup]', async () => {
 
     test('[Connect] user Bob can connect to Konrad', async (t: Test) => {
 
-      const konradProfile = await bob.ju.core().profile.get(konradAddress)
+      // const konradProfile = await bob.ju.core().app(testApp).getProfile(konradAddress)
 
       // Bob create new Connection with Konrad.
-      const { response } = await bob.ju.core().connection.create(konradProfile);
+      const { response } = await bob.ju.core().connections(testApp).createConnection(konradAddress);
 
       t.comment(`tx signature: ${response.signature}`);
     });
 
     test('[Connect] user Alice can connect to Konrad', async (t: Test) => {
 
-      const konradProfile = await alice.ju.core().profile.get(konradAddress)
+      // const konradProfile = await alice.ju.core().app(testApp).getProfile(konradAddress)
 
       // Create new Connection (subscribe to Alice group).
-      const { response } = await alice.ju.core().connection.create(konradProfile);
+      const { response } = await alice.ju.core().connections(testApp).createConnection(konradAddress);
 
       t.comment(`tx signature: ${response.signature}`);
     });
 
     test('[Connect] user Alice can connect to Bob', async (t: Test) => {
 
-      const bobProfile = await alice.ju.core().profile.get(bobAddress)
+      // const bobProfile = await alice.ju.core().profile.get(bobAddress)
 
       // Create new Connection (subscribe to Alice group).
-      const { response } = await alice.ju.core().connection.create(bobProfile);
+      const { response } = await alice.ju.core().connections(testApp).createConnection(bobAddress);
 
       t.comment(`tx signature: ${response.signature}`);
     });
 
     test('[Approve] Konrad can approve Alice Connection', async (t: Test) => {
 
-      const aliceProfile = await bob.ju.core().profile.get(aliceAddress)
+      // const aliceProfile = await bob.ju.core().profile.get(aliceAddress)
 
       // Create new Connection (subscribe to Alice group).
-      const { response } = await konrad.ju.core().connection.update(
-        aliceProfile,
+      const { response } = await konrad.ju.core().connections(testApp).updateConnection(
+        aliceAddress,
         konradAddress,
         true
       );
@@ -417,12 +417,12 @@ test('[Setup]', async () => {
       // t.comment(`Alice Subspace metadata Avatar : ${metadata.avatar}`);
 
       // Create a new App Profile.
-      const { subspace } = await alice.ju.core().subspace.create(
+      const { subspace } = await alice.ju.core().subspaces(testApp).createSubspace(
         {
-          app: testApp,
           data: {
             alias: alice.subspaceAlias,
             name: subspace1Name,
+            publishingPermission: 0,
             metadataUri: uri,
           },
           externalProcessors: {
@@ -446,16 +446,18 @@ test('[Setup]', async () => {
         collectingProcessor: null,
       });
 
+      t.equal(subspace.name, subspace1Name);
+
       subspace1 = subspace.address;
 
     });
 
     test('[Subscribe] user Bob can connect to Subspace 1', async (t: Test) => {
 
-      const subspace = await bob.ju.core().subspace.get(subspace1);
+      // const subspace = await bob.ju.core().subspace.get(subspace1);
 
       // Create new Connection (subscribe to Alice group).
-      const { response } = await bob.ju.core().connection.create(subspace);
+      const { response } = await bob.ju.core().connections(testApp).createConnection(subspace1);
 
       t.comment(`tx signature: ${response.signature}`);
 
@@ -466,10 +468,10 @@ test('[Setup]', async () => {
 
     test('[Subscribe] user Konrad can connect to Subspace 1', async (t: Test) => {
 
-      const subspace = await konrad.ju.core().subspace.get(subspace1);
+      // const subspace = await konrad.ju.core().subspace.get(subspace1);
 
       // Create new Connection (subscribe to Alice group).
-      const { response } = await konrad.ju.core().connection.create(subspace);
+      const { response } = await konrad.ju.core().connections(testApp).createConnection(subspace1);
 
       t.comment(`tx signature: ${response.signature}`);
 
@@ -478,18 +480,88 @@ test('[Setup]', async () => {
 
     });
 
-    test('[Approve] Alice can approve Konrad Subspace subscribtion', async (t: Test) => {
+    test('[Approve] Alice can approve Konrad Subspace 1 subscribtion', async (t: Test) => {
 
-      const konradProfile = await alice.ju.core().profile.get(konradAddress)
+      // const konradProfile = await alice.ju.core().app(testApp).getProfile(konradAddress)
 
       // Update Connection (Approve suscriber).
-      const { response } = await alice.ju.core().connection.update(
-        konradProfile,
+      const { response } = await alice.ju.core().connections(testApp).updateConnection(
+        konradAddress,
         subspace1,
         true
       );
 
       t.comment(`tx signature: ${response.signature}`);
+    });
+
+
+    test('[Management Create] Alice can add Konrad as Subspace 1 Manager with *Publisher* access', async (t: Test) => {
+
+      const { response } = await alice.ju.core().subspaces(testApp).addManager(
+        subspace1,
+        konradAddress,
+        0 // 0 - Publisher,  1 - Admin
+      );
+
+      t.comment(`tx signature: ${response.signature}`);
+    });
+
+    test('[Management Create] Alice can add Bob as Subspace Manager with *Publisher* access', async (t: Test) => {
+
+      const { response } = await alice.ju.core().subspaces(testApp).addManager(
+        subspace1,
+        bobAddress,
+        0 // 0 - Publisher, 1 - Admin
+      );
+
+      t.comment(`tx signature: ${response.signature}`);
+    });
+
+    test('[Management Update] Alice can update Bob access as Subspace Manager with *Admin* access', async (t: Test) => {
+
+      const { response } = await alice.ju.core().subspaces(testApp).updateManager(
+        subspace1,
+        bobAddress,
+        1 // 0 - Publisher, 1 - Admin
+      );
+
+      t.comment(`tx signature: ${response.signature}`);
+    });
+
+    test('[Management Query] Alice can find all Subspace Managers', async (t: Test) => {
+
+      const managers = await alice.ju.core().subspaces(testApp).findManagers(
+        {
+          subspace: subspace1
+        }
+      );
+
+      t.comment(`Managers length: ${managers.length}`);
+
+      t.equal(managers.length, 2);
+    });
+
+    test('[Management Delete] Alice can delete Bob from Subspace Managers', async (t: Test) => {
+
+      const { response } = await alice.ju.core().subspaces(testApp).deleteManager(
+        subspace1,
+        bobAddress
+      );
+
+      t.comment(`tx signature: ${response.signature}`);
+    });
+
+    test('[Management Query] Alice can find all Subspace Managers', async (t: Test) => {
+
+      const managers = await alice.ju.core().subspaces(testApp).findManagers(
+        {
+          subspace: subspace1
+        }
+      );
+
+      t.comment(`Managers length: ${managers.length}`);
+
+      t.equal(managers.length, 1);
     });
 
   })
@@ -506,9 +578,9 @@ test('[Setup]', async () => {
       const uri = 'test-uri';
 
       // Create a new App Profile.
-      const { publication } = await alice.ju.core().publication.create(
+      const { publication } = await alice.ju.core().publications(testApp).createPublication(
         {
-          app: testApp,
+          isEncrypted: true,
           metadataUri: uri,
           externalProcessors: {
             collectingProcessor: null,
@@ -529,7 +601,7 @@ test('[Setup]', async () => {
         isReply: false,
         subspace: null,
         contentType: 0,
-        tag: null,
+        // tag: '',
         metadataUri: uri,
         authority: alice.ju.identity().publicKey,
         collectingProcessor: null,
@@ -544,11 +616,11 @@ test('[Setup]', async () => {
       const uri = 'reply-test-uri';
 
       // Create a new App Profile.
-      const { publication } = await bob.ju.core().publication.create(
+      const { publication } = await bob.ju.core().publications(testApp).createPublication(
         {
-          app: testApp,
           isReply: true,
           target: publication1,
+          isEncrypted: true,
           metadataUri: uri,
           externalProcessors: {
             collectingProcessor: null,
@@ -557,7 +629,7 @@ test('[Setup]', async () => {
         }
       );
 
-      // console.log('Publication data: :>> ', publication.data);
+      t.comment(JSON.stringify(publication, null, 4));
 
       t.equal(publication.app.toBase58(), testApp.toBase58());
       t.equal(publication.targetPublication?.toBase58(), publication1.toBase58())
@@ -570,7 +642,7 @@ test('[Setup]', async () => {
         isReply: true,
         subspace: null,
         contentType: 0,
-        tag: null,
+        // tag: null,
         metadataUri: uri,
         authority: bob.ju.identity().publicKey,
         collectingProcessor: null,
@@ -584,9 +656,9 @@ test('[Setup]', async () => {
       const tag = 'solanax100';
 
       // Create a new App Profile.
-      const { publication } = await alice.ju.core().publication.create(
+      const { publication } = await alice.ju.core().publications(testApp).createPublication(
         {
-          app: testApp,
+          isEncrypted: true,
           metadataUri: uri,
           subspace: subspace1,
           tag,
@@ -599,14 +671,66 @@ test('[Setup]', async () => {
 
       publication2 = publication.address;
 
-      // console.log('Publication data: :>> ', publication);
+      t.comment(JSON.stringify(publication, null, 4));
 
       t.equal(publication.address.toBase58(), publication2.toBase58(), 'Publication public key');
       t.equal(publication.app.toBase58(), testApp.toBase58(), 'App');
       t.equal(publication.subspace?.toBase58(), subspace1.toBase58(), 'Subspace');
       t.equal(publication.metadataUri, uri, 'URI');
+      
       t.equal(publication.tag, tag, 'Tag');
 
+
+    });
+
+
+    test('[Query] it can query all Publications', async (t: Test) => {
+
+      const publications = await bob.ju.core().publications(testApp).findPublications(
+        {
+          app: testApp
+        }
+      );
+
+      t.equal(publications.length, 3);
+
+    });
+
+    test('[Query] it can query all Publications by Profile', async (t: Test) => {
+
+      const publications = await bob.ju.core().publications(testApp).findPublications(
+        {
+          profile: aliceAddress
+        }
+      );
+
+      t.equal(publications.length, 2);
+
+    });
+
+    test('[Query] it can query all Subspace Publications', async (t: Test) => {
+
+      const publications = await bob.ju.core().publications(testApp).findPublications(
+        {
+          subspace: subspace1
+        }
+      );
+
+      t.equal(publications.length, 1);
+
+    });
+
+    test('[Query] it can query all Publication1 Reply', async (t: Test) => {
+
+      const publications = await bob.ju.core().publications(testApp).findPublications(
+        {
+          // isEncrypted: true,
+          // isReply: true,
+          targetPublication: publication1
+        }
+      );
+
+      t.equal(publications.length, 1);
 
     });
 
@@ -618,11 +742,11 @@ test('[Setup]', async () => {
     test('[Create] Bob can create Reaction to Publication1', async (t: Test) => {
 
       // Get Publication instance
-      const publication = await bob.ju.core().publication.get(publication1);
+      // const publication = await bob.ju.core().app(testApp).getPublication(publication1);
 
       // Create a new Reaction
-      const { response } = await bob.ju.core().reaction.create(
-        publication,
+      const { response } = await bob.ju.core().reactions(testApp).createReaction(
+        publication1,
         0,
       );
 
@@ -633,11 +757,11 @@ test('[Setup]', async () => {
     test('[Create] Konrad can create Reaction to Publication1', async (t: Test) => {
 
       // Get Publication instance
-      const publication = await konrad.ju.core().publication.get(publication1);
+      // const publication = await konrad.ju.core().app(testApp).getPublication(publication1);
 
       // Create a new Reaction
-      const { response } = await konrad.ju.core().reaction.create(
-        publication,
+      const { response } = await konrad.ju.core().reactions(testApp).createReaction(
+        publication1,
         0,
       );
 
@@ -653,9 +777,8 @@ test('[Setup]', async () => {
     test('[Create] Konrad can create Report to Publication1', async (t: Test) => {
 
       // Create a new Reaction
-      const { response } = await bob.ju.core().report.create(
+      const { response } = await bob.ju.core().reports(testApp).createReport(
         {
-          app: testApp,
           target: publication1,
           reportType: 0,
           notificationString: publicationReportString
@@ -669,9 +792,8 @@ test('[Setup]', async () => {
     test('[Create] Alice can create Report to Konrads Profile', async (t: Test) => {
 
       // Create a new Reaction
-      const { response } = await alice.ju.core().report.create(
+      const { response } = await alice.ju.core().reports(testApp).createReport(
         {
-          app: testApp,
           target: konrad.ju.core().pdas().profile({ app: testApp }),
           reportType: 1,
           notificationString: profileReportString
@@ -684,10 +806,9 @@ test('[Setup]', async () => {
 
     test('[Create] Bob can create Report to Alice Group', async (t: Test) => {
 
-      // Create a new Reaction
-      const { response } = await alice.ju.core().report.create(
+      // Create a new Report
+      const { response } = await alice.ju.core().reports(testApp).createReport(
         {
-          app: testApp,
           target: subspace1,
           reportType: 0,
           notificationString: subspaceReportString
@@ -706,7 +827,7 @@ test('[Setup]', async () => {
     test('[Fetch] it can find single Application Profile with Metadata', async (t: Test) => {
 
       // Fetch Profile.
-      const profile = await alice.ju.core().profile.get(aliceAddress);
+      const profile = await alice.ju.core().profiles(testApp).getProfile(aliceAddress);
 
       t.comment(`Profile: ${profile.address}`);
 
@@ -722,9 +843,9 @@ test('[Setup]', async () => {
 
     test('[Query] it can find all Application Profiles', async (t: Test) => {
 
-      const profiles = await alice.ju.core().profile.keysByFilter(
+      const profiles = await alice.ju.core().profiles(testApp).findProfiles(
         {
-          app: testApp
+          // all over the App
         }
       );
 
@@ -733,17 +854,25 @@ test('[Setup]', async () => {
 
     });
 
-    test('[Query] it can find all Subspace 1 (Alice group) subscribers', async (t: Test) => {
+    test('[Query] it can find all Application Subspaces', async (t: Test) => {
 
-      const subspace = await konrad.ju.core().subspace.get(subspace1);
-
-      // Create a new App Profile.
-      const profiles = await alice.ju.core().profile.findByConnectionTarget(
+      const profiles = await alice.ju.core().subspaces(testApp).findSubspaces(
         {
-          app: testApp,
-          target: subspace.address
+          // all over the App
         }
       );
+
+      t.equal(profiles.length, 1);
+      // console.log(profiles);
+
+    });
+
+    test('[Query] it can find all Subspace 1 (Alice group) subscribers', async (t: Test) => {
+
+      // const subspace = await konrad.ju.core().subspaces(testApp).getSubspace(subspace1);
+
+      // Create a new App Profile.
+      const profiles = await alice.ju.core().profiles(testApp).findProfilesAsKeysByConnectionTarget(subspace1);
 
       t.equal(profiles.length, 2);
       // console.log(profiles);
@@ -752,13 +881,7 @@ test('[Setup]', async () => {
     test('[Query] it can find Approved Subspace 1 (Alice group) subscribers', async (t: Test) => {
 
       // Create a new App Profile.
-      const profiles = await alice.ju.core().profile.findByConnectionTarget(
-        {
-          app: testApp,
-          target: subspace1,
-          approved: true
-        }
-      );
+      const profiles = await alice.ju.core().profiles(testApp).findProfilesAsKeysByConnectionTarget(subspace1, true);
 
       t.equal(profiles.length, 1);
       t.equal(profiles[0].toBase58(), konrad.ju.core().pdas().profile({ app: testApp }).toBase58());
@@ -767,13 +890,8 @@ test('[Setup]', async () => {
 
     test('[Query] it can find all Alice friends (connections as initializer)', async (t: Test) => {
 
-      // Create a new App Profile.
-      const profiles = await alice.ju.core().profile.findByConnectionInitializer(
-        {
-          app: testApp,
-          initializer: alice.ju.core().pdas().profile({ app: testApp })
-        }
-      );
+      // Query
+      const profiles = await alice.ju.core().profiles(testApp).findProfilesAsKeysByConnectionInitializer(aliceAddress);
 
       t.equal(profiles.length, 2);
       // console.log(profiles);
@@ -782,10 +900,7 @@ test('[Setup]', async () => {
     test('[Fetch] it can find Entity by Alias name', async (t: Test) => {
 
       // Fetch Profile.
-      const result = await konrad.ju.core().common.findEntityByAliasValue(
-        testApp,
-        konrad.name
-      );
+      const result = await konrad.ju.core().utils(testApp).findEntityByAliasValue(konrad.name);
 
       t.comment(`Entity - ${result ? result.address : 'not found'}`);
       t.equal(result?.alias, konrad.name)
@@ -800,10 +915,7 @@ test('[Setup]', async () => {
     test('[Fetch] it can NOT find Entity by nonexistent Alias name', async (t: Test) => {
 
       // Fetch Profile.
-      const result = await konrad.ju.core().common.findEntityByAliasValue(
-        testApp,
-        'nonexistalias'
-      );
+      const result = await konrad.ju.core().utils(testApp).findEntityByAliasValue('nonexistalias');
 
       t.comment(`Entity - ${result ? result.address : 'not found'}`);
       t.equal(result, null)
@@ -812,9 +924,8 @@ test('[Setup]', async () => {
     test('[Reactions Fetch] it can find All Publication reactions', async (t: Test) => {
 
       // Fetch Upvote (reactionType = 0) Reactions.
-      const reactions = await konrad.ju.core().reaction.keysByFilter(
+      const reactions = await konrad.ju.core().reactions(testApp).findReactionsAsKeys(
         {
-          app: testApp,
           target: publication1,
           reactionType: 0
         }
@@ -826,5 +937,7 @@ test('[Setup]', async () => {
     });
 
   });
+
+
 
 })

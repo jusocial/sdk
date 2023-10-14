@@ -5,6 +5,7 @@ import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { Subspace } from '../../models/Subspace';
 import { generateUuid, toOptionalAccount } from '../../helpers';
 import { ExternalProcessors } from '../../types';
+import { findSubspaceByAddressOperation } from './findSubspaceByAddress';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';
 import {
   makeConfirmOptionsFinalizedOnMainnet,
@@ -31,6 +32,7 @@ const Key = 'CreateSubspaceOperation' as const;
  * ```ts
  * await ju
  *   .core()
+ *   .subspaces(app)
  *   .createSubspace({ });
  * ```
  *
@@ -113,12 +115,16 @@ export const createSubspaceOperationHandler: OperationHandler<CreateSubspaceOper
 
     // Retrieve Subspace
     const subspace = await ju
-      .core()
-      .subspace
-      .get(
-        output.subspaceAddress,
+      .operations()
+      .execute(findSubspaceByAddressOperation(
+        {
+          subspace: output.subspaceAddress,
+          loadJsonMetadata: operation.input.loadJsonMetadata
+        },
+      ),
         scope
       );
+
 
     if (!subspace) {
       // TO-DO
@@ -174,11 +180,11 @@ export const createSubspaceBuilder = (
   // Data.
   const { programs, payer = ju.rpc().getDefaultFeePayer() } = options;
 
-  const { 
+  const {
     app,
     data,
     externalProcessors
-   } = params;
+  } = params;
 
   // UUID
   const uuid = generateUuid();

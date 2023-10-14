@@ -13,6 +13,8 @@ export class SdkError extends JuError {
 /** @group Errors */
 export class OperationHandlerMissingError extends SdkError {
   readonly name: string = 'OperationHandlerMissingError';
+
+  // @ts-ignore
   constructor(operationKey: string) {
     const message =
       `No operation handler was registered for the [${operationKey}] operation. ` +
@@ -25,6 +27,8 @@ export class OperationHandlerMissingError extends SdkError {
 /** @group Errors */
 export class DriverNotProvidedError extends SdkError {
   readonly name: string = 'DriverNotProvidedError';
+
+  // @ts-ignore
   constructor(driver: string) {
     const message =
       `The SDK tried to access the driver [${driver}] but was not provided. ` +
@@ -38,6 +42,8 @@ export class UnexpectedCurrencyError extends SdkError {
   readonly name: string = 'UnexpectedCurrencyError';
   readonly actual: Currency;
   readonly expected: Currency;
+
+  // @ts-ignore
   constructor(actual: Currency, expected: Currency) {
     const message =
       `Expected currency [${expected}] but got [${actual}]. ` +
@@ -54,6 +60,8 @@ export class CurrencyMismatchError extends SdkError {
   readonly left: Currency;
   readonly right: Currency;
   readonly operation?: string;
+
+  // @ts-ignore
   constructor(left: Currency, right: Currency, operation?: string) {
     const wrappedOperation = operation ? ` [${operation}]` : '';
     const message =
@@ -92,6 +100,8 @@ export class InvalidJsonStringError extends SdkError {
 /** @group Errors */
 export class OperationUnauthorizedForGuestsError extends SdkError {
   readonly name: string = 'OperationUnauthorizedForGuestsError';
+
+  // @ts-ignore
   constructor(operation: string) {
     const message =
       `Trying to access the [${operation}] operation as a guest. ` +
@@ -105,6 +115,8 @@ export class OperationUnauthorizedForGuestsError extends SdkError {
 /** @group Errors */
 export class UninitializedWalletAdapterError extends SdkError {
   readonly name: string = 'UninitializedWalletAdapterError';
+
+  // @ts-ignore
   constructor() {
     const message =
       `The current wallet adapter is not initialized. ` +
@@ -117,6 +129,8 @@ export class UninitializedWalletAdapterError extends SdkError {
 /** @group Errors */
 export class OperationNotSupportedByWalletAdapterError extends SdkError {
   readonly name: string = 'OperationNotSupportedByWalletAdapterError';
+
+  // @ts-ignore
   constructor(operation: string) {
     const message =
       `The current wallet adapter does not support the following operation: [${operation}]. ` +
@@ -128,6 +142,8 @@ export class OperationNotSupportedByWalletAdapterError extends SdkError {
 /** @group Errors */
 export class TaskIsAlreadyRunningError extends SdkError {
   readonly name: string = 'TaskIsAlreadyRunningError';
+
+  // @ts-ignore
   constructor() {
     const message =
       `Trying to re-run a task that hasn't completed yet. ` +
@@ -147,6 +163,8 @@ export class AssetNotFoundError extends SdkError {
 /** @group Errors */
 export class AccountNotFoundError extends SdkError {
   readonly name: string = 'AccountNotFoundError';
+
+  // @ts-ignore
   constructor(address: PublicKey, accountType?: string, solution?: string) {
     const message =
       (accountType
@@ -161,6 +179,8 @@ export class AccountNotFoundError extends SdkError {
 /** @group Errors */
 export class UnexpectedAccountError extends SdkError {
   readonly name: string = 'UnexpectedAccountError';
+
+  // @ts-ignore
   constructor(address: PublicKey, expectedType: string, cause?: Error) {
     const message =
       `The account at the provided address [${address.toString()}] ` +
@@ -172,6 +192,8 @@ export class UnexpectedAccountError extends SdkError {
 /** @group Errors */
 export class UnexpectedTypeError extends SdkError {
   readonly name: string = 'UnexpectedTypeError';
+
+  // @ts-ignore
   constructor(variable: string, actualType: string, expectedType: string) {
     const message =
       `Expected variable [${variable}] to be ` +
@@ -183,6 +205,8 @@ export class UnexpectedTypeError extends SdkError {
 /** @group Errors */
 export class ExpectedSignerError extends SdkError {
   readonly name: string = 'ExpectedSignerError';
+
+  // @ts-ignore
   constructor(variable: string, actualType: string, solution?: string) {
     const message =
       `Expected variable [${variable}] to be of type [Signer] but got [${actualType}]. ` +
@@ -198,6 +222,8 @@ export class ProgramNotRecognizedError extends SdkError {
   readonly name: string = 'ProgramNotRecognizedError';
   readonly nameOrAddress: string | PublicKey;
   readonly cluster: Cluster;
+
+  // @ts-ignore
   constructor(nameOrAddress: string | PublicKey, cluster: Cluster) {
     const isName = typeof nameOrAddress === 'string';
     const toString = isName ? nameOrAddress : nameOrAddress.toString();
@@ -215,6 +241,8 @@ export class ProgramNotRecognizedError extends SdkError {
 /** @group Errors */
 export class NoInstructionsToSendError extends SdkError {
   readonly name: string = 'NoInstructionsToSendError';
+
+  // @ts-ignore
   constructor(operation: string, solution?: string) {
     const message =
       `The input provided to the [${operation}] resulted ` +
@@ -230,6 +258,8 @@ export class NoInstructionsToSendError extends SdkError {
 /** @group Errors */
 export class FailedToSerializeDataError extends SdkError {
   readonly name: string = 'FailedToSerializeDataError';
+
+  // @ts-ignore
   constructor(dataDescription: string, cause?: Error) {
     const message = `The received data could not be serialized as a [${dataDescription}].`;
     super(message, cause);
@@ -239,6 +269,8 @@ export class FailedToSerializeDataError extends SdkError {
 /** @group Errors */
 export class FailedToDeserializeDataError extends SdkError {
   readonly name: string = 'FailedToDeserializeDataError';
+
+  // @ts-ignore
   constructor(dataDescription: string, cause?: Error) {
     const message = `The received serialized data could not be deserialized to a [${dataDescription}].`;
     super(message, cause);
@@ -248,6 +280,8 @@ export class FailedToDeserializeDataError extends SdkError {
 /** @group Errors */
 export class MissingInputDataError extends SdkError {
   readonly name: string = 'MissingInputDataError';
+
+  // @ts-ignore
   constructor(missingParameters: string[], solution?: string) {
     const message =
       `Some parameters are missing from the provided input object. ` +
@@ -261,6 +295,8 @@ export class MissingInputDataError extends SdkError {
 /** @group Errors */
 export class NotYetImplementedError extends SdkError {
   readonly name: string = 'NotYetImplementedError';
+
+  // @ts-ignore
   constructor() {
     const message = `This feature is not yet implemented. Please check back later.`;
     super(message);
@@ -270,6 +306,8 @@ export class NotYetImplementedError extends SdkError {
 /** @group Errors */
 export class UnreachableCaseError extends SdkError {
   readonly name: string = 'UnreachableCaseError';
+
+  // @ts-ignore
   constructor(value: never) {
     const message =
       `A switch statement is not handling the provided case [${value}]. ` +

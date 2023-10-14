@@ -1,4 +1,5 @@
 import type { PublicKey } from '@solana/web3.js';
+import { findConnectionsOperation } from '../connections';
 import {
   Operation,
   OperationHandler,
@@ -11,30 +12,31 @@ import type { Ju } from '@/Ju';
 // Operation
 // -----------------
 
-const Key = 'FindAllSubspacesByConnectionTargetOperation' as const;
+const Key = 'FindSubspacesAsKeysByConnectionTargetOperation' as const;
 
 /**
- * Finds all Subspaces for specified Application.
+ * Finds Subspaces by filters (as Public keys Array).
  *
  * ```ts
  * const subspace = await ju
  *   .core()
- *   .findAllSubspacesByConnectionTarget({ });
+ *   .subspaces(app)
+ *   .findSubspacesAsKeysByConnectionTarget();
  * ```
  *
  * @group Operations
  * @category Constructors
  */
-export const findAllSubspacesByConnectionTargetOperation =
-  useOperation<FindAllSubspacesByConnectionTargetOperation>(Key);
+export const findSubspacesAsKeysByConnectionTargetOperation =
+  useOperation<FindSubspacesAsKeysByConnectionTargetOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllSubspacesByConnectionTargetOperation = Operation<
+export type FindSubspacesAsKeysByConnectionTargetOperation = Operation<
   typeof Key,
-  FindAllSubspacesByConnectionTargetInput,
+  FindSubspacesAsKeysByConnectionTargetInput,
   PublicKey[]
 >;
 
@@ -42,7 +44,7 @@ export type FindAllSubspacesByConnectionTargetOperation = Operation<
  * @group Operations
  * @category Inputs
  */
-export type FindAllSubspacesByConnectionTargetInput = {
+export type FindSubspacesAsKeysByConnectionTargetInput = {
   /** The address of the Application. */
   app: PublicKey;
 
@@ -57,16 +59,16 @@ export type FindAllSubspacesByConnectionTargetInput = {
  * @group Operations
  * @category Outputs
  */
-// export type FindAllSubspacesByConnectionTargetOutput = Subspace[];
+// export type FindSubspacesAsKeysByConnectionTargetOutput = Subspace[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllSubspacesByConnectionTargetOperationHandler: OperationHandler<FindAllSubspacesByConnectionTargetOperation> =
+export const findSubspacesAsKeysByConnectionTargetOperationHandler: OperationHandler<FindSubspacesAsKeysByConnectionTargetOperation> =
 {
   handle: async (
-    operation: FindAllSubspacesByConnectionTargetOperation,
+    operation: FindSubspacesAsKeysByConnectionTargetOperation,
     ju: Ju,
     scope: OperationScope
   ) => {
@@ -77,15 +79,9 @@ export const findAllSubspacesByConnectionTargetOperationHandler: OperationHandle
       approved
     } = operation.input;
 
-    const connectionAddresses = await ju.core().connection.keysByFilter({ app, target, approved });
-    scope.throwIfCanceled();
-
-    const connections = await ju.core().connection.findByKeyList(
-      {
-        keys: connectionAddresses,
-      }
-      , scope
-    );
+    const connections = await ju
+      .operations()
+      .execute(findConnectionsOperation({ app, target, approved }), scope);
     scope.throwIfCanceled();
 
     const initializers = connections

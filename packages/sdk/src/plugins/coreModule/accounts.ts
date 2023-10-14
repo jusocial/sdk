@@ -6,7 +6,8 @@ import {
   Subspace,
   Reaction,
   Publication,
-  Report
+  Report,
+  SubspaceManager
 } from '@ju-protocol/ju-core';
 import {
   Account,
@@ -21,6 +22,7 @@ export type ProfileAccount = Account<Profile>;
 export type AliasAccount = Account<Alias>;
 export type ConnectionAccount = Account<Connection>;
 export type SubspaceAccount = Account<Subspace>;
+export type SubspaceManagerAccount = Account<SubspaceManager>;
 export type ReactionAccount = Account<Reaction>;
 export type PublicationAccount = Account<Publication>;
 export type ReportAccount = Account<Report>;
@@ -31,6 +33,7 @@ export const parseProfileAccount = getAccountParsingFunction(Profile);
 export const parseAliasAccount = getAccountParsingFunction(Alias);
 export const parseConnectionAccount = getAccountParsingFunction(Connection);
 export const parseSubspaceAccount = getAccountParsingFunction(Subspace);
+export const parseSubspaceManagerAccount = getAccountParsingFunction(SubspaceManager);
 export const parseReactionAccount = getAccountParsingFunction(Reaction);
 export const parsePublicationAccount = getAccountParsingFunction(Publication);
 export const parseReportAccount = getAccountParsingFunction(Report);
@@ -41,6 +44,7 @@ export const toProfileAccount = getAccountParsingAndAssertingFunction(Profile);
 export const toAliasAccount = getAccountParsingAndAssertingFunction(Alias);
 export const toConnectionAccount = getAccountParsingAndAssertingFunction(Connection);
 export const toSubspaceAccount = getAccountParsingAndAssertingFunction(Subspace);
+export const toSubspaceManagerAccount = getAccountParsingAndAssertingFunction(SubspaceManager);
 export const toReactionAccount = getAccountParsingAndAssertingFunction(Reaction);
 export const toPublicationAccount = getAccountParsingAndAssertingFunction(Publication);
 export const toReportAccount = getAccountParsingAndAssertingFunction(Report);

@@ -103,14 +103,6 @@ export const findAppByAddressOperationHandler: OperationHandler<FindAppByAddress
       }
     }
 
-    // if (appAccount.data.authority.toBase58() === ju.identity().publicKey.toBase58()) {
-    //   return new AppAdmin(
-    //     ju,
-    //     appAccount,
-    //     metadataJson
-    //   );
-    // }
-
     return toApp(
       appAccount,
       metadataJson

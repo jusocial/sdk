@@ -12,17 +12,17 @@ import type { Ju } from '@/Ju';
 // Operation
 // -----------------
 
-const Key = 'FindAllPublicationsOperation' as const;
+const Key = 'FindPublicationsAsKeysOperation' as const;
 
 /**
- * Finds all Profiles for specified Application.
+ * Finds all Profiles for specified Application (as Public keys Array).
  *
  * ```ts
  * const profile = await ju
  *   .core()
- *   .findAllPublications(
+ *   .publications(app)
+ *   .findPublicationsAsKeys(
  *      {
- *        app: JP8sM3QGJxEdGpZ3MJP8sM3QypwzuzZpko1ueonUQgT,
  *        profile: ldkfgM3QGJxEdGpZ3MJP8sM3QypwzuzZpko1ueonUQasW,
  *        isMirror: true
  *      }
@@ -32,16 +32,16 @@ const Key = 'FindAllPublicationsOperation' as const;
  * @group Operations
  * @category Constructors
  */
-export const findAllPublicationsOperation =
-  useOperation<FindAllPublicationsOperation>(Key);
+export const findPublicationsAsKeysOperation =
+  useOperation<FindPublicationsAsKeysOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllPublicationsOperation = Operation<
+export type FindPublicationsAsKeysOperation = Operation<
   typeof Key,
-  FindAllPublicationsInput,
+  FindPublicationsAsKeysInput,
   PublicKey[]
 >;
 
@@ -49,15 +49,22 @@ export type FindAllPublicationsOperation = Operation<
  * @group Operations
  * @category Inputs
  */
-export type FindAllPublicationsInput = {
+export type FindPublicationsAsKeysInput = {
   /** The address of the Application. */
-  app: PublicKey;
+  app?: PublicKey;
 
   /** The address of the Publication creator Profile (for additional filtering) */
   profile?: PublicKey;
 
   /** Subspace as Publication destination  (for additional filtering)*/
   subspace?: PublicKey;
+
+  /**
+  * Whether or not Publication contain encrypted content
+  *
+  * @defaultValue `false`
+  */
+  isEncrypted?: boolean;
 
   /** Is Publication mirroring another Publication (for additional filtering) */
   isMirror?: boolean;
@@ -87,16 +94,16 @@ export type FindAllPublicationsInput = {
  * @group Operations
  * @category Outputs
  */
-// export type FindAllPublicationsOutput = PublicKey[];
+// export type FindPublicationsAsKeysOutput = PublicKey[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllPublicationsOperationHandler: OperationHandler<FindAllPublicationsOperation> =
+export const findPublicationsAsKeysOperationHandler: OperationHandler<FindPublicationsAsKeysOperation> =
 {
   handle: async (
-    operation: FindAllPublicationsOperation,
+    operation: FindPublicationsAsKeysOperation,
     ju: Ju,
     scope: OperationScope
   ) => {
@@ -105,6 +112,7 @@ export const findAllPublicationsOperationHandler: OperationHandler<FindAllPublic
       app,
       profile,
       subspace,
+      isEncrypted,
       isMirror,
       isReply,
       targetPublication,
@@ -114,9 +122,10 @@ export const findAllPublicationsOperationHandler: OperationHandler<FindAllPublic
 
     // Building GPA
     const builder = Publication.gpaBuilder();
+
     // Add discriminator
     builder.addFilter("accountDiscriminator", publicationDiscriminator);
-    
+
     // Add additional filters
 
     if (app) {
@@ -128,10 +137,13 @@ export const findAllPublicationsOperationHandler: OperationHandler<FindAllPublic
     if (subspace) {
       builder.addFilter("subspace", subspace)
     }
-    if (isMirror) {
+    if (isEncrypted !== undefined) {
+      builder.addFilter('isEncrypted', isEncrypted)
+    }
+    if (isMirror !== undefined) {
       builder.addFilter("isMirror", isMirror)
     }
-    if (isReply) {
+    if (isReply !== undefined) {
       builder.addFilter("isReply", isReply)
     }
     if (targetPublication) {
@@ -145,7 +157,7 @@ export const findAllPublicationsOperationHandler: OperationHandler<FindAllPublic
     }
 
     // Limit returned accouns data to minimum
-    builder.config.dataSlice = {offset: 0, length: 0};
+    builder.config.dataSlice = { offset: 0, length: 0 };
 
     const result = await builder.run(ju.connection);
 

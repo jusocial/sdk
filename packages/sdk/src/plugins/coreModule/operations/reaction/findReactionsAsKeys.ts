@@ -12,30 +12,31 @@ import type { Ju } from '@/Ju';
 // Operation
 // -----------------
 
-const Key = 'FindAllReactionsOperation' as const;
+const Key = 'FindReactionsAsKeysOperation' as const;
 
 /**
- * Finds all Reactions for specified filters.
+ * Finds all Reactions by specified filters (as Public keys Array).
  *
  * ```ts
  * const profile = await ju
  *   .core()
- *   .findAllReactions({ });
+ *   .reactions(app)
+ *   .findReactionsAsKeys({ });
  * ```
  *
  * @group Operations
  * @category Constructors
  */
-export const findAllReactionsOperation =
-  useOperation<FindAllReactionsOperation>(Key);
+export const findReactionsAsKeysOperation =
+  useOperation<FindReactionsAsKeysOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllReactionsOperation = Operation<
+export type FindReactionsAsKeysOperation = Operation<
   typeof Key,
-  FindAllReactionsInput,
+  FindReactionsAsKeysInput,
   PublicKey[]
 >;
 
@@ -43,7 +44,7 @@ export type FindAllReactionsOperation = Operation<
  * @group Operations
  * @category Inputs
  */
-export type FindAllReactionsInput = {
+export type FindReactionsAsKeysInput = {
   /** The address of the Application. */
   app: PublicKey;
 
@@ -64,16 +65,16 @@ export type FindAllReactionsInput = {
 //  * @group Operations
 //  * @category Outputs
 //  */
-// export type FindAllReactionsOutput = Reaction[];
+// export type FindReactionsOutput = Reaction[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllReactionsOperationHandler: OperationHandler<FindAllReactionsOperation> =
+export const findReactionsAsKeysOperationHandler: OperationHandler<FindReactionsAsKeysOperation> =
 {
   handle: async (
-    operation: FindAllReactionsOperation,
+    operation: FindReactionsAsKeysOperation,
     ju: Ju,
     scope: OperationScope
   ) => {

@@ -1,20 +1,27 @@
-import { SubspaceArgs } from '@ju-protocol/ju-core';
+import { SubspaceData, SubspaceManagementRoleType } from '@ju-protocol/ju-core';
 import {
-  FindAllSubspacesInput,
-  findAllSubspacesOperation,
-  FindAllSubspacesByKeyListInput,
-  findAllSubspacesByKeyListOperation,
+  FindSubspacesInput,
+  findSubspacesOperation,
+  FindSubspacesByKeyListInput,
+  findSubspacesByKeyListOperation,
   findSubspaceByAddressOperation,
   CreateSubspaceInput,
   createSubspaceOperation,
   updateSubspaceOperation,
   deleteSubspaceOperation,
-  FindAllSubspacesByConnectionTargetInput,
-  findAllSubspacesByConnectionTargetOperation,
-  FindAllSubspacesByConnectionInitializerInput,
-  findAllSubspacesByConnectionInitializerOperation,
+  FindSubspacesAsKeysByConnectionTargetInput,
+  findSubspacesAsKeysByConnectionTargetOperation,
+  FindSubspacesAsKeysByConnectionInitializerInput,
+  findSubspacesAsKeysByConnectionInitializerOperation,
+  findSubspacesAsKeysOperation,
+  FindSubspacesAsKeysInput,
 } from '../operations';
 import { Subspace } from '../models';
+import { addSubspaceManagerOperation } from '../operations/subspace/addSubspaceManager';
+import { deleteSubspaceManagerOperation } from '../operations/subspace/deleteSubspaceManager';
+import { updateSubspaceManagerOperation } from '../operations/subspace/updateSubspaceManager';
+import { FindSubspaceManagersInput, findSubspaceManagersOperation } from '../operations/subspace/findSubspaceManagers';
+import { ExternalProcessors } from '../types';
 import type { Ju } from '@/Ju';
 import { OperationOptions, PublicKey } from '@/types';
 
@@ -25,7 +32,7 @@ import { OperationOptions, PublicKey } from '@/types';
  *
  * @example
  * ```ts
- * const subspaceClient = ju.core().subspace;
+ * const subspaceClient = ju.core().subspaces(app);
  * ```
  *
  * @see {@link CoreClient} The `Core` client
@@ -33,16 +40,18 @@ import { OperationOptions, PublicKey } from '@/types';
  */
 export class SubspaceClient {
 
-  constructor(readonly ju: Ju) { }
+  constructor(readonly ju: Ju, readonly app: PublicKey) { }
 
   /**
-   * Get the Subspace instance by address (public key).
-   * @param {PublicKey} address - The Subspace address
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Promise<Subspace>} The Subspace instance.
-   */
-  get(
+  * Get the Subspace instance by address (public key).
+  * @param {PublicKey} address - The Subspace address
+  * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
+  * @param {OperationOptions} options - The optional operation options
+  * @returns {Promise<Subspace>} The Subspace instance.
+  */
+  getSubspace(
     address: PublicKey,
+    loadJsonMetadata = true,
     options?: OperationOptions
   ) {
     return this.ju
@@ -50,7 +59,7 @@ export class SubspaceClient {
       .execute(findSubspaceByAddressOperation(
         {
           subspace: address,
-          loadJsonMetadata: true
+          loadJsonMetadata
         },
       ),
         options
@@ -58,10 +67,18 @@ export class SubspaceClient {
   }
 
   /** {@inheritDoc createSubspaceOperation} */
-  create(input: CreateSubspaceInput, options?: OperationOptions) {
+  createSubspace(
+    input: Omit<CreateSubspaceInput, 'app'>,
+    options?: OperationOptions
+  ) {
     return this.ju
       .operations()
-      .execute(createSubspaceOperation(input), options);
+      .execute(createSubspaceOperation(
+        {
+          app: this.app,
+          ...input
+        }
+      ), options);
   }
 
   /**
@@ -72,10 +89,10 @@ export class SubspaceClient {
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<Subspace>} Updated Subspace instance.
    */
-  update(
+  updateSubspace(
     subspace: Subspace,
-    data: Partial<SubspaceArgs>,
-    loadJsonMetadata?: boolean,
+    data: Omit<Partial<SubspaceData>, 'app'> & Pick<Partial<ExternalProcessors>, 'connectingProcessor' | 'publishingProcessor' | 'collectingProcessor' | 'referencingProcessor'>,
+    loadJsonMetadata = true,
     options?: OperationOptions
   ) {
     return this.ju
@@ -87,6 +104,7 @@ export class SubspaceClient {
           data: {
             alias: data.alias === undefined ? subspace.alias : data.alias,
             name: data.name === undefined ? subspace.name : data.name,
+            publishingPermission: data.publishingPermission === undefined ? subspace.publishingPermission : data.publishingPermission,
             metadataUri: data.metadataUri === undefined ? subspace.metadataUri : data.metadataUri,
           },
           currentAlias: subspace.alias,
@@ -107,64 +125,190 @@ export class SubspaceClient {
 
   /**
    * Delete the given Subspace.
-   * @param {Publication} subspace - The Subspace address
+   * @param {PublicKey} subspace - The Subspace address
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<SendAndConfirmTransactionResponse>} The Subspace delete responce.
    */
-  delete(
-    subspace: Subspace,
+  deleteSubspace(
+    subspace: PublicKey,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
       .execute(deleteSubspaceOperation(
         {
-          app: subspace.app,
-          subspace: subspace.address
+          app: this.app,
+          subspace
         }
       ),
         options
       );
   }
 
-  /** {@inheritDoc findAllSubspacesOperation} */
-  keysByFilter(
-    input: FindAllSubspacesInput,
+  /**
+   * Add new Subspace Manager.
+   * @param {PublicKey} subspace - The Subspace address
+   * @param {PublicKey} profile - The Profile address
+   * @param {PublSubspaceManagementRoleTypeicKey} role - Manager Role valiant
+   * @param {OperationOptions} options - The optional operation options
+   * @returns {Promise<AddSubspaceManagerOutput>} Add new Subspace Manager output.
+   */
+  addManager(
+    subspace: PublicKey,
+    profile: PublicKey,
+    role: SubspaceManagementRoleType,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllSubspacesOperation(input), options);
+      .execute(addSubspaceManagerOperation(
+        {
+          app: this.app,
+          subspace,
+          profile,
+          role
+        }
+      ),
+        options
+      );
   }
 
-  /** {@inheritDoc findAllSubspacesByConnectionTargetOperation} */
-  findByConnectionTarget(
-    input: FindAllSubspacesByConnectionTargetInput,
+  /**
+   * Add new Subspace Manager.
+   * @param {PublicKey} subspace - The Subspace address
+   * @param {PublicKey} profile - The Profile address
+   * @param {PublSubspaceManagementRoleTypeicKey} role - Manager Role valiant
+   * @param {OperationOptions} options - The optional operation options
+   * @returns {Promise<UpdateSubspaceManagerOutput>} Update Subspace Manager output.
+   */
+  updateManager(
+    subspace: PublicKey,
+    profile: PublicKey,
+    role: SubspaceManagementRoleType,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllSubspacesByConnectionTargetOperation(input), options);
+      .execute(updateSubspaceManagerOperation(
+        {
+          app: this.app,
+          subspace,
+          profile,
+          role
+        }
+      ),
+        options
+      );
   }
 
-  /** {@inheritDoc findAllSubspacesByConnectionInitializerOperation} */
-  findByConnectionInitializer(
-    input: FindAllSubspacesByConnectionInitializerInput,
+  /**
+   * Delete existing Subspace Manager.
+   * @param {PublicKey} subspace - The Subspace address
+   * @param {PublicKey} profile - The Profile address
+   * @param {OperationOptions} options - The optional operation options
+   * @returns {Promise<DeleteSubspaceManagerOutput>} Delete Subspace Manager output.
+   */
+  deleteManager(
+    subspace: PublicKey,
+    profile: PublicKey,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllSubspacesByConnectionInitializerOperation(input), options);
+      .execute(deleteSubspaceManagerOperation(
+        {
+          app: this.app,
+          subspace,
+          profile
+        }
+      ),
+        options
+      );
   }
 
-  /** {@inheritDoc findAllSubspacesByKeyListOperation} */
-  findByKeyList(
-    input: FindAllSubspacesByKeyListInput,
+   /** {@inheritDoc findSubspaceManagersOperation} */
+  findManagers(
+    filter: Omit<FindSubspaceManagersInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllSubspacesByKeyListOperation(input), options);
+      .execute(findSubspaceManagersOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findSubspacesOperation} */
+  findSubspaces(
+    filter: Omit<FindSubspacesInput, 'app'>,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findSubspacesOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findSubspacesOperation} */
+  findSubspacesAsKeys(
+    filter: Omit<FindSubspacesAsKeysInput, 'app'>,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findSubspacesAsKeysOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findSubspacesByConnectionTargetOperation} */
+  findSubspacesAsKeysByConnectionTarget(
+    input: Omit<FindSubspacesAsKeysByConnectionTargetInput, 'app'>,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findSubspacesAsKeysByConnectionTargetOperation(
+        {
+          app: this.app,
+          ...input
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findSubspacesByConnectionInitializerOperation} */
+  findSubspacesAsKeysByConnectionInitializer(
+    input: Omit<FindSubspacesAsKeysByConnectionInitializerInput, 'app'>,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findSubspacesAsKeysByConnectionInitializerOperation(
+        {
+          app: this.app,
+          ...input
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findSubspacesByKeyListOperation} */
+  getSubspacesByKeyList(
+    input: FindSubspacesByKeyListInput,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findSubspacesByKeyListOperation(input), options);
   }
 
 }

@@ -1,4 +1,5 @@
 export * from './createReaction';
 export * from './deleteReaction';
-export * from './findAllReactions';
-export * from './findAllReactionsByKeyList';
+export * from './findReactions';
+export * from './findReactionsAsKeys';
+export * from './findReactionsByKeyList';

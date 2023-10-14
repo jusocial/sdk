@@ -6,6 +6,7 @@ import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { Publication } from '../../models/Publication';
 import { generateUuid, toOptionalAccount } from '../../helpers';;
 import { ExternalProcessors } from '../../types';
+import { findPublicationByAddressOperation } from './findPublicationByAddress';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';
 import {
   makeConfirmOptionsFinalizedOnMainnet,
@@ -70,6 +71,13 @@ export type CreatePublicationInput = {
   /** Subspace as Publication destination */
   subspace?: PublicKey;
 
+  /**
+   * Whether or not Publication contain encrypted content
+   *
+   * @defaultValue `false`
+   */
+  isEncrypted?: boolean;
+
   /** Publication metadata URI. */
   metadataUri: string;
 
@@ -128,7 +136,7 @@ export const createPublicationOperationHandler: OperationHandler<CreatePublicati
     ju: Ju,
     scope: OperationScope
   ): Promise<CreatePublicationOutput> {
-    const builder = createPublicationBuilder(
+    const builder = await createPublicationBuilder(
       ju,
       operation.input,
       scope
@@ -143,12 +151,16 @@ export const createPublicationOperationHandler: OperationHandler<CreatePublicati
 
     // Retrieve Publication
     const publication = await ju
-      .core()
-      .publication
-      .get(
-        output.publicationAddress,
+      .operations()
+      .execute(findPublicationByAddressOperation(
+        {
+          publication: output.publicationAddress,
+          loadJsonMetadata: operation.input.loadJsonMetadata
+        },
+      ),
         scope
       );
+    scope.throwIfCanceled();
 
     if (!publication) {
       // TO-DO
@@ -196,11 +208,11 @@ export type CreatePublicationBuilderContext = Omit<
  * @group Transaction Builders
  * @category Constructors
  */
-export const createPublicationBuilder = (
+export const createPublicationBuilder = async (
   ju: Ju,
   params: CreatePublicationBuilderParams,
   options: TransactionBuilderOptions = {}
-): TransactionBuilder<CreatePublicationBuilderContext> => {
+): Promise<TransactionBuilder<CreatePublicationBuilderContext>> => {
   // Data.
   const { programs, payer = ju.rpc().getDefaultFeePayer() } = options;
 
@@ -211,8 +223,9 @@ export const createPublicationBuilder = (
     isMirror = false,
     isReply = false,
     contentType = 0,
+    isEncrypted = false,
     metadataUri,
-    tag = null,
+    tag = '',
     externalProcessingData = null,
     externalProcessors
   } = params;
@@ -241,6 +254,44 @@ export const createPublicationBuilder = (
       programs,
     });
 
+
+  let connectionProof: PublicKey | undefined = undefined;
+  let subspaceManagerProof: PublicKey | undefined = undefined;
+
+  if (subspace) {
+    const connectionAccount = ju
+      .core()
+      .pdas()
+      .connection({
+        app,
+        initializer: publicationCreatorPda,
+        target: subspace,
+        programs,
+      });
+    
+    const isConnectionExist = await ju.rpc().accountExists(connectionAccount);
+
+    if (isConnectionExist) {
+      connectionProof = connectionAccount;
+    }
+
+
+    const subspaceManagerAccount = ju
+      .core()
+      .pdas()
+      .subspaceManager({
+        subspace,
+        profile: publicationCreatorPda,
+        programs,
+      });
+    
+    const isSubspaceManagerExist = await ju.rpc().accountExists(subspaceManagerAccount);
+
+    if (isSubspaceManagerExist) {
+      subspaceManagerProof = subspaceManagerAccount;
+    }
+  }
+
   return (
     TransactionBuilder.make<CreatePublicationBuilderContext>()
       .setFeePayer(payer)
@@ -257,6 +308,10 @@ export const createPublicationBuilder = (
             publication: publicationPda,
 
             subspace: toOptionalAccount(subspace),
+
+            connectionProof: toOptionalAccount(connectionProof),
+            subspaceManagerProof: toOptionalAccount(subspaceManagerProof),
+
             targetPublication: toOptionalAccount(target),
 
             collectingProcessorPda: toOptionalAccount(externalProcessors.collectingProcessor),
@@ -270,6 +325,7 @@ export const createPublicationBuilder = (
               isMirror,
               isReply,
               contentType,
+              isEncrypted,
               metadataUri,
               tag,
             },

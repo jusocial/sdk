@@ -12,38 +12,39 @@ import type { Ju } from '@/Ju';
 // Operation
 // -----------------
 
-const Key = 'FindAllReportsOperation' as const;
+const Key = 'FindReportsAsKeysOperation' as const;
 
 /**
- * Finds all Profiles for specified Application.
+ * Finds Reports by filters (as Public keys Array).
  *
  * ```ts
  * const profile = await ju
  *   .core()
- *   .findAllReportsByApp({ address };
+ *   .reports(app)
+ *   .findReportsAsKeysAsKeys(filter, options);
  * ```
  *
  * @group Operations
  * @category Constructors
  */
-export const findAllReportsOperation =
-  useOperation<FindAllReportsOperation>(Key);
+export const findReportsAsKeysOperation =
+  useOperation<FindReportsAsKeysOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllReportsOperation = Operation<
+export type FindReportsAsKeysOperation = Operation<
   typeof Key,
-  FindAllReportsInput,
-  FindAllReportsOutput
+  FindReportsAsKeysInput,
+  PublicKey[]
 >;
 
 /**
  * @group Operations
  * @category Inputs
  */
-export type FindAllReportsInput = {
+export type FindReportsAsKeysInput = {
   /** The address of the Application. */
   app: PublicKey;
 
@@ -64,16 +65,16 @@ export type FindAllReportsInput = {
  * @group Operations
  * @category Outputs
  */
-export type FindAllReportsOutput = PublicKey[];
+// export type FindReportsAsKeysOutput = PublicKey[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllReportsOperationHandler: OperationHandler<FindAllReportsOperation> =
+export const findReportsAsKeysOperationHandler: OperationHandler<FindReportsAsKeysOperation> =
 {
   handle: async (
-    operation: FindAllReportsOperation,
+    operation: FindReportsAsKeysOperation,
     ju: Ju,
     scope: OperationScope
   ) => {

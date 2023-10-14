@@ -1,8 +1,12 @@
 /** @group Models */
 export type ProfileJsonMetadata<Uri = string> = {
-  logo?: Uri;
+  appId?: string;
+  profileId?: string;
+
   image?: Uri;
-  avatar?: Uri;
-  animation_url?: Uri;
+  imageCover?: Uri;
+
+  bio?: string;
+
   [key: string]: unknown;
 };

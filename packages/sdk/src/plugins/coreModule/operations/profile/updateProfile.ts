@@ -5,6 +5,7 @@ import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { Profile } from '../../models/Profile';
 import { toOptionalAccount } from '../../helpers';
 import { ExternalProcessors } from '../../types';
+import { findProfileByAddressOperation } from './findProfileByAddress';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';
 import {
   // isSigner,
@@ -127,12 +128,13 @@ export const updateProfileOperationHandler: OperationHandler<UpdateProfileOperat
 
     // Retrieve Profile
     const profile = await ju
-      .core()
-      .profile
-      .get(
-        output.profileAddress,
-        scope
-      );
+      .operations()
+      .execute(findProfileByAddressOperation(
+        {
+          profile: output.profileAddress,
+          loadJsonMetadata: operation.input.loadJsonMetadata
+        },
+      ), scope);
 
     return { ...output, profile };
   },
@@ -182,8 +184,8 @@ export const updateProfileBuilder = (
 ): TransactionBuilder<UpdateProfileBuilderContext> => {
   // Data.
   const { programs, payer = ju.rpc().getDefaultFeePayer() } = options;
-  
-  const { 
+
+  const {
     app,
     data,
     currentAlias,
@@ -264,10 +266,10 @@ export const updateProfileBuilder = (
 
             currentAliasPda: toOptionalAccount(currentAliasPda),
             newAliasPda: toOptionalAccount(newAliasPda),
-           
+
             // TODO
             connectingProcessorPda: toOptionalAccount(externalProcessors.connectingProcessor),
-            
+
             authority: toPublicKey(authority),
           },
           {

@@ -1,5 +1,6 @@
-import { PublicationArgs } from '@ju-protocol/ju-core';
+import { PublicationData } from '@ju-protocol/ju-core';
 import {
+  
   findPublicationByAddressOperation,
   CreatePublicationInput,
   createPublicationOperation,
@@ -8,14 +9,17 @@ import {
 } from '../operations';
 import {
   collectPublicationOperation,
-  FindAllPublicationsByKeyListInput,
-  findAllPublicationsByKeyListOperation,
-  FindAllPublicationsInput,
-  findAllPublicationsOperation
+  FindPublicationsAsKeysInput,
+  findPublicationsAsKeysOperation,
+  FindPublicationsByKeyListInput,
+  findPublicationsByKeyListOperation,
+  FindPublicationsInput,
+  findPublicationsOperation
 } from '../operations/publication';
 import { Publication } from '../models';
 import type { Ju } from '@/Ju';
 import { OperationOptions, PublicKey } from '@/types';
+import { ExternalProcessors } from '../types';
 
 /**
  * This client helps to interact with the Ju Publications.
@@ -24,7 +28,7 @@ import { OperationOptions, PublicKey } from '@/types';
  *
  * @example
  * ```ts
- * const publicationClient = ju.core();
+ * const publicationClient = ju.core().publications(app);
  * ```
  *
  * @see {@link CoreClient} The `Core` client
@@ -32,7 +36,7 @@ import { OperationOptions, PublicKey } from '@/types';
  */
 export class PublicationClient {
 
-  constructor(readonly ju: Ju) { }
+  constructor(readonly ju: Ju, readonly app: PublicKey) {}
 
   /**
    * Get the Publication instance by address (public key).
@@ -40,8 +44,9 @@ export class PublicationClient {
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<Publication>} The Publication instance.
    */
-  get(
+  getPublication(
     address: PublicKey,
+    loadJsonMetadata = true,
     options?: OperationOptions
   ) {
     return this.ju
@@ -49,7 +54,7 @@ export class PublicationClient {
       .execute(findPublicationByAddressOperation(
         {
           publication: address,
-          loadJsonMetadata: true
+          loadJsonMetadata
         },
       ),
         options
@@ -57,24 +62,32 @@ export class PublicationClient {
   }
 
   /** {@inheritDoc createPublicationOperation} */
-  create(input: CreatePublicationInput, options?: OperationOptions) {
+  createPublication(
+    input: Omit<CreatePublicationInput, 'app'>,
+    options?: OperationOptions
+  ) {
     return this.ju
       .operations()
-      .execute(createPublicationOperation(input), options);
+      .execute(createPublicationOperation(
+        {
+          app: this.app,
+          ...input
+        }
+      ), options);
   }
 
   /**
    * Update the Publication data.
    * @param {Publication} publication - The instance of the current Publication
-   * @param {Partial<PublicationArgs>} data - The Publication data to update.
+   * @param {Omit<Partial<PublicationArgs>, 'app'>} data - The Publication data to update.
    * @param {loadJsonMetadata} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<Publication>} Updated Publication instance.
    */
-  update(
+  updatePublication(
     publication: Publication,
-    data: Partial<PublicationArgs>,
-    loadJsonMetadata?: boolean,
+    data: Omit<Partial<PublicationData>, 'app'> & Pick<Partial<ExternalProcessors>, 'collectingProcessor' | 'referencingProcessor'>,
+    loadJsonMetadata = true,
     options?: OperationOptions
   ) {
     return this.ju
@@ -84,6 +97,7 @@ export class PublicationClient {
           app: publication.app,
           publication: publication.address,
           data: {
+            isEncrypted: data.isEncrypted === undefined ? publication.isEncrypted : data.isEncrypted,
             metadataUri: data.metadataUri === undefined ? publication.metadataUri : data.metadataUri,
             isMirror: publication.isMirror,
             isReply: publication.isReply,
@@ -92,10 +106,10 @@ export class PublicationClient {
           },
 
           externalProcessors: {
-            collectingProcessor: data.collectingProcessor === undefined ? publication.collectingProcessor : data.collectingProcessor,
-            referencingProcessor: data.referencingProcessor === undefined ? publication.referencingProcessor : data.referencingProcessor,
+            collectingProcessor: data?.collectingProcessor === undefined ? publication.collectingProcessor : data?.collectingProcessor,
+            referencingProcessor: data?.referencingProcessor === undefined ? publication.referencingProcessor : data?.referencingProcessor,
           },
-          
+
           loadJsonMetadata
         }
       ),
@@ -105,13 +119,13 @@ export class PublicationClient {
 
   /**
    * Collect the given Publication.
-   * @param {Publication} publication - The Publication address
+   * @param {PublicKey} publication - The Publication address
    * @param {string} externalProcessingData - The optional data to possyble pass into collecting processor
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<SendAndConfirmTransactionResponse>} The Publication delete responce.
    */
-  collect(
-    publication: Publication,
+  collectPublication(
+    publication: PublicKey,
     externalProcessingData?: string,
     options?: OperationOptions
   ) {
@@ -119,8 +133,8 @@ export class PublicationClient {
       .operations()
       .execute(collectPublicationOperation(
         {
-          app: publication.app,
-          publication: publication.address,
+          app: this.app,
+          publication,
           externalProcessingData,
         }
       ),
@@ -130,43 +144,65 @@ export class PublicationClient {
 
   /**
    * Delete the given Publication.
-   * @param {Publication} publication - The Publication address
+   * @param {PublicKey} publication - The Publication address
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<SendAndConfirmTransactionResponse>} The Publication delete responce.
    */
-  delete(
-    publication: Publication,
+  deletePublication(
+    publication: PublicKey,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
       .execute(deletePublicationOperation(
         {
-          app: publication.app,
-          publication: publication.address
+          app: this.app,
+          publication
         }
       ),
         options
       );
   }
 
-  /** {@inheritDoc findAllPublicationsOperation} */
-  keysByFilter(
-    input: FindAllPublicationsInput,
+  /** {@inheritDoc findPublicationsOperation} */
+  findPublications(
+    filter: FindPublicationsInput,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllPublicationsOperation(input), options);
+      .execute(findPublicationsOperation(
+        {
+          app: (filter.profile || filter.subspace || filter.targetPublication) ? undefined : this.app,
+          ...filter
+        }
+      ), options);
   }
 
-  /** {@inheritDoc findAllPublicationsByKeyListOperation} */
-  findByKeyList(
-    input: FindAllPublicationsByKeyListInput,
+  /** {@inheritDoc findPublicationsOperation} */
+  findPublicationsAsKeys(
+    filter: FindPublicationsAsKeysInput,
+    options?: OperationOptions
+  ): Promise<PublicKey[]> {
+    return this.ju
+      .operations()
+      .execute(findPublicationsAsKeysOperation(
+        {
+          app: (filter.profile || filter.subspace || filter.targetPublication) ? undefined : this.app,
+          ...filter
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findPublicationsByKeyListOperation} */
+  getPublicationsByKeyList(
+    input: FindPublicationsByKeyListInput,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllPublicationsByKeyListOperation(input), options);
+      .execute(findPublicationsByKeyListOperation(input), options);
   }
+
+  
 }

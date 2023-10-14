@@ -1,13 +1,14 @@
 import {
-  FindAllConnectionsByKeyListInput,
-  findAllConnectionsByKeyListOperation,
-  FindAllConnectionsInput,
-  findAllConnectionsOperation,
+  FindConnectionsByKeyListInput,
+  findConnectionsByKeyListOperation,
+  FindConnectionsInput,
+  findConnectionsOperation,
   createConnectionOperation,
   updateConnectionOperation,
   deleteConnectionOperation,
+  findConnectionsAsKeysOperation,
+  FindConnectionsAsKeysInput,
 } from '../operations';
-import { Profile, Subspace } from '../models';
 import type { Ju } from '@/Ju';
 import { OperationOptions, PublicKey } from '@/types';
 
@@ -18,7 +19,7 @@ import { OperationOptions, PublicKey } from '@/types';
  *
  * @example
  * ```ts
- * const connectionClient = ju.core().connection;
+ * const connectionClient = ju.core().connections(app);
  * ```
  *
  * @see {@link CoreClient} The `Core` client
@@ -26,17 +27,17 @@ import { OperationOptions, PublicKey } from '@/types';
  */
 export class ConnectionClient {
 
-  constructor(readonly ju: Ju) { }
+  constructor(readonly ju: Ju, readonly app: PublicKey) { }
 
   /**
    * Creates new Connection with Targer entity.
-   * @param {Profile | Subspace} target - The given Profile or Subspace instance
+   * @param {PublicKey} target - The given Target (Profile or Subspace) Public Key
    * @param {string} externalProcessingData - The optional data to possyble pass into connecting processor
    * @param {OperationOptions} options - The optional operation options
    * @returns {Pomise<SendAndConfirmTransactionResponse>} The response of the Connection creation.
    */
-  create(
-    target: Profile | Subspace,
+  createConnection(
+    target: PublicKey,
     externalProcessingData?: string,
     options?: OperationOptions
   ) {
@@ -44,8 +45,8 @@ export class ConnectionClient {
       .operations()
       .execute(createConnectionOperation(
         {
-          app: target.app,
-          target: target.address,
+          app: this.app,
+          target,
           externalProcessingData
         }
       ),
@@ -55,14 +56,14 @@ export class ConnectionClient {
 
   /**
    * Update existing Connection by given instance.
-   * @param {Profile} initializer - The given Profile instance
+   * @param {PublicKey} initializer - The given Profile Public Key
    * @param {PublicKey} target - The given Profile or Subspace PublicKey
    * @param {boolean} approveStatus - The approve status to set
    * @param {OperationOptions} options - The optional operation options
    * @returns {Pomise<SendAndConfirmTransactionResponse>} The response of the Connection creation.
    */
-  update(
-    initializer: Profile,
+  updateConnection(
+    initializer: PublicKey,
     target: PublicKey,
     approveStatus: boolean,
     options?: OperationOptions
@@ -71,8 +72,8 @@ export class ConnectionClient {
       .operations()
       .execute(updateConnectionOperation(
         {
-          app: initializer.app,
-          initializer: initializer.address,
+          app: this.app,
+          initializer,
           target,
           approveStatus
         }
@@ -81,42 +82,63 @@ export class ConnectionClient {
 
   /**
    * Delete existing Connection by Target given.
-   * @param {Profile | Subspace} target - The given Profile or Subspace instance
+   * @param {PublicKey} target - The given Target (Profile or Subspace) Public key
    * @param {OperationOptions} options - The optional operation options
    * @returns {Pomise<SendAndConfirmTransactionResponse>} The response of the Connection creation.
    */
-  delete(
-    target: Profile | Subspace,
+  deleteConnection(
+    target: PublicKey,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
       .execute(deleteConnectionOperation(
         {
-          app: target.app,
-          target: target.address,
+          app: this.app,
+          target,
         }
       ), options);
   }
 
-  /** {@inheritDoc findAllConnectionsOperation} */
-  keysByFilter(
-    input: FindAllConnectionsInput,
+  /** {@inheritDoc findConnectionsOperation} */
+  findConnections(
+    filter: Omit<FindConnectionsInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllConnectionsOperation(input), options);
+      .execute(findConnectionsOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
   }
 
-  /** {@inheritDoc findAllConnectionsByKeyListOperation} */
-  findByKeyList(
-    input: FindAllConnectionsByKeyListInput,
+
+  /** {@inheritDoc findConnectionsOperation} */
+  findConnectionsAsKeys(
+    filter: Omit<FindConnectionsAsKeysInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllConnectionsByKeyListOperation(input), options);
+      .execute(findConnectionsAsKeysOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findConnectionsByKeyListOperation} */
+  getConnectionsByKeyList(
+    input: FindConnectionsByKeyListInput,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findConnectionsByKeyListOperation(input), options);
   }
 
 }

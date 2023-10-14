@@ -26,6 +26,7 @@ const Key = 'CreateConnectionOperation' as const;
  * ```ts
  * await ju
  *   .core()
+ *   .connections(app)
  *   .createConnection({ app, target });
  * ```
  *

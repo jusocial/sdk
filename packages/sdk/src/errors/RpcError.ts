@@ -13,6 +13,8 @@ export class RpcError extends JuError {
 /** @group Errors */
 export class FailedToSendTransactionError extends RpcError {
   readonly name: string = 'FailedToSendTransactionError';
+
+  // @ts-ignore
   constructor(cause: Error) {
     const message =
       'The transaction could not be sent successfully to the network. ' +
@@ -43,6 +45,8 @@ export class FailedToSendTransactionError extends RpcError {
 /** @group Errors */
 export class FailedToConfirmTransactionError extends RpcError {
   readonly name: string = 'FailedToConfirmTransactionError';
+
+  // @ts-ignore
   constructor(cause: Error) {
     const message =
       'The transaction could not be confirmed. ' +
@@ -56,6 +60,7 @@ export class FailedToConfirmTransactionWithResponseError extends FailedToConfirm
   readonly name: string = 'FailedToConfirmTransactionWithResponseError';
   readonly response: ConfirmTransactionResponse;
 
+  // @ts-ignore
   constructor(response: ConfirmTransactionResponse) {
     const getMessage = (error: TransactionError | null): string => {
       if (!error) return 'Unknown error';

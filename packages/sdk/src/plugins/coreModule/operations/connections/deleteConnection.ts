@@ -24,9 +24,9 @@ const Key = 'DeleteConnectionOperation' as const;
  * ```ts
  * await ju
  *   .core()
+ *   .connections(app)
  *   .deleteConnection(
  *      { 
- *        app:, 
  *        target: 
  *      }
  *    );

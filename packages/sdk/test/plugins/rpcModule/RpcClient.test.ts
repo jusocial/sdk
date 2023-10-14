@@ -9,19 +9,19 @@ test('[rpcModule] it parses program errors when sending transactions', async (t:
   const jp = await ju();
 
   // When we try to create an App with a name that's too long.
-  const promise = jp.core().app.create({
+  const promise = jp.core().apps().createApp({
     appName: 'x'.repeat(101), // Name is too long.
     data: {
       metadataUri: 'http://example.com/jutestapp',
 
-      profileNameRequired: true,
-      profileSurnameRequired: true,
+      profileGenderRequired: false,
+      profileFirstNameRequired: true,
+      profileLastNameRequired: true,
       profileBirthdateRequired: true,
       profileCountryRequired: false,
       profileCityRequired: false,
       profileMetadataUriRequired: true,
 
-      subspaceNameRequired: true,
       subspaceMetadataUriRequired: true,
 
       profileDeleteAllowed: false,

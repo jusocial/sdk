@@ -1,4 +1,7 @@
 import { Profile, Subspace } from '../../models';
+import { findProfileByAddressOperation } from '../profile';
+import { findSubspaceByAddressOperation } from '../subspace';
+import { findAliasByValueOperation } from './findAliasByValue';
 import {
   Operation,
   OperationHandler,
@@ -88,10 +91,17 @@ export const findEntityByAliasValueOperationHandler: OperationHandler<FindEntity
     } = operation.input;
 
     const aliasAccount = await ju
-      .core()
-      .common
-      .findAliasByValue(app, alias)     
+      .operations()
+      .execute(findAliasByValueOperation(
+        {
+          app,
+          alias
+        }
+      ),
+        scope
+      );
     scope.throwIfCanceled();
+
 
     if (!aliasAccount) {
       return null;
@@ -102,27 +112,31 @@ export const findEntityByAliasValueOperationHandler: OperationHandler<FindEntity
     if (aliasType == 0) {
       // Retrieve Profile
       const profile = await ju
-        .core()
-        .profile
-        .get(
-          owner,
-          scope
-        );
+        .operations()
+        .execute(findProfileByAddressOperation(
+          {
+            profile: owner,
+            loadJsonMetadata: operation.input.loadJsonMetadata
+          },
+        ), scope);
 
       return profile;
     } else if (aliasType == 1) {
       // Retrieve Subspace
       const subspace = await ju
-        .core()
-        .subspace
-        .get(
-          owner,
-          scope
-        );
+      .operations()
+      .execute(findSubspaceByAddressOperation(
+        {
+          subspace: owner,
+          loadJsonMetadata: operation.input.loadJsonMetadata
+        },
+      ),
+        scope
+      );
 
       return subspace
     }
-    
+
     return null
 
   },

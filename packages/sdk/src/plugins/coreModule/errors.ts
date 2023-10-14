@@ -12,6 +12,7 @@ export class AppError extends JuError {
 /** @group Errors */
 export class ProfileNotFoundError extends AppError {
   readonly name: string = 'ProfileNotFoundError';
+  // @ts-ignore
   constructor() {
     const message = 'Profile not found.'
     super(message);
@@ -21,6 +22,7 @@ export class ProfileNotFoundError extends AppError {
 /** @group Errors */
 export class ManagementNotAuthorizedError extends AppError {
   readonly name: string = 'ManagementNotAuthorizedError';
+  // @ts-ignore
   constructor() {
     const message = 'Management not authorized'
     super(message);

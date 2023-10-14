@@ -4,30 +4,15 @@ import {
 import { PublicKey } from '@solana/web3.js';
 import { GpaBuilder } from '@/utils';
 
-type AccountDiscriminator = [
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number,
-  number
-];
-
 const APP = appDiscriminator.length;
 
 export class AppGpaBuilder extends GpaBuilder {
-  whereDiscriminator(discrimator: AccountDiscriminator) {
-    return this.where(0, Buffer.from(discrimator));
+  appAccounts() {
+    return this.where(0, Buffer.from(appDiscriminator));
   }
 
-  profileAccounts() {
-    return this.whereDiscriminator(appDiscriminator as AccountDiscriminator);
-  }
-
-  profileAccountsForApp(app: PublicKey) {
-    return this.profileAccounts().where(APP, app.toBase58());
+  appAccountsByAuthority(authority: PublicKey) {
+    return this.appAccounts().where(APP, authority.toBase58());
   }
 }
 

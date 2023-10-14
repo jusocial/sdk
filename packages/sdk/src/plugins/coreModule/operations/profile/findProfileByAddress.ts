@@ -21,7 +21,8 @@ const Key = 'FindProfileByAddressOperation' as const;
  *
  * ```ts
  * const profile = await ju
- *   .profile()
+ *   .core()
+ *   .profiles(app)
  *   .findByAddress(
  *      { 
  *        profile: JP8sM3QGJxEdGpZ3MJP8sM3QypwzuzZpko1ueonUQgT,

@@ -1,27 +1,36 @@
 /** @group Models */
 export type SubspaceJsonMetadata<Uri = string> = {
+  appId?: string;
+
   title?: string;
+
   description?: string;
+
   image?: Uri;
+  imageCover?: Uri;
   animation_url?: Uri;
-  external_url?: Uri;
+
   attributes?: Array<{
-    trait_type?: string;
+    type?: string;
     value?: string;
     [key: string]: unknown;
   }>;
+
   properties?: {
-    creators?: Array<{
+    team?: Array<{
+      title?: string;
+      description?: string;
       address?: string;
-      share?: number;
       [key: string]: unknown;
     }>;
-    files?: Array<{
-      type?: string;
-      uri?: Uri;
+
+    links?: {
+      website?: string,
       [key: string]: unknown;
-    }>;
+    }
+
     [key: string]: unknown;
   };
+
   [key: string]: unknown;
 };

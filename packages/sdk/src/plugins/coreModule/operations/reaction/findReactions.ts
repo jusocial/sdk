@@ -1,0 +1,141 @@
+import type { PublicKey } from '@solana/web3.js';
+import { Reaction as ReactionCore, reactionDiscriminator , ReactionType } from '@ju-protocol/ju-core'
+import { Reaction, toReaction } from '../../models';
+import { toReactionAccount } from '../../accounts';
+import {
+  lamports,
+  Operation,
+  OperationHandler,
+  OperationScope,
+  useOperation,
+} from '@/types';
+import type { Ju } from '@/Ju';
+
+// -----------------
+// Operation
+// -----------------
+
+const Key = 'FindReactionsOperation' as const;
+
+/**
+ * Finds all Reactions by specified filters.
+ *
+ * ```ts
+ * const profile = await ju
+ *   .core()
+ *   .reactions(app)
+ *   .findReactions({ });
+ * ```
+ *
+ * @group Operations
+ * @category Constructors
+ */
+export const findReactionsOperation =
+  useOperation<FindReactionsOperation>(Key);
+
+/**
+ * @group Operations
+ * @category Types
+ */
+export type FindReactionsOperation = Operation<
+  typeof Key,
+  FindReactionsInput,
+  Reaction[]
+>;
+
+/**
+ * @group Operations
+ * @category Inputs
+ */
+export type FindReactionsInput = {
+  /** The address of the Application. */
+  app: PublicKey;
+
+  /** Reaction initializer address (for additional filtering) */
+  initializer?: PublicKey;
+
+  /** Reaction target address (for additional filtering) */
+  target?: PublicKey;
+
+  /** Reaction type 
+   * Profile = 0,
+   * Subspace = 1
+  */
+  reactionType?: ReactionType;
+};
+
+// /**
+//  * @group Operations
+//  * @category Outputs
+//  */
+// export type FindReactionsOutput = Reaction[];
+
+/**
+ * @group Operations
+ * @category Handlers
+ */
+export const findReactionsOperationHandler: OperationHandler<FindReactionsOperation> =
+{
+  handle: async (
+    operation: FindReactionsOperation,
+    ju: Ju,
+    scope: OperationScope
+  ) => {
+    // const { commitment } = scope;
+    const { 
+      app,
+      initializer,
+      target,
+      reactionType
+     } = operation.input;
+
+
+    const builder =  ReactionCore.gpaBuilder();
+    // Add discriminator
+    builder.addFilter("accountDiscriminator", reactionDiscriminator);
+    
+    // Add additional filters
+
+    if (app) {
+      builder.addFilter("app", app);
+    }
+    if (initializer) {
+      builder.addFilter("initializer", initializer);
+    }
+    if (target) {
+      builder.addFilter("target", target);
+    }
+    if (reactionType) {
+      builder.addFilter("reactionType", reactionType);
+    }
+
+    const res = await builder.run(ju.connection);
+    scope.throwIfCanceled();
+
+    const unparsedAccounts = res.map(({ pubkey, account }) => (
+      {
+        ...account,
+        publicKey: pubkey,
+        lamports: lamports(account.lamports),
+      }
+    ));
+
+    const reactions: Reaction[] = [];
+
+    for (const account of unparsedAccounts) {
+      try {
+        const connectionAccount = toReactionAccount(account);
+
+        const reaction = toReaction(connectionAccount);
+
+        reactions.push(reaction);
+
+      } catch (error) {
+        // TODO
+      }
+    }
+
+    return reactions;
+    
+  },
+};

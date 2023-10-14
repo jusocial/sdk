@@ -673,7 +673,7 @@
 
 //     test('[Query] it can find all Application Profiles', async (t: Test) => {
 
-//       const profileKeys = await alice.ju.core().findAllProfiles({app: testApp})
+//       const profileKeys = await alice.ju.core().findProfiles({app: testApp})
 
 //       t.equal(profileKeys.length, 3);
 //       // console.log(profiles);

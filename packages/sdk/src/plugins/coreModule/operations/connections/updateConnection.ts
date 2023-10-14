@@ -26,6 +26,7 @@ const Key = 'UpdateConnectionOperation' as const;
  * ```ts
  * await ju
  *   .core()
+ *   .connections(app)
  *   .updateConnection({ app, initializer, status });
  * ```
  *

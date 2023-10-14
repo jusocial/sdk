@@ -56,16 +56,20 @@ export class GpaBuilder {
 
     this.config.filters.push(...filters);
 
+    console.log('filters :>> ', this.config.filters);
+    
     return this;
   }
 
-  where(offset: number, bytes: string | Buffer | PublicKey | BN | number) {
+  where(offset: number, bytes: string | Buffer | PublicKey | BN | number | boolean) {
     if (Buffer.isBuffer(bytes)) {
       bytes = base58.encode(bytes);
     } else if (typeof bytes === 'object' && 'toBase58' in bytes) {
       bytes = bytes.toBase58();
     } else if (BN.isBN(bytes)) {
       bytes = base58.encode(bytes.toArray());
+    } else if (typeof bytes === 'boolean') {
+      bytes = bytes === true ? '2' : '1';
     } else if (typeof bytes !== 'string') {
       bytes = base58.encode(new BN(bytes, 'le').toArray());
     }
@@ -117,4 +121,5 @@ export class GpaBuilder {
 
     return new GmaBuilder(this.ju, await this.getAndMap(cb), options);
   }
+
 }

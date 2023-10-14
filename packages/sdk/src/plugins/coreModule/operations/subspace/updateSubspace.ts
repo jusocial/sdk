@@ -19,6 +19,7 @@ import {
   useOperation,
 } from '@/types';
 import type { Ju } from '@/Ju';
+import { findSubspaceByAddressOperation } from './findSubspaceByAddress';
 // import { ExpectedSignerError } from '@/errors';
 
 // -----------------
@@ -121,10 +122,13 @@ export const updateSubspaceOperationHandler: OperationHandler<UpdateSubspaceOper
 
     // Retrieve Subspace
     const subspace = await ju
-      .core()
-      .subspace
-      .get(
-        output.subspaceAddress,
+      .operations()
+      .execute(findSubspaceByAddressOperation(
+        {
+          subspace: output.subspaceAddress,
+          loadJsonMetadata: operation.input.loadJsonMetadata
+        },
+      ),
         scope
       );
 

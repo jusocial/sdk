@@ -1,13 +1,15 @@
 import {
-  findAllReportsOperation,
-  FindAllReportsInput,
-  findAllReportsByKeyListOperation,
-  FindAllReportsByKeyListInput,
+  findReportsOperation,
+  FindReportsInput,
+  findReportsByKeyListOperation,
+  FindReportsByKeyListInput,
   CreateReportInput,
   createReportOperation,
+  FindReportsAsKeysInput,
+  findReportsAsKeysOperation,
 } from '../operations';
 import type { Ju } from '@/Ju';
-import { OperationOptions } from '@/types';
+import { OperationOptions, PublicKey } from '@/types';
 
 /**
  * This client helps to interact with the Ju Aplication Reports.
@@ -16,40 +18,67 @@ import { OperationOptions } from '@/types';
  *
  * @example
  * ```ts
- * const reportClient = ju.core().report;
+ * const reportClient = ju.core().reports(app);
  * ```
  *
  * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
 export class ReportClient {
-  constructor(readonly ju: Ju) { }
+  constructor(readonly ju: Ju, readonly app: PublicKey) { }
 
   /** {@inheritDoc createReportOperation} */
-  create(input: CreateReportInput, options?: OperationOptions) {
-    return this.ju
-      .operations()
-      .execute(createReportOperation(input), options);
-  }
-
-  /** {@inheritDoc findAllReportsOperation} */
-  keysByFilter(
-    input: FindAllReportsInput,
+  createReport(
+    input: Omit<CreateReportInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllReportsOperation(input), options);
+      .execute(createReportOperation(
+        {
+          app: this.app,
+          ...input
+        }
+      ), options);
   }
 
-  /** {@inheritDoc findAllReportsByKeyListOperation} */
-  findByKeyList(
-    input: FindAllReportsByKeyListInput,
+  /** {@inheritDoc findReportsOperation} */
+  findReports(
+    filter: Omit<FindReportsInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllReportsByKeyListOperation(input), options);
+      .execute(findReportsOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
   }
 
+  /** {@inheritDoc findReportsOperation} */
+  findReportsAsKeys(
+    filter: Omit<FindReportsAsKeysInput, 'app'>,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findReportsAsKeysOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findReportsByKeyListOperation} */
+  getReportsByKeyList(
+    input: FindReportsByKeyListInput,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findReportsByKeyListOperation(input), options);
+  }
 }

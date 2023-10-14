@@ -1,7 +1,7 @@
 import type { PublicKey } from '@solana/web3.js';
-import { toProfileAccount } from '../../accounts';
-import { Profile, toProfile } from '../../models/Profile';
-import { ProfileJsonMetadata } from '../../models';
+import { toPublicationAccount } from '../../accounts';
+import { Publication, toPublication } from '../../models/Publication';
+import { PublicationJsonMetadata } from '../../models';
 import {
   Operation,
   OperationHandler,
@@ -15,7 +15,7 @@ import { Option, GmaBuilder } from '@/utils';
 // Operation
 // -----------------
 
-const Key = 'FindAllProfilesByKeyListOperation' as const;
+const Key = 'FindPublicationsByKeyListOperation' as const;
 
 /**
  * Finds all Profiles data for specified pubkey list.
@@ -23,31 +23,31 @@ const Key = 'FindAllProfilesByKeyListOperation' as const;
  * ```ts
  * const profile = await ju
  *   .core()
- *   .findAllProfilesByKeyList({ [] };
+ *   .findPublicationsByKeyList({ addressList };
  * ```
  *
  * @group Operations
  * @category Constructors
  */
-export const findAllProfilesByKeyListOperation =
-  useOperation<FindAllProfilesByKeyListOperation>(Key);
+export const findPublicationsByKeyListOperation =
+  useOperation<FindPublicationsByKeyListOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllProfilesByKeyListOperation = Operation<
+export type FindPublicationsByKeyListOperation = Operation<
   typeof Key,
-  FindAllProfilesByKeyListInput,
-  FindAllProfilesByKeyListOutput
+  FindPublicationsByKeyListInput,
+  FindPublicationsByKeyListOutput
 >;
 
 /**
  * @group Operations
  * @category Inputs
  */
-export type FindAllProfilesByKeyListInput = {
-  /** Profiles as Public key array */
+export type FindPublicationsByKeyListInput = {
+  /** Publications as Public keys array */
   keys: PublicKey[];
 
   /**
@@ -65,28 +65,28 @@ export type FindAllProfilesByKeyListInput = {
  * @group Operations
  * @category Outputs
  */
-export type FindAllProfilesByKeyListOutput = Profile[];
+export type FindPublicationsByKeyListOutput = (Publication | null)[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllProfilesByKeyListOperationHandler: OperationHandler<FindAllProfilesByKeyListOperation> =
+export const findPublicationsByKeyListOperationHandler: OperationHandler<FindPublicationsByKeyListOperation> =
 {
   handle: async (
-    operation: FindAllProfilesByKeyListOperation,
+    operation: FindPublicationsByKeyListOperation,
     ju: Ju,
     scope: OperationScope
   ) => {
     const { commitment } = scope;
-
-    const { 
-      keys,
-      loadJsonMetadata = true,
-      chunkSize
+    const {
+      chunkSize,
+      loadJsonMetadata = false
     } = operation.input;
 
-    const profileInfos = await GmaBuilder.make(
+    const { keys } = operation.input;
+
+    const publicationInfos = await GmaBuilder.make(
       ju,
       keys,
       {
@@ -96,33 +96,33 @@ export const findAllProfilesByKeyListOperationHandler: OperationHandler<FindAllP
     ).get();
     scope.throwIfCanceled();
 
-    const profiles: Profile[] = [];
+    const publications: Publication[] = [];
 
-    for (const account of profileInfos) {
+    for (const account of publicationInfos) {
       if (account.exists) {
         try {
-          const profileAccount = toProfileAccount(account);
+          const publicationAccount = toPublicationAccount(account);
 
           // TO-DO: Catching metadata here might be slow, need to find the way...
-          const { metadataUri } = profileAccount.data;
-          let metadataJson: Option<ProfileJsonMetadata<string>> = null
+          const { metadataUri } = publicationAccount.data;
+          let metadataJson: Option<PublicationJsonMetadata<string>> | undefined = undefined
 
           if (loadJsonMetadata && metadataUri) {
             try {
               metadataJson = await ju
                 .storage()
-                .downloadJson<ProfileJsonMetadata>(metadataUri, scope);
+                .downloadJson<PublicationJsonMetadata>(metadataUri, scope);
             } catch (error) {
               // TODO
             }
           }
 
-          const profile = toProfile(
-            profileAccount,
+          const profile = toPublication(
+            publicationAccount,
             metadataJson
           );
 
-          profiles.push(profile);
+          publications.push(profile);
 
         } catch (error) {
           // TODO
@@ -130,6 +130,6 @@ export const findAllProfilesByKeyListOperationHandler: OperationHandler<FindAllP
       }
     }
 
-    return profiles;
+    return publications;
   },
 };

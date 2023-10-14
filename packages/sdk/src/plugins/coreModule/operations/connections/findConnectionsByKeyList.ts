@@ -14,7 +14,7 @@ import { GmaBuilder } from '@/utils';
 // Operation
 // -----------------
 
-const Key = 'FindAllConnectionsByKeyListOperation' as const;
+const Key = 'FindConnectionsByKeyListOperation' as const;
 
 /**
  * Finds all Connections data for specified pubkey list.
@@ -22,22 +22,23 @@ const Key = 'FindAllConnectionsByKeyListOperation' as const;
  * ```ts
  * const connection = await ju
  *   .core()
- *   .findAllConnectionsByKeyList({ [] };
+ *   .connections(app)
+ *   .findConnectionsByKeyList({ [] };
  * ```
  *
  * @group Operations
  * @category Constructors
  */
-export const findAllConnectionsByKeyListOperation =
-  useOperation<FindAllConnectionsByKeyListOperation>(Key);
+export const findConnectionsByKeyListOperation =
+  useOperation<FindConnectionsByKeyListOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllConnectionsByKeyListOperation = Operation<
+export type FindConnectionsByKeyListOperation = Operation<
   typeof Key,
-  FindAllConnectionsByKeyListInput,
+  FindConnectionsByKeyListInput,
   Connection[]
 >;
 
@@ -45,7 +46,7 @@ export type FindAllConnectionsByKeyListOperation = Operation<
  * @group Operations
  * @category Inputs
  */
-export type FindAllConnectionsByKeyListInput = {
+export type FindConnectionsByKeyListInput = {
   /** Connections as Public key array */
   keys: PublicKey[];
 
@@ -57,16 +58,16 @@ export type FindAllConnectionsByKeyListInput = {
  * @group Operations
  * @category Outputs
  */
-// export type FindAllConnectionsByKeyListOutput = Connection[];
+// export type FindConnectionsByKeyListOutput = Connection[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllConnectionsByKeyListOperationHandler: OperationHandler<FindAllConnectionsByKeyListOperation> =
+export const findConnectionsByKeyListOperationHandler: OperationHandler<FindConnectionsByKeyListOperation> =
 {
   handle: async (
-    operation: FindAllConnectionsByKeyListOperation,
+    operation: FindConnectionsByKeyListOperation,
     ju: Ju,
     scope: OperationScope
   ) => {

@@ -1,21 +1,21 @@
-import { LocationCoordinates, ProfileArgs } from '@ju-protocol/ju-core';
+import { ProfileData } from '@ju-protocol/ju-core';
 import {
-  FindAllProfilesByKeyListInput,
-  findAllProfilesByKeyListOperation,
+  FindProfilesByKeyListInput,
+  findProfilesByKeyListOperation,
   CreateProfileInput,
   createProfileOperation,
   findProfileByAddressOperation,
   updateProfileOperation,
   deleteProfileOperation,
-  FindAllProfilesInput,
-  findAllProfilesOperation,
-  FindAllProfilesByConnectionTargetInput,
-  FindAllProfilesByConnectionInitializerInput,
-  findAllProfilesByConnectionInitializerOperation,
-  findAllProfilesByConnectionTargetOperation,
+  FindProfilesInput,
+  findProfilesOperation,
+  findProfilesAsKeysByConnectionInitializerOperation,
+  findProfilesAsKeysByConnectionTargetOperation,
+  findProfilesAsKeysOperation,
+  FindProfilesAsKeysInput,
 } from '../operations';
 import { Profile } from '../models';
-import { toBirthDate } from '../helpers';
+import { ExternalProcessors } from '../types';
 import type { Ju } from '@/Ju';
 import { OperationOptions, PublicKey } from '@/types';
 
@@ -26,7 +26,7 @@ import { OperationOptions, PublicKey } from '@/types';
  *
  * @example
  * ```ts
- * const profileClient = ju.core().profile;
+ * const profileClient = ju.core().profiles(app);
  * ```
  *
  * @see {@link CoreClient} The `Core` client
@@ -34,7 +34,7 @@ import { OperationOptions, PublicKey } from '@/types';
  */
 export class ProfileClient {
 
-  constructor(readonly ju: Ju) { }
+  constructor(readonly ju: Ju, readonly app: PublicKey) { }
 
 
   /**
@@ -43,8 +43,9 @@ export class ProfileClient {
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<Profile>} The Profile instance.
    */
-  get(
+  getProfile(
     address: PublicKey,
+    loadJsonMetadata = true,
     options?: OperationOptions
   ) {
     return this.ju
@@ -52,16 +53,24 @@ export class ProfileClient {
       .execute(findProfileByAddressOperation(
         {
           profile: address,
-          loadJsonMetadata: true
+          loadJsonMetadata
         },
       ), options);
   }
 
   /** {@inheritDoc createProfileOperation} */
-  create(input: CreateProfileInput, options?: OperationOptions) {
+  createProfile(
+    input: Omit<CreateProfileInput, 'app'>,
+    options?: OperationOptions
+  ) {
     return this.ju
       .operations()
-      .execute(createProfileOperation(input), options);
+      .execute(createProfileOperation(
+        {
+          app: this.app,
+          ...input
+        }
+      ), options);
   }
 
   /**
@@ -72,9 +81,9 @@ export class ProfileClient {
    * @param {OperationOptions} options - The optional operation options
    * @returns {Pomise<UpdateProfileOutput>} The response of the Profile update.
    */
-  update(
+  updateProfile(
     profile: Profile,
-    data: Partial<ProfileArgs>,
+    data: Partial<ProfileData> & Pick<Partial<ExternalProcessors>, 'connectingProcessor'>,
     loadJsonMetadata = true,
     options?: OperationOptions
   ) {
@@ -82,13 +91,14 @@ export class ProfileClient {
       .operations()
       .execute(updateProfileOperation(
         {
-          app: profile.app,
+          app: this.app,
           data: {
             alias: data.alias === undefined ? profile.alias : data.alias,
             metadataUri: data.metadataUri === undefined ? profile.metadataUri : data.metadataUri,
             statusText: data.statusText === undefined ? profile.statusText : data.statusText,
-            name: data.name === undefined ? profile.name : data.name,
-            surname: data.surname === undefined ? profile.surname : data.surname,
+            gender: data.gender === undefined ? profile.gender : data.gender,
+            firstName: data.firstName === undefined ? profile.firstName : data.firstName,
+            lastName: data.lastName === undefined ? profile.lastName : data.lastName,
             birthDate: data.birthDate === undefined ? profile.birthDate : data.birthDate,
             countryCode: data.countryCode === undefined ? profile.countryCode : data.countryCode,
             cityCode: data.cityCode === undefined ? profile.cityCode : data.cityCode,
@@ -96,7 +106,7 @@ export class ProfileClient {
           },
           currentAlias: profile.alias,
           externalProcessors: {
-            connectingProcessor: data.connectingProcessor === undefined ? profile.connectingProcessor : data.connectingProcessor,
+            connectingProcessor: data?.connectingProcessor === undefined ? profile.connectingProcessor : data?.connectingProcessor,
           },
           loadJsonMetadata
         }
@@ -106,189 +116,169 @@ export class ProfileClient {
   }
 
 
-  /**
-    * Set the name of the Profile.
-    * @param {Profile} profile - The given Profile instance
-    * @param {string | null} name - The name to set.
-    * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-    * @param {OperationOptions} options - The optional operation options
-    * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-    */
-  setName(
-    profile: Profile,
-    name: string | null,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(profile, { name }, loadJsonMetadata, options);
-  }
+  // /**
+  //   * Set the name of the Profile.
+  //   * @param {obj} input - Input
+  //   * @param {OperationOptions} options - The optional operation options
+  //   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  //   */
+  // setProfileFirstName(
+  //   input: {
+  //     profile: Profile,
+  //     firstName?: string,
+  //     loadJsonMetadata?: boolean,
+  //   },
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(input.profile, { firstName: input.firstName }, input.loadJsonMetadata, options);
+  // }
 
-  /**
-   * Set the surname of the Profile.
-   * @param {Profile} profile - The given Profile instance
-   * @param {string | null} surname - The surname to set.
-   * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-   */
-  setSurname(
-    profile: Profile,
-    surname: string | null,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(profile, { surname }, loadJsonMetadata, options);
-  }
+  // /**
+  //  * Set the surname of the Profile.
+  //  * @param {obj} input - Input
+  //  * @param {OperationOptions} options - The optional operation options
+  //  * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  //  */
+  // setProfileLastName(
+  //   input: {
+  //     profile: Profile,
+  //     flasttName?: string,
+  //     loadJsonMetadata?: boolean,
+  //   },
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(input.profile, { lastName: input.flasttName }, input.loadJsonMetadata, options);
+  // }
 
-  /**
-   * Set the alias of the Profile.
-   * @param {Profile} profile - The given Profile instance
-   * @param {string | null} alias - The alias to set.
-   * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-   */
-  setAlias(
-    profile: Profile,
-    alias: string | null,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(profile, { alias }, loadJsonMetadata, options);
-  }
+  // /**
+  //  * Set the alias of the Profile.
+  //  * @param {Profile} profile - The given Profile instance
+  //  * @param {string | null} alias - The alias to set.
+  //  * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
+  //  * @param {OperationOptions} options - The optional operation options
+  //  * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  //  */
+  // setProfileAlias(
+  //   profile: Profile,
+  //   alias: string | null,
+  //   loadJsonMetadata?: boolean,
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(profile, { alias }, loadJsonMetadata, options);
+  // }
 
-  /**
-   * Set the metadata URI of the Profile.
-   * @param {Profile} profile - The given Profile instance
-   * @param {string | null} metadataUri - The metadata URI to set.
-   * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-   */
-  setMetadataUri(
-    profile: Profile,
-    metadataUri: string | null,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(profile, { metadataUri }, loadJsonMetadata, options);
-  }
+  // /**
+  //  * Set the metadata URI of the Profile.
+  //  * @param {Profile} profile - The given Profile instance
+  //  * @param {string | null} metadataUri - The metadata URI to set.
+  //  * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
+  //  * @param {OperationOptions} options - The optional operation options
+  //  * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  //  */
+  // setProfileMetadataUri(
+  //   profile: Profile,
+  //   metadataUri: string | null,
+  //   loadJsonMetadata?: boolean,
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(profile, { metadataUri }, loadJsonMetadata, options);
+  // }
 
-  /**
-   * Set the status text of the Profile.
-   * @param {Profile} profile - The given Profile instance
-   * @param {string | null} statusText - The status text to set.
-   * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-   */
-  setStatus(
-    profile: Profile,
-    statusText: string | null,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(profile, { statusText }, loadJsonMetadata, options);
-  }
+  // /**
+  //  * Set the status text of the Profile.
 
-  /**
-   * Set the birth date of the Profile.
-   * @param {Profile} profile - The given Profile instance
-   * @param {number} year - The year of birth date.
-   * @param {number} month - The month of birth date.
-   * @param {number} day - The day of birth date.
-   * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-   */
-  setBirthDate(
-    profile: Profile,
-    year: number,
-    month: number,
-    day: number,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(
-      profile, 
-      { birthDate: toBirthDate(year, month, day) },
-      loadJsonMetadata, 
-      options
-      );
-  }
+  //  * @param {OperationOptions} options - The optional operation options
+  //  * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  //  */
+  // setProfileStatus(
+  //   input: {
+  //     profile: Profile,
+  //     statusText?: string,
+  //     loadJsonMetadata?: boolean,
+  //   },
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(input.profile, { statusText: input.statusText }, input.loadJsonMetadata, options);
+  // }
 
-  /**
-   * Delete the birth date of the Profile.
-   * @param {Profile} profile - The given Profile instance
-   * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-   */
-  deleteBirthDate(
-    profile: Profile,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(
-      profile, 
-      { birthDate: null },
-      loadJsonMetadata, 
-      options
-      );
-  }
+  // /**
+  //  * Set the birth date of the Profile.
+  //  * @param {Profile} profile - The given Profile instance
+  //  * @param {number} year - The year of birth date.
+  //  * @param {number} month - The month of birth date.
+  //  * @param {number} day - The day of birth date.
+  //  * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
+  //  * @param {OperationOptions} options - The optional operation options
+  //  * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  //  */
+  // setProfileBirthDate(
+  //   profile: Profile,
+  //   year: number,
+  //   month: number,
+  //   day: number,
+  //   loadJsonMetadata?: boolean,
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(
+  //     profile,
+  //     { birthDate: toBirthDate(year, month, day) },
+  //     loadJsonMetadata,
+  //     options
+  //   );
+  // }
 
-  /**
-   * Set the country code of the Profile.
-   * @param {Profile} profile - The given Profile instance
-   * @param {number | null} countryCode - The country code to set.
-   * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-   */
-  setCountryCode(
-    profile: Profile,
-    countryCode: number | null,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(profile, { countryCode }, loadJsonMetadata, options);
-  }
 
-  /**
-   * Set the city code of the Profile.
-   * @param {Profile} profile - The given Profile instance
-   * @param {number | null} cityCode - The city code to set.
-   * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-   * @param {OperationOptions} options - The optional operation options
-   * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-   */
-  setCityCode(
-    profile: Profile,
-    cityCode: number | null,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(profile, { cityCode }, loadJsonMetadata, options);
-  }
+  // /**
+  //  * Set the country code of the Profile.
+  //  * @param {Profile} profile - The given Profile instance
+  //  * @param {number | null} countryCode - The country code to set.
+  //  * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
+  //  * @param {OperationOptions} options - The optional operation options
+  //  * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  //  */
+  // setProfileCountryCode(
+  //   profile: Profile,
+  //   countryCode: number | null,
+  //   loadJsonMetadata?: boolean,
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(profile, { countryCode }, loadJsonMetadata, options);
+  // }
 
-  /**
-  * Set the current location of the Profile. 
-  * The location coordinates should include the latitude and longitude.
-  * @param {Profile} profile - The given Profile instance
-  * @param {LocationCoordinates | null} currentLocation - The current location to set.
-  * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
-  * @param {OperationOptions} [options] - The optional operation options.
-  * @returns {Pomise<UpdateProfileOutput>} The response of the update.
-  */
-  setCurrentLocation(
-    profile: Profile,
-    currentLocation: LocationCoordinates | null,
-    loadJsonMetadata?: boolean,
-    options?: OperationOptions
-  ) {
-    return this.update(profile, { currentLocation }, loadJsonMetadata, options);
-  }
+  // /**
+  //  * Set the city code of the Profile.
+  //  * @param {Profile} profile - The given Profile instance
+  //  * @param {number | null} cityCode - The city code to set.
+  //  * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
+  //  * @param {OperationOptions} options - The optional operation options
+  //  * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  //  */
+  // setProfileCityCode(
+  //   profile: Profile,
+  //   cityCode: number | null,
+  //   loadJsonMetadata?: boolean,
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(profile, { cityCode }, loadJsonMetadata, options);
+  // }
 
+  // /**
+  // * Set the current location of the Profile. 
+  // * The location coordinates should include the latitude and longitude.
+  // * @param {Profile} profile - The given Profile instance
+  // * @param {LocationCoordinates | null} currentLocation - The current location to set.
+  // * @param {boolean} loadJsonMetadata - The flag indicates to load JSON metadata from external URI
+  // * @param {OperationOptions} [options] - The optional operation options.
+  // * @returns {Pomise<UpdateProfileOutput>} The response of the update.
+  // */
+  // setProfileCurrentLocation(
+  //   profile: Profile,
+  //   currentLocation: LocationCoordinates | null,
+  //   loadJsonMetadata?: boolean,
+  //   options?: OperationOptions
+  // ) {
+  //   return this.updateProfile(profile, { currentLocation }, loadJsonMetadata, options);
+  // }
 
   /**
    * Delete the given Profile.
@@ -296,7 +286,7 @@ export class ProfileClient {
    * @param {OperationOptions} options - The optional operation options
    * @returns {Promise<SendAndConfirmTransactionResponse>} The Profile delete responce.
    */
-  delete(
+  deleteProfile(
     profile: Profile,
     options?: OperationOptions
   ) {
@@ -313,44 +303,86 @@ export class ProfileClient {
       );
   }
 
-  /** {@inheritDoc findAllProfilesOperation} */
-  keysByFilter(
-    input: FindAllProfilesInput,
+  /** {@inheritDoc findProfilesOperation} */
+  findProfiles(
+    filter: Omit<FindProfilesInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllProfilesOperation(input), options);
+      .execute(findProfilesOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
   }
 
-  /** {@inheritDoc findAllProfilesByConnectionTargetOperation} */
-  findByConnectionTarget(
-    input: FindAllProfilesByConnectionTargetInput,
+  /** {@inheritDoc findProfilesOperation} */
+  findProfilesAsKeys(
+    filter: Omit<FindProfilesAsKeysInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllProfilesByConnectionTargetOperation(input), options);
+      .execute(findProfilesAsKeysOperation(
+        {
+          app: this.app,
+          ...filter
+        }
+      ), options);
   }
 
-  /** {@inheritDoc findAllProfilesByConnectionInitializerOperation} */
-  findByConnectionInitializer(
-    input: FindAllProfilesByConnectionInitializerInput,
+  /** {@inheritDoc findProfilesByConnectionTargetOperation} */
+  findProfilesAsKeysByConnectionTarget(
+    /** The address (Profile Pubkey) of the Connection target */
+    target: PublicKey,
+
+    /** Approved Profiles only */
+    approved?: boolean,
+
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllProfilesByConnectionInitializerOperation(input), options);
+      .execute(findProfilesAsKeysByConnectionTargetOperation(
+        {
+          app: this.app,
+          target,
+          approved
+        }
+      ), options);
   }
 
-  /** {@inheritDoc findAllProfilesByKeyListOperation} */
-  findByKeyList(
-    input: FindAllProfilesByKeyListInput,
+  /** {@inheritDoc findProfilesByConnectionInitializerOperation} */
+  findProfilesAsKeysByConnectionInitializer(
+    /** The address (Profile Pubkey) of the Connection initializer */
+    initializer?: PublicKey,
+
+    /** Approved Profiles only */
+    approved?: boolean,
+
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findAllProfilesByKeyListOperation(input), options);
+      .execute(findProfilesAsKeysByConnectionInitializerOperation(
+        {
+          app: this.app,
+          initializer,
+          approved
+        }
+      ), options);
+  }
+
+  /** {@inheritDoc findProfilesByKeyListOperation} */
+  getProfilesByKeyList(
+    input: FindProfilesByKeyListInput,
+    options?: OperationOptions
+  ) {
+    return this.ju
+      .operations()
+      .execute(findProfilesByKeyListOperation(input), options);
   }
 
 }

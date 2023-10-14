@@ -111,7 +111,7 @@ export const createAppOperationHandler: OperationHandler<CreateAppOperation> =
     scope.throwIfCanceled();
 
     // Retrieve App
-    const retrievedApp = await ju.core().app.get(
+    const retrievedApp = await ju.core().apps().getApp(
       output.appAddress,
       scope
     );

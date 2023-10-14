@@ -12,6 +12,20 @@ import { Pda, Program, PublicKey, toPublicKey } from '@/types';
 export class CorePdasClient {
   constructor(protected readonly ju: Ju) {}
 
+  /** Finds the Protocol Developer whitelist item. */
+  developer(input: {
+    /** Developer authority */
+    authority: PublicKey
+    /** An optional set of programs that override the registered ones. */
+    programs?: Program[];
+  }): Pda {
+    const programId = this.programId(input.programs);
+    return Pda.find(programId, [
+      Buffer.from('developer', 'utf8'),
+      input.authority.toBuffer(),
+    ]);
+  }
+
   /** Finds the protocol Application. */
   app(input: {
     /** Applications name */
@@ -80,6 +94,7 @@ export class CorePdasClient {
       input.app.toBuffer(),
       input.initializer.toBuffer(),
       input.target.toBuffer(),
+      input.initializer.toBuffer(),  // Second time!
     ]);
   }
 
@@ -100,6 +115,23 @@ export class CorePdasClient {
       input.app.toBuffer(),
       input.creator.toBuffer(),
       Buffer.from(input.uuid, 'utf8'),
+    ]);
+  }
+
+  /** Finds the Subspace Manager whitelist item. */
+  subspaceManager(input: {
+    /** The address of the Subspace. */
+    subspace: PublicKey
+    /** Profile to add as Managet(Pubkey). */
+    profile: PublicKey;
+    /** An optional set of programs that override the registered ones. */
+    programs?: Program[];
+  }): Pda {
+    const programId = this.programId(input.programs);
+    return Pda.find(programId, [
+      Buffer.from('subspace_manager', 'utf8'),
+      input.subspace.toBuffer(),
+      input.profile.toBuffer(),
     ]);
   }
 

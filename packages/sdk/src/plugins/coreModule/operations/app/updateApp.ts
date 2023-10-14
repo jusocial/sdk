@@ -109,7 +109,7 @@ export const updateAppOperationHandler: OperationHandler<UpdateAppOperation> =
     const output = await builder.sendAndConfirm(ju, confirmOptions);
     scope.throwIfCanceled();
 
-    const retrievedApp = await ju.core().app.get(
+    const retrievedApp = await ju.core().apps().getApp(
       output.appAddress,
       scope
     );

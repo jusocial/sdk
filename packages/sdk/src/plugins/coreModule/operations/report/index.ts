@@ -1,3 +1,4 @@
 export * from './createReport';
-export * from './findAllReports';
-export * from './findAllReportsByKeyList';
+export * from './findReports';
+export * from './findReportsAsKeys';
+export * from './findReportsByKeyList';

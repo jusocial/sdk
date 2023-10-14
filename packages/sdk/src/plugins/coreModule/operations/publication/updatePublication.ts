@@ -6,6 +6,7 @@ import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { Publication } from '../../models/Publication';
 import { toOptionalAccount } from '../../helpers';
 import { ExternalProcessors } from '../../types';
+import { findPublicationByAddressOperation } from './findPublicationByAddress';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';
 import {
   // isSigner,
@@ -118,12 +119,16 @@ export const updatePublicationOperationHandler: OperationHandler<UpdatePublicati
 
     // Retrieve Publication
     const publication = await ju
-      .core()
-      .publication
-      .get(
-        output.publicationAddress,
+      .operations()
+      .execute(findPublicationByAddressOperation(
+        {
+          publication: output.publicationAddress,
+          loadJsonMetadata: operation.input.loadJsonMetadata
+        },
+      ),
         scope
       );
+    scope.throwIfCanceled();
 
     if (!publication) {
       // TO-DO
@@ -213,7 +218,7 @@ export const updatePublicationBuilder = (
             app,
             profile: publicationCreatorPda,
             publication,
-            
+
             collectingProcessorPda: toOptionalAccount(externalProcessors.collectingProcessor),
             referencingProcessorPda: toOptionalAccount(externalProcessors.referencingProcessor),
 

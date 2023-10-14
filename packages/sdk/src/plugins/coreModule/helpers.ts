@@ -48,5 +48,18 @@ export const toBirthDate = (year: number, month: number, day: number) => {
   return new BN(unixTimestamp);
 }
 
+export const bytesArrToStr = (bytes: number[]): string => {
+  let result = '';
+  for (let i = 0; i < bytes.length; ++i) {
+      const byte = bytes[i];
+      if (byte === 0) {
+          continue; // TODO: Stop if a null byte is encountered ?
+      }
+      const text = byte.toString(16);
+      result += (byte < 16 ? '%0' : '%') + text;
+  }
+  return decodeURIComponent(result);
+};
+
 
 

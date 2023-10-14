@@ -1,7 +1,7 @@
 import type { PublicKey } from '@solana/web3.js';
-import { toSubspaceAccount } from '../../accounts';
-import { Subspace, toSubspace } from '../../models/Subspace';
-import { SubspaceJsonMetadata } from '../../models';
+import { toAppAccount } from '../../accounts';
+import { App, toApp } from '../../models/App';
+import { AppJsonMetadata } from '../../models';
 import {
   Operation,
   OperationHandler,
@@ -9,45 +9,46 @@ import {
   useOperation,
 } from '@/types';
 import type { Ju } from '@/Ju';
-import { GmaBuilder, Option } from '@/utils';
+import { Option, GmaBuilder } from '@/utils';
 
 // -----------------
 // Operation
 // -----------------
 
-const Key = 'FindAllSubspacesByKeyListOperation' as const;
+const Key = 'FindAppsByKeyListOperation' as const;
 
 /**
- * Finds all Subspaces data for specified pubkey list.
+ * Finds all Apps data for specified Pubkey list.
  *
  * ```ts
- * const subspaces = await ju
+ * const app = await ju
  *   .core()
- *   .findAllSubspacesByKeyList({ addressList };
+ *   .apps()
+ *   .findAppsByKeyList({ [] };
  * ```
  *
  * @group Operations
  * @category Constructors
  */
-export const findAllSubspacesByKeyListOperation =
-  useOperation<FindAllSubspacesByKeyListOperation>(Key);
+export const findAppsByKeyListOperation =
+  useOperation<FindAppsByKeyListOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllSubspacesByKeyListOperation = Operation<
+export type FindAppsByKeyListOperation = Operation<
   typeof Key,
-  FindAllSubspacesByKeyListInput,
-  Subspace[]
+  FindAppsByKeyListInput,
+  App[]
 >;
 
 /**
  * @group Operations
  * @category Inputs
  */
-export type FindAllSubspacesByKeyListInput = {
-  /** Subspaces as Public keys array */
+export type FindAppsByKeyListInput = {
+  /** Apps as Public key array */
   keys: PublicKey[];
 
   /**
@@ -58,23 +59,23 @@ export type FindAllSubspacesByKeyListInput = {
   loadJsonMetadata?: boolean;
 
   /** Chunk size */
-  chunkSize?: number | undefined;
+  chunkSize?: number;
 };
 
 /**
  * @group Operations
  * @category Outputs
  */
-// export type FindAllSubspacesByKeyListOutput = Subspace [];
+// export type FindAppsByKeyListOutput = App[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllSubspacesByKeyListOperationHandler: OperationHandler<FindAllSubspacesByKeyListOperation> =
+export const findAppsByKeyListOperationHandler: OperationHandler<FindAppsByKeyListOperation> =
 {
   handle: async (
-    operation: FindAllSubspacesByKeyListOperation,
+    operation: FindAppsByKeyListOperation,
     ju: Ju,
     scope: OperationScope
   ) => {
@@ -82,12 +83,12 @@ export const findAllSubspacesByKeyListOperationHandler: OperationHandler<FindAll
     const { chunkSize } = operation.input;
     // const { loadJsonMetadata = false } = operation.input;
 
-    const { 
+    const {
       keys,
       loadJsonMetadata = true
     } = operation.input;
 
-    const subspaceInfos = await GmaBuilder.make(
+    const appInfos = await GmaBuilder.make(
       ju,
       keys,
       {
@@ -97,33 +98,33 @@ export const findAllSubspacesByKeyListOperationHandler: OperationHandler<FindAll
     ).get();
     scope.throwIfCanceled();
 
-    const subspaces: Subspace[] = [];
+    const apps: App[] = [];
 
-    for (const account of subspaceInfos) {
+    for (const account of appInfos) {
       if (account.exists) {
         try {
-          const subspaceAccount = toSubspaceAccount(account);
+          const appAccount = toAppAccount(account);
 
           // TO-DO: Catching metadata here might be slow, need to find the way...
-          const { metadataUri } = subspaceAccount.data;
-          let metadataJson: Option<SubspaceJsonMetadata<string>> = null
+          const { metadataUri } = appAccount.data;
+          let metadataJson: Option<AppJsonMetadata<string>> | undefined = undefined
 
           if (loadJsonMetadata && metadataUri) {
             try {
               metadataJson = await ju
                 .storage()
-                .downloadJson<SubspaceJsonMetadata>(metadataUri, scope);
+                .downloadJson<AppJsonMetadata>(metadataUri, scope);
             } catch (error) {
               // TODO
             }
           }
 
-          const subspace = toSubspace(
-            subspaceAccount,
+          const app = toApp(
+            appAccount,
             metadataJson
           );
 
-          subspaces.push(subspace);
+          apps.push(app);
 
         } catch (error) {
           // TODO
@@ -131,6 +132,6 @@ export const findAllSubspacesByKeyListOperationHandler: OperationHandler<FindAll
       }
     }
 
-    return subspaces;
+    return apps;
   },
 };

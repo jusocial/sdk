@@ -1,3 +1,4 @@
+// @ts-ignore
 import { Buffer } from 'buffer';
 import {
   AccountInfo,
@@ -271,7 +272,7 @@ export class RpcClient {
     return this.ju.connection.getLatestBlockhash(commitmentOrConfig);
   }
 
-  getSolanaExporerUrl(signature: string): string {
+  getSolanaExplorerUrl(signature: string): string {
     let clusterParam = '';
     switch (this.ju.cluster) {
       case 'devnet':

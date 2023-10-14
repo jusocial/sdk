@@ -12,30 +12,31 @@ import type { Ju } from '@/Ju';
 // Operation
 // -----------------
 
-const Key = 'FindAllConnectionsOperation' as const;
+const Key = 'FindConnectionsAsKeysOperation' as const;
 
 /**
- * Finds all Profiles for specified Application.
+ * Finds all Connections for specified Application.
  *
  * ```ts
  * const profile = await ju
  *   .core()
- *   .findAllConnectionsByApp({ address };
+ *   .connections(app)
+ *   .findConnectionsAsKeys({ address });
  * ```
  *
  * @group Operations
  * @category Constructors
  */
-export const findAllConnectionsOperation =
-  useOperation<FindAllConnectionsOperation>(Key);
+export const findConnectionsAsKeysOperation =
+  useOperation<FindConnectionsAsKeysOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllConnectionsOperation = Operation<
+export type FindConnectionsAsKeysOperation = Operation<
   typeof Key,
-  FindAllConnectionsInput,
+  FindConnectionsAsKeysInput,
   PublicKey[]
 >;
 
@@ -43,7 +44,7 @@ export type FindAllConnectionsOperation = Operation<
  * @group Operations
  * @category Inputs
  */
-export type FindAllConnectionsInput = {
+export type FindConnectionsAsKeysInput = {
   /** The address of the Application. */
   app: PublicKey;
 
@@ -67,16 +68,16 @@ export type FindAllConnectionsInput = {
  * @group Operations
  * @category Outputs
  */
-// export type FindAllConnectionsOutput = Connection[];
+// export type FindConnectionsOutput = Connection[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllConnectionsOperationHandler: OperationHandler<FindAllConnectionsOperation> =
+export const findConnectionsAsKeysOperationHandler: OperationHandler<FindConnectionsAsKeysOperation> =
 {
   handle: async (
-    operation: FindAllConnectionsOperation,
+    operation: FindConnectionsAsKeysOperation,
     ju: Ju,
     scope: OperationScope
   ) => {
@@ -107,7 +108,7 @@ export const findAllConnectionsOperationHandler: OperationHandler<FindAllConnect
     if (connectionTargetType) {
       builder.addFilter("connectionTargetType", connectionTargetType)
     }
-    if (approved) {
+    if (approved !== undefined) {
       builder.addFilter("approved", approved)
     }
 

@@ -6,6 +6,7 @@ export * from './guestIdentity';
 export * from './identityModule';
 export * from './keypairIdentity';
 export * from './mockStorage';
+export * from './webServerStorage';
 export * from './operationModule';
 export * from './programModule';
 export * from './rpcModule';

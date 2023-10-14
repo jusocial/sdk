@@ -1,13 +1,14 @@
+import { PublicKey } from '@solana/web3.js';
 import { CoreBuildersClient } from './CoreBuildersClient';
 import { CorePdasClient } from './CorePdasClient';
-import { AppClient } from './AppClient';
+import { CoreUtilsClient } from './CoreUtilsClient';
 import { ProfileClient } from './ProfileClient';
 import { ConnectionClient } from './ConnectionClient';
 import { SubspaceClient } from './SubspaceClient';
 import { PublicationClient } from './PublicationClient';
 import { ReactionClient } from './ReactionClient';
 import { ReportClient } from './ReportClient';
-import { CommonClient } from './CommonClient';
+import { AppClient } from './AppClient';
 import type { Ju } from '@/Ju';
 
 /**
@@ -53,36 +54,36 @@ export class CoreClient {
     return new CorePdasClient(this.ju);
   }
 
-  get common() {
-    return new CommonClient(this.ju)
+  utils(app: PublicKey) {
+    return new CoreUtilsClient(this.ju, app)
   }
 
-  get app() {
+  apps() {
     return new AppClient(this.ju)
   }
 
-  get profile() {
-    return new ProfileClient(this.ju)
+  profiles(app: PublicKey) {
+    return new ProfileClient(this.ju, app)
   }
 
-  get connection() {
-    return new ConnectionClient(this.ju)
+  connections(app: PublicKey) {
+    return new ConnectionClient(this.ju, app)
   }
 
-  get subspace() {
-    return new SubspaceClient(this.ju)
+  subspaces(app: PublicKey) {
+    return new SubspaceClient(this.ju, app)
   }
 
-  get publication() {
-    return new PublicationClient(this.ju)
+  publications(app: PublicKey) {
+    return new PublicationClient(this.ju, app)
   }
 
-  get reaction() {
-    return new ReactionClient(this.ju)
+  reactions(app: PublicKey) {
+    return new ReactionClient(this.ju, app)
   }
 
-  get report() {
-    return new ReportClient(this.ju)
+  reports(app: PublicKey) {
+    return new ReportClient(this.ju, app)
   }
 
 

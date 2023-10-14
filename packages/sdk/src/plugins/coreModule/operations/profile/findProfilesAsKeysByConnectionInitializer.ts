@@ -1,4 +1,5 @@
 import type { PublicKey } from '@solana/web3.js';
+import { findConnectionsOperation } from '../connections';
 import {
   Operation,
   OperationHandler,
@@ -11,7 +12,7 @@ import type { Ju } from '@/Ju';
 // Operation
 // -----------------
 
-const Key = 'FindAllProfilesByConnectionInitializerOperation' as const;
+const Key = 'FindProfilesAsKeysByConnectionInitializerOperation' as const;
 
 /**
  * Finds all Profiles for specified Application. 
@@ -19,9 +20,9 @@ const Key = 'FindAllProfilesByConnectionInitializerOperation' as const;
  * ```ts
  * const profile = await ju
  *   .core()
- *   .findAllProfilesByConnectionInitializerByApp(
+ *   .profile(app)
+ *   .findProfilesAsKeysByConnectionInitializer(
  *      {
- *        app: JP8sM3QGJxEdGpZ3MJP8sM3QypwzuzZpko1ueonUQgT,
  *        initializer: asdsM3QGJxEdGpZ3MJP8sM3QypwzuzZpko1ueonUdfg,
  *        approved: false,
  *        loadJsonMetadata: true,
@@ -33,24 +34,24 @@ const Key = 'FindAllProfilesByConnectionInitializerOperation' as const;
  * @group Operations
  * @category Constructors
  */
-export const findAllProfilesByConnectionInitializerOperation =
-  useOperation<FindAllProfilesByConnectionInitializerOperation>(Key);
+export const findProfilesAsKeysByConnectionInitializerOperation =
+  useOperation<FindProfilesAsKeysByConnectionInitializerOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllProfilesByConnectionInitializerOperation = Operation<
+export type FindProfilesAsKeysByConnectionInitializerOperation = Operation<
   typeof Key,
-  FindAllProfilesByConnectionInitializerInput,
-  FindAllProfilesByConnectionInitializerOutput
+  FindProfilesAsKeysByConnectionInitializerInput,
+  FindProfilesAsKeysByConnectionInitializerOutput
 >;
 
 /**
  * @group Operations
  * @category Inputs
  */
-export type FindAllProfilesByConnectionInitializerInput = {
+export type FindProfilesAsKeysByConnectionInitializerInput = {
   /** The address of the Application. */
   app: PublicKey;
 
@@ -65,16 +66,16 @@ export type FindAllProfilesByConnectionInitializerInput = {
  * @group Operations
  * @category Outputs
  */
-export type FindAllProfilesByConnectionInitializerOutput = PublicKey[];
+export type FindProfilesAsKeysByConnectionInitializerOutput = PublicKey[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllProfilesByConnectionInitializerOperationHandler: OperationHandler<FindAllProfilesByConnectionInitializerOperation> =
+export const findProfilesAsKeysByConnectionInitializerOperationHandler: OperationHandler<FindProfilesAsKeysByConnectionInitializerOperation> =
 {
   handle: async (
-    operation: FindAllProfilesByConnectionInitializerOperation,
+    operation: FindProfilesAsKeysByConnectionInitializerOperation,
     ju: Ju,
     scope: OperationScope
   ) => {
@@ -85,15 +86,11 @@ export const findAllProfilesByConnectionInitializerOperationHandler: OperationHa
       approved,
     } = operation.input;
 
-    const connectionAddresses = await ju.core().connection.keysByFilter({ app, initializer, approved });
+    const connections = await ju
+      .operations()
+      .execute(findConnectionsOperation({ app, initializer, approved }), scope);
     scope.throwIfCanceled();
 
-    const connections = await ju.core().connection.findByKeyList(
-      {
-        keys: connectionAddresses,
-      }
-      , scope);
-    scope.throwIfCanceled();
 
     const targets = connections.map((connection) => connection.target);
 

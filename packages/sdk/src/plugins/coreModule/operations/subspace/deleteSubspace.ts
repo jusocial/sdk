@@ -132,19 +132,6 @@ export const deleteSubspaceBuilder = (
       programs,
     });
 
-  // TO_DO: May be better to retrieve alias from Subspace account?
-  //
-  // // Retrieve Subspace
-  // const retrievedSubspace = await ju
-  //   .core()
-  //   .findSubspaceByAddress(
-  //     {
-  //       subspace,
-  //     },
-  //     scope
-  //   );
-  // const aliasPda = retrievedSubspace.data.alias;
-
   return TransactionBuilder.make()
     .add({
       instruction: createDeleteSubspaceInstruction(

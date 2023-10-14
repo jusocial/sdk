@@ -27,7 +27,8 @@ const Key = 'CreateReportOperation' as const;
  * ```ts
  * await ju
  *   .core()
- *   .createReport({ app, target });
+ *   .reports(app)
+ *   .createReport();
  * ```
  *
  * @group Operations

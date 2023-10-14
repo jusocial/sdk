@@ -1,6 +1,6 @@
 import type { PublicKey } from '@solana/web3.js';
-import { toReportAccount } from '../../accounts';
-import { Report, toReport } from '../../models/Report';
+import { toReactionAccount } from '../../accounts';
+import { Reaction, toReaction } from '../../models/Reaction';
 import {
   Operation,
   OperationHandler,
@@ -14,7 +14,7 @@ import { GmaBuilder } from '@/utils';
 // Operation
 // -----------------
 
-const Key = 'FindAllReportsByKeyListOperation' as const;
+const Key = 'FindReactionsByKeyListOperation' as const;
 
 /**
  * Finds all Profiles data for specified pubkey list.
@@ -22,31 +22,31 @@ const Key = 'FindAllReportsByKeyListOperation' as const;
  * ```ts
  * const profile = await ju
  *   .core()
- *   .findAllReportsByKeyList({ addressList };
+ *   .findReactionsByKeyList({ addressList };
  * ```
  *
  * @group Operations
  * @category Constructors
  */
-export const findAllReportsByKeyListOperation =
-  useOperation<FindAllReportsByKeyListOperation>(Key);
+export const findReactionsByKeyListOperation =
+  useOperation<FindReactionsByKeyListOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllReportsByKeyListOperation = Operation<
+export type FindReactionsByKeyListOperation = Operation<
   typeof Key,
-  FindAllReportsByKeyListInput,
-  FindAllReportsByKeyListOutput
+  FindReactionsByKeyListInput,
+  FindReactionsByKeyListOutput
 >;
 
 /**
  * @group Operations
  * @category Inputs
  */
-export type FindAllReportsByKeyListInput = {
-  /** Reports as Public keys array */
+export type FindReactionsByKeyListInput = {
+  /** Reactions as Public keys array */
   keys: PublicKey[];
 
   /** Chunk size */
@@ -57,16 +57,16 @@ export type FindAllReportsByKeyListInput = {
  * @group Operations
  * @category Outputs
  */
-export type FindAllReportsByKeyListOutput = (Report | null)[];
+export type FindReactionsByKeyListOutput = (Reaction | null)[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllReportsByKeyListOperationHandler: OperationHandler<FindAllReportsByKeyListOperation> =
+export const findReactionsByKeyListOperationHandler: OperationHandler<FindReactionsByKeyListOperation> =
 {
   handle: async (
-    operation: FindAllReportsByKeyListOperation,
+    operation: FindReactionsByKeyListOperation,
     ju: Ju,
     scope: OperationScope
   ) => {
@@ -76,7 +76,7 @@ export const findAllReportsByKeyListOperationHandler: OperationHandler<FindAllRe
 
     const { keys } = operation.input;
 
-    const reportInfos = await GmaBuilder.make(
+    const reactionInfos = await GmaBuilder.make(
       ju,
       keys,
       {
@@ -86,18 +86,16 @@ export const findAllReportsByKeyListOperationHandler: OperationHandler<FindAllRe
     ).get();
     scope.throwIfCanceled();
 
-    const reports: Report[] = [];
+    const reactions: Reaction[] = [];
 
-    for (const account of reportInfos) {
+    for (const account of reactionInfos) {
       if (account.exists) {
-
         try {
-          
-          const reportAccount = toReportAccount(account);
+          const reactionAccount = toReactionAccount(account);
 
-          const report = toReport(reportAccount);
+          const reaction = toReaction(reactionAccount);
 
-          reports.push(report);
+          reactions.push(reaction);
 
         } catch (error) {
           // TODO
@@ -105,6 +103,6 @@ export const findAllReportsByKeyListOperationHandler: OperationHandler<FindAllRe
       }
     }
 
-    return reports;
+    return reactions;
   },
 };

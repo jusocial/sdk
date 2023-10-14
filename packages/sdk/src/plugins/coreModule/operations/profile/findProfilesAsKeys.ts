@@ -12,18 +12,18 @@ import type { Ju } from '@/Ju';
 // Operation
 // -----------------
 
-const Key = 'FindAllProfilesOperation' as const;
+const Key = 'FindProfilesAsKeysOperation' as const;
 
 /**
- * Finds all Profiles for specified Application.
+ * Finds all Profiles for specified Application as Public keys Array.
  *
  * ```ts
  * 
  * const profile = await ju
  *   .core()
- *   .findAllProfiles(
+ *   .profiles(app)
+ *   .findProfilesAsKeys(
  *      {
- *        app: JP8sM3QGJxEdGpZ3MJP8sM3QypwzuzZpko1ueonUQgT,
  *        name: 'John'
  *      }
  *   );
@@ -32,16 +32,16 @@ const Key = 'FindAllProfilesOperation' as const;
  * @group Operations
  * @category Constructors
  */
-export const findAllProfilesOperation =
-  useOperation<FindAllProfilesOperation>(Key);
+export const findProfilesAsKeysOperation =
+  useOperation<FindProfilesAsKeysOperation>(Key);
 
 /**
  * @group Operations
  * @category Types
  */
-export type FindAllProfilesOperation = Operation<
+export type FindProfilesAsKeysOperation = Operation<
   typeof Key,
-  FindAllProfilesInput,
+  FindProfilesAsKeysInput,
   PublicKey[]
 >;
 
@@ -49,15 +49,18 @@ export type FindAllProfilesOperation = Operation<
  * @group Operations
  * @category Inputs
  */
-export type FindAllProfilesInput = {
+export type FindProfilesAsKeysInput = {
   /** The address of the Application. */
-  app: PublicKey;
+  app?: PublicKey;
 
-  /** The Profile's user Name (for additional filtering) */
-  name?: string;
+  /** The Profile's user gender (for additional filtering) */
+  gender?: string;
 
-  /** The Profile's user Surname (for additional filtering) */
-  surname?: string;
+  /** The Profile's first user Name (for additional filtering) */
+  firstName?: string;
+
+  /** The Profile's user last name (for additional filtering) */
+  lastName?: string;
 
   /** The Profile's user Country code (for additional filtering) */
   countryCode?: number;
@@ -66,35 +69,36 @@ export type FindAllProfilesInput = {
   cityCode?: number;
 
   /** Verified status (for additional filtering) */
-  verified?: boolean;
+  isVerified?: boolean;
 };
 
 /**
  * @group Operations
  * @category Outputs
  */
-// export type FindAllProfilesOutput = Profile[];
-// export type FindAllProfilesOutput =  PublicKey[];
+// export type FindProfilesOutput = Profile[];
+// export type FindProfilesOutput =  PublicKey[];
 
 /**
  * @group Operations
  * @category Handlers
  */
-export const findAllProfilesOperationHandler: OperationHandler<FindAllProfilesOperation> =
+export const findProfilesAsKeysOperationHandler: OperationHandler<FindProfilesAsKeysOperation> =
 {
   handle: async (
-    operation: FindAllProfilesOperation,
+    operation: FindProfilesAsKeysOperation,
     ju: Ju,
     scope: OperationScope
   ) => {
     // const { commitment } = scope;
     const {
       app,
-      name,
-      surname,
+      gender,
+      firstName,
+      lastName,
       countryCode,
       cityCode,
-      verified,
+      isVerified,
     } = operation.input;
 
     // Building GPA
@@ -108,11 +112,14 @@ export const findAllProfilesOperationHandler: OperationHandler<FindAllProfilesOp
     if (app) {
       builder.addFilter("app", app);
     }
-    if (name) {
-      builder.addFilter("name", name);
+    if (gender) {
+      builder.addFilter("gender", gender);
     }
-    if (surname) {
-      builder.addFilter("surname", surname);
+    if (firstName) {
+      builder.addFilter("firstName", firstName);
+    }
+    if (lastName) {
+      builder.addFilter("lastName", lastName);
     }
     if (countryCode) {
       builder.addFilter("countryCode", countryCode);
@@ -120,8 +127,8 @@ export const findAllProfilesOperationHandler: OperationHandler<FindAllProfilesOp
     if (cityCode) {
       builder.addFilter("cityCode", cityCode);
     }
-    if (verified) {
-      builder.addFilter("verified", verified);
+    if (isVerified !== undefined) {
+      builder.addFilter("isVerified", isVerified);
     }
 
     // Limit returned accounts data to minimum

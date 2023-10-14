@@ -25,9 +25,9 @@ const Key = 'DeleteProfileOperation' as const;
  * ```ts
  * await ju
  *   .app()
+ *   .prodiles(app)
  *   .deleteProfile(
  *      {
- *        app: JP8sM3QGJxEdGpZ3MJP8sM3QypwzuzZpko1ueonUQgT,
  *        profile: asUsM3QGJxEdGpZ3MJP8sM3QypwzuzZpko1ueonUQsD
  *      });
  * ```

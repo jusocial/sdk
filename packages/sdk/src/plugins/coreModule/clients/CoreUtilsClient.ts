@@ -3,6 +3,7 @@ import {
   findEntityByAliasValueOperation
 } from '../operations';
 // import { Profile, Publication, Subspace } from '../models';
+// import { isPda } from '../helpers';
 import { isPda } from '../helpers';
 import type { Ju } from '@/Ju';
 import { OperationOptions, PublicKey } from '@/types';
@@ -17,19 +18,19 @@ interface SearchResultItem {
 /**
  * This client helps to make common interactions with the Ju Aplication.
  *
- * You may access this client via the `core()` method of your `Ju` instance.
+ * You may access this client via the `core().utils(app)` method of your `Ju` instance.
  *
  * @example
  * ```ts
- * const aliasClient = ju.core().common;
+ * const utilsClient = ju.core().utils(app);
  * ```
  *
  * @see {@link CoreClient} The `Core` client
  * @group Modules
  */
-export class CommonClient {
+export class CoreUtilsClient {
 
-  constructor(readonly ju: Ju) { }
+  constructor(readonly ju: Ju, readonly app: PublicKey) { }
 
   /**
    * Finds entities by given request string.
@@ -39,8 +40,8 @@ export class CommonClient {
    * @returns {Promise<SearchResultItem>} Alias instance or null.
    */
   async search(
-    app: PublicKey,
     request: string,
+    loadJsonMetadata: false,
     options?: OperationOptions
   ): Promise<SearchResultItem[]> {
 
@@ -50,12 +51,15 @@ export class CommonClient {
       const pk = new PublicKey(request);
 
       try {
-        const profile = await this.ju.core().profile.get(pk, options);
+        const profile = await this.ju
+          .core()
+          .profiles(this.app)
+          .getProfile(pk, loadJsonMetadata, options);
 
         result.push(
           {
             name: profile.model,
-            description: `${profile.name} ${profile.surname}`,
+            description: `${profile.firstName} ${profile.lastName}`,
             address: profile.address
           }
         );
@@ -67,7 +71,10 @@ export class CommonClient {
       }
 
       try {
-        const subspace = await this.ju.core().subspace.get(pk, options);
+        const subspace = await this.ju
+        .core()
+        .subspaces(this.app)
+        .getSubspace(pk, loadJsonMetadata, options);
 
         result.push(
           {
@@ -84,7 +91,10 @@ export class CommonClient {
       }
 
       try {
-        const publication = await this.ju.core().publication.get(pk, options);
+        const publication = await this.ju
+        .core()
+        .publications(this.app)
+        .getPublication(pk, loadJsonMetadata, options);
 
         result.push(
           {
@@ -103,7 +113,7 @@ export class CommonClient {
     } else {
 
       // Search alias
-      const aliasSearchResult = await this.findEntityByAliasValue(app, request);
+      const aliasSearchResult = await this.findEntityByAliasValue(request, loadJsonMetadata, options);
       if (aliasSearchResult) {
         result.push(
           {
@@ -131,7 +141,6 @@ export class CommonClient {
    * @returns {Promise<Alias | null>} Alias instance or null.
    */
   findAliasByValue(
-    app: PublicKey,
     alias: string,
     options?: OperationOptions
   ) {
@@ -139,7 +148,7 @@ export class CommonClient {
       .operations()
       .execute(findAliasByValueOperation(
         {
-          app,
+          app: this.app,
           alias
         }
       ),
@@ -156,7 +165,6 @@ export class CommonClient {
    * @returns {Promise<Profile | Subspaca>} Profile or Subspace instance.
    */
   findEntityByAliasValue(
-    app: PublicKey,
     alias: string,
     loadJsonMetadata?: boolean,
     options?: OperationOptions
@@ -165,7 +173,7 @@ export class CommonClient {
       .operations()
       .execute(findEntityByAliasValueOperation(
         {
-          app,
+          app: this.app,
           alias,
           loadJsonMetadata
         }

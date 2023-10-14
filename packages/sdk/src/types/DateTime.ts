@@ -51,6 +51,6 @@ export const formatDateTime = (
   }
 ): string => {
   const date = new Date(value.toNumber() * 1000);
-
+  // @ts-ignore
   return date.toLocaleDateString(locales, options);
 };
