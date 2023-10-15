@@ -1,6 +1,6 @@
 {
   "name": "@ju-protocol/sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "sideEffects": false,
   "module": "dist/esm/index.mjs",
   "main": "dist/cjs/index.cjs",
@@ -14,8 +14,7 @@
   "files": [
     "/dist/cjs",
     "/dist/esm",
-    "/dist/types",
-    "/src"
+    "/dist/types"
   ],
   "publishConfig": {
     "access": "public"
@@ -44,7 +43,7 @@
   },
   "dependencies": {
     "@bundlr-network/client": "^0.8.8",
-    "@ju-protocol/ju-core": "^0.1.7",
+    "@ju-protocol/ju-core": "^0.1.91",
     "@metaplex-foundation/beet": "0.7.1",
     "@metaplex-foundation/mpl-token-metadata": "^2.11.0",
     "@noble/ed25519": "^1.7.1",

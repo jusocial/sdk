@@ -5,16 +5,9 @@ import {
   killStuckProcess,
   ju
 } from '../../helpers';
-import { bytesArrToStr, toBirthDate, toJuFile } from '@/index';
+import { toBirthDate, toJuFile } from '@/index';
 
 killStuckProcess();
-
-// type TestProfileJsonMetadata<Uri = string> = {
-//   name?: string;
-//   description?: string;
-//   image?: Uri
-//   avatar?: Uri;
-// };
 
 test('[Setup]', async () => {
 
@@ -51,7 +44,7 @@ test('[Setup]', async () => {
     ju: await ju(),
     name: 'bobb',
     lastName: 'Johnson',
-    birthdate: [1991, 2, 23] as [number, number, number],
+    birthdate: [1986, 2, 23] as [number, number, number],
     status: 'Hey there!',
     json: {
       name: 'Bob',
@@ -107,15 +100,8 @@ test('[Setup]', async () => {
           data: {
             metadataUri: uri,
 
-            profileGenderRequired: false,
-            profileFirstNameRequired: true,
-            profileLastNameRequired: true,
-            profileBirthdateRequired: true,
-            profileCountryRequired: false,
-            profileCityRequired: false,
-            profileMetadataUriRequired: true,
-
-            subspaceMetadataUriRequired: true,
+            profileMetadataRequired: true,
+            subspaceMetadataRequired: true,
 
             profileDeleteAllowed: false,
             subspaceDeleteAllowed: false,
@@ -211,6 +197,7 @@ test('[Setup]', async () => {
             lastName: alice.lastName,
             birthDate: toBirthDate(...alice.birthdate),
             countryCode: 0,
+            regionCode: 0,
             cityCode: 0,
             currentLocation: null
           }
@@ -253,6 +240,7 @@ test('[Setup]', async () => {
             lastName: bob.lastName,
             birthDate: toBirthDate(...bob.birthdate),
             countryCode: 0,
+            regionCode: 0,
             cityCode: 0,
             currentLocation: null
           }
@@ -289,6 +277,7 @@ test('[Setup]', async () => {
             lastName: konrad.lastName,
             birthDate: toBirthDate(...konrad.birthdate),
             countryCode: 0,
+            regionCode: 0,
             cityCode: 0,
             currentLocation: null
           }
@@ -398,6 +387,8 @@ test('[Setup]', async () => {
 
       t.comment(`tx signature: ${response.signature}`);
     });
+
+    
   })
 
   test('[Subspaces]', async () => {
@@ -599,7 +590,7 @@ test('[Setup]', async () => {
         $topic: 'Publication test',
         isMirror: false,
         isReply: false,
-        subspace: null,
+        subspace: PublicKey.default,
         contentType: 0,
         // tag: '',
         metadataUri: uri,
@@ -640,7 +631,7 @@ test('[Setup]', async () => {
         $topic: 'Publication test',
         isMirror: false,
         isReply: true,
-        subspace: null,
+        subspace: PublicKey.default,
         contentType: 0,
         // tag: null,
         metadataUri: uri,
@@ -677,7 +668,7 @@ test('[Setup]', async () => {
       t.equal(publication.app.toBase58(), testApp.toBase58(), 'App');
       t.equal(publication.subspace?.toBase58(), subspace1.toBase58(), 'Subspace');
       t.equal(publication.metadataUri, uri, 'URI');
-      
+
       t.equal(publication.tag, tag, 'Tag');
 
 
@@ -725,7 +716,7 @@ test('[Setup]', async () => {
       const publications = await bob.ju.core().publications(testApp).findPublications(
         {
           // isEncrypted: true,
-          // isReply: true,
+          isReply: true,
           targetPublication: publication1
         }
       );
@@ -897,6 +888,30 @@ test('[Setup]', async () => {
       // console.log(profiles);
     });
 
+    test('[Query] it can find all Profiles `30 age old + - 10 years` (connections as initializer)', async (t: Test) => {
+      // Query
+      const profiles = await alice.ju.core().profiles(testApp).findProfilesAsKeys(
+        {
+          age10yearsInterval: 30
+        }
+      );
+
+      t.equal(profiles.length, 3);
+      // console.log(profiles);
+    });
+
+    test('[Query] it can find all Profiles `27 age old + - 5 years` (connections as initializer)', async (t: Test) => {
+      // Query
+      const profiles = await alice.ju.core().profiles(testApp).findProfilesAsKeys(
+        {
+          age5yearsInterval: 36
+        }
+      );
+
+      t.equal(profiles.length, 1);
+      // console.log(profiles);
+    });
+
     test('[Fetch] it can find Entity by Alias name', async (t: Test) => {
 
       // Fetch Profile.
@@ -934,6 +949,18 @@ test('[Setup]', async () => {
       // console.log('reactions :>> ', reactions);
 
       t.equal(reactions.length, 2)
+    });
+
+    test('[Query] it can find All Publication reactions that happens in 3 days', async (t: Test) => {
+      // Query
+      const profiles = await alice.ju.core().reactions(testApp).findReactionsAsKeys(
+        {
+          target: publication1,
+          isIn3Days: true
+        }
+      );
+
+      t.equal(profiles.length, 2);
     });
 
   });

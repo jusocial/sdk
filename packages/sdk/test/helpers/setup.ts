@@ -52,16 +52,9 @@ export const createApp = async (
       appName: 'testApp',
       data: {
         metadataUri: uri,
-
-        profileGenderRequired: false,
-        profileFirstNameRequired: true,
-        profileLastNameRequired: true,
-        profileBirthdateRequired: true,
-        profileCountryRequired: false,
-        profileCityRequired: false,
-        profileMetadataUriRequired: true,
-
-        subspaceMetadataUriRequired: true,
+        
+        profileMetadataRequired: true,
+        subspaceMetadataRequired: true,
 
         profileDeleteAllowed: false,
         subspaceDeleteAllowed: false,

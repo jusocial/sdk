@@ -208,7 +208,7 @@ export type JsonMetadataAttachment<T> = {
 
 export type JsonMetadataContent = {
   type?: 'plainText' | 'html' | 'markdown';
-  value: string;
+  value?: string;
 
   [key: string]: unknown;
 }

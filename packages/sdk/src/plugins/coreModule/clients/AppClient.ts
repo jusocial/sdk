@@ -81,14 +81,8 @@ export class AppClient {
           data: {
             metadataUri: data.metadataUri === undefined ? app.metadataUri : data.metadataUri,
 
-            profileGenderRequired: data.profileGenderRequired === undefined ? app.profileGenderRequired : data.profileGenderRequired,
-            profileFirstNameRequired: data.profileFirstNameRequired === undefined ? app.profileFirstNameRequired : data.profileFirstNameRequired,
-            profileLastNameRequired: data.profileLastNameRequired === undefined ? app.profileLastNameRequired : data.profileLastNameRequired,
-            profileBirthdateRequired: data.profileBirthdateRequired === undefined ? app.profileBirthdateRequired : data.profileBirthdateRequired,
-            profileCountryRequired: data.profileCountryRequired === undefined ? app.profileCountryRequired : data.profileCountryRequired,
-            profileCityRequired: data.profileCityRequired === undefined ? app.profileCityRequired : data.profileCityRequired,
-            profileMetadataUriRequired: data.profileMetadataUriRequired === undefined ? app.profileMetadataUriRequired : data.profileMetadataUriRequired,
-            subspaceMetadataUriRequired: data.subspaceMetadataUriRequired === undefined ? app.subspaceMetadataUriRequired : data.subspaceMetadataUriRequired,
+            profileMetadataRequired: data.profileMetadataRequired === undefined ? app.profileMetadataRequired : data.profileMetadataRequired,
+            subspaceMetadataRequired: data.subspaceMetadataRequired === undefined ? app.subspaceMetadataRequired : data.subspaceMetadataRequired,
 
             profileDeleteAllowed: data.profileDeleteAllowed === undefined ? app.profileDeleteAllowed : data.profileDeleteAllowed,
             subspaceDeleteAllowed: data.subspaceDeleteAllowed === undefined ? app.subspaceDeleteAllowed : data.subspaceDeleteAllowed,

@@ -101,6 +101,7 @@ export class ProfileClient {
             lastName: data.lastName === undefined ? profile.lastName : data.lastName,
             birthDate: data.birthDate === undefined ? profile.birthDate : data.birthDate,
             countryCode: data.countryCode === undefined ? profile.countryCode : data.countryCode,
+            regionCode: data.regionCode === undefined ? profile.regionCode : data.regionCode,
             cityCode: data.cityCode === undefined ? profile.cityCode : data.cityCode,
             currentLocation: data.currentLocation === undefined ? profile.currentLocation : data.currentLocation
           },

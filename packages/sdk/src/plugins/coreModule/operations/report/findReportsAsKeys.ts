@@ -59,6 +59,9 @@ export type FindReportsAsKeysInput = {
    * Abuse = 1
   */
   reportType?: ReportType;
+  
+  /** Searchable number of day  (for additional filtering) */
+  searchableDay?: number;
 };
 
 /**
@@ -79,17 +82,18 @@ export const findReportsAsKeysOperationHandler: OperationHandler<FindReportsAsKe
     scope: OperationScope
   ) => {
     // const { commitment } = scope;
-    const { 
+    const {
       app,
       initializer,
       target,
-      reportType
+      reportType,
+      searchableDay
     } = operation.input;
 
-    const builder =  Report.gpaBuilder();
+    const builder = Report.gpaBuilder();
     // Add discriminator
     builder.addFilter("accountDiscriminator", reportDiscriminator);
-    
+
     // Add additional filters
 
     if (app) {
@@ -104,9 +108,12 @@ export const findReportsAsKeysOperationHandler: OperationHandler<FindReportsAsKe
     if (reportType) {
       builder.addFilter("reportType", reportType);
     }
+    if (searchableDay) {
+      builder.addFilter("searchableDay", searchableDay)
+    }
 
     // Limit returned accouns data to minimum
-    builder.config.dataSlice = {offset: 0, length: 0};
+    builder.config.dataSlice = { offset: 0, length: 0 };
 
     const res = await builder.run(ju.connection);
 

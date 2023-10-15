@@ -1,5 +1,6 @@
 import { Connection, connectionDiscriminator, ConnectionTargetType } from '@ju-protocol/ju-core'
 import type { PublicKey } from '@solana/web3.js';
+import { todayToSearchInterval } from '../../helpers';
 import {
   Operation,
   OperationHandler,
@@ -62,6 +63,12 @@ export type FindConnectionsAsKeysInput = {
 
   /** Connection status (for additional filtering) */
   approved?: boolean;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
 };
 
 /**
@@ -82,18 +89,20 @@ export const findConnectionsAsKeysOperationHandler: OperationHandler<FindConnect
     scope: OperationScope
   ) => {
     // const { commitment } = scope;
-    const { 
+    const {
       app,
       initializer,
       target,
       connectionTargetType,
-      approved
+      approved,
+      isIn3Days,
+      isToday
     } = operation.input;
 
-    const builder =  Connection.gpaBuilder();
+    const builder = Connection.gpaBuilder();
     // Add discriminator
     builder.addFilter("accountDiscriminator", connectionDiscriminator);
-    
+
     // Add additional filters
 
     if (app) {
@@ -111,12 +120,18 @@ export const findConnectionsAsKeysOperationHandler: OperationHandler<FindConnect
     if (approved !== undefined) {
       builder.addFilter("approved", approved)
     }
+    if (isIn3Days) {
+      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+    }
+    if (isToday) {
+      builder.addFilter("searchableDay", todayToSearchInterval(1))
+    }
 
     // Limit returned accouns data to minimum
-    builder.config.dataSlice = {offset: 0, length: 0};
+    builder.config.dataSlice = { offset: 0, length: 0 };
 
     const res = await builder.run(ju.connection);
-    
+
     const connectionAddresses = res.map((connection) => connection.pubkey)
 
     return connectionAddresses;

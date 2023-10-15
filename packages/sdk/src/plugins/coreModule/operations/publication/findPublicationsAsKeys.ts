@@ -1,4 +1,4 @@
-import type { PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { ContentType, Publication, publicationDiscriminator } from '@ju-protocol/ju-core'
 import {
   Operation,
@@ -7,6 +7,7 @@ import {
   useOperation,
 } from '@/types';
 import type { Ju } from '@/Ju';
+import { todayToSearchInterval } from '../../helpers';
 
 // -----------------
 // Operation
@@ -57,7 +58,7 @@ export type FindPublicationsAsKeysInput = {
   profile?: PublicKey;
 
   /** Subspace as Publication destination  (for additional filtering)*/
-  subspace?: PublicKey;
+  subspace?: PublicKey | false;
 
   /**
   * Whether or not Publication contain encrypted content
@@ -88,6 +89,12 @@ export type FindPublicationsAsKeysInput = {
 
   /** Publication Tag  (for additional filtering) */
   tag?: string,
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
 };
 
 /**
@@ -117,7 +124,9 @@ export const findPublicationsAsKeysOperationHandler: OperationHandler<FindPublic
       isReply,
       targetPublication,
       contentType,
-      tag
+      tag,
+      isIn3Days,
+      isToday
     } = operation.input;
 
     // Building GPA
@@ -134,8 +143,12 @@ export const findPublicationsAsKeysOperationHandler: OperationHandler<FindPublic
     if (profile) {
       builder.addFilter("profile", profile)
     }
-    if (subspace) {
-      builder.addFilter("subspace", subspace)
+    if (subspace !== undefined) {
+      if (subspace === false) {
+        builder.addFilter("subspace", PublicKey.default)
+      } else {
+        builder.addFilter("subspace", subspace);
+      }
     }
     if (isEncrypted !== undefined) {
       builder.addFilter('isEncrypted', isEncrypted)
@@ -154,6 +167,12 @@ export const findPublicationsAsKeysOperationHandler: OperationHandler<FindPublic
     }
     if (tag) {
       builder.addFilter("tag", tag)
+    }
+    if (isIn3Days) {
+      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+    }
+    if (isToday) {
+      builder.addFilter("searchableDay", todayToSearchInterval(1))
     }
 
     // Limit returned accouns data to minimum

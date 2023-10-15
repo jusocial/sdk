@@ -70,6 +70,12 @@ export type FindProfilesAsKeysInput = {
 
   /** Verified status (for additional filtering) */
   isVerified?: boolean;
+
+  /** Searchable number of 10-years-period related to birthdate (for additional filtering) */
+  age10yearsInterval?: number;
+
+  /** Searchable number of 5-years-period related to birthdate (for additional filtering) */
+  age5yearsInterval?: number;
 };
 
 /**
@@ -99,6 +105,8 @@ export const findProfilesAsKeysOperationHandler: OperationHandler<FindProfilesAs
       countryCode,
       cityCode,
       isVerified,
+      age10yearsInterval,
+      age5yearsInterval,
     } = operation.input;
 
     // Building GPA
@@ -129,6 +137,12 @@ export const findProfilesAsKeysOperationHandler: OperationHandler<FindProfilesAs
     }
     if (isVerified !== undefined) {
       builder.addFilter("isVerified", isVerified);
+    }
+    if (age10yearsInterval) {
+      builder.addFilter("searchable10Years", Math.floor(age10yearsInterval / 10))
+    }
+    if (age5yearsInterval) {
+      builder.addFilter("searchable5Years", Math.floor(age5yearsInterval / 5))
     }
 
     // Limit returned accounts data to minimum

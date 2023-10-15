@@ -3,7 +3,7 @@ import { AppArgs } from '@ju-protocol/ju-core';
 import {
   AppAccount
 } from '../accounts';
-import { AppJsonMetadata } from './AppJsonMetadata';
+import { AppJsonMetadata } from './JsonMetadata';
 import { assert, Option } from '@/utils';
 
 

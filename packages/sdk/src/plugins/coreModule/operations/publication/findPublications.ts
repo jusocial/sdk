@@ -1,4 +1,4 @@
-import type { PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { ContentType, 
   Publication as PublicationCore, 
   publicationDiscriminator 
@@ -15,6 +15,7 @@ import {
 } from '@/types';
 import type { Ju } from '@/Ju';
 import { Option } from '@/utils';
+import { todayToSearchInterval } from '../../helpers';
 
 // -----------------
 // Operation
@@ -65,7 +66,7 @@ export type FindPublicationsInput = {
   profile?: PublicKey;
 
   /** Subspace as Publication destination  (for additional filtering)*/
-  subspace?: PublicKey;
+  subspace?: PublicKey | false;
 
   /**
   * Whether or not Publication contain encrypted content
@@ -95,7 +96,13 @@ export type FindPublicationsInput = {
   contentType?: ContentType;
 
   /** Publication Tag  (for additional filtering) */
-  tag?: string,
+  tag?: string;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
 
   /**
    * Whether or not we should fetch the JSON Metadata.
@@ -133,6 +140,8 @@ export const findPublicationsOperationHandler: OperationHandler<FindPublications
       targetPublication,
       contentType,
       tag,
+      isIn3Days,
+      isToday,
       loadJsonMetadata = false
     } = operation.input;
 
@@ -188,8 +197,12 @@ export const findPublicationsOperationHandler: OperationHandler<FindPublications
     if (profile) {
       builder.addFilter("profile", profile)
     }
-    if (subspace) {
-      builder.addFilter("subspace", subspace)
+    if (subspace !== undefined) {
+      if (subspace === false) {
+        builder.addFilter("subspace", PublicKey.default)
+      } else {
+        builder.addFilter("subspace", subspace);
+      }
     }
     if (isEncrypted !== undefined) {
       builder.addFilter("isEncrypted",  isEncrypted)
@@ -208,6 +221,12 @@ export const findPublicationsOperationHandler: OperationHandler<FindPublications
     }
     if (tag) {
       builder.addFilter("tag", tag)
+    }
+    if (isIn3Days) {
+      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+    }
+    if (isToday) {
+      builder.addFilter("searchableDay", todayToSearchInterval(1))
     }
 
     const res = await builder.run(ju.connection);

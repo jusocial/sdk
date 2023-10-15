@@ -664,11 +664,11 @@ export type App<JsonMetadata extends object = AppJsonMetadata> = {
     /** Whether or not the App's Profiles City field is required */
     profileCityRequired: boolean;
     /** Whether or not the App's Profiles external Metadata URI field is required */
-    profileMetadataUriRequired: boolean;
+    profileMetadataRequired: boolean;
     /** Whether or not the App's Subspaces Name field is required */
     subspaceNameRequired: boolean;
     /** Whether or not the App's Subspaces external Metadata URI field is required */
-    subspaceMetadataUriRequired: boolean;
+    subspaceMetadataRequired: boolean;
     /** Whether or not the App's Profiles delete action is allowed */
     profileDeleteAllowed: boolean;
     /** Whether or not the App's Subspaces delete action is allowed */

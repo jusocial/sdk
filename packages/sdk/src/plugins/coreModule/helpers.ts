@@ -61,5 +61,13 @@ export const bytesArrToStr = (bytes: number[]): string => {
   return decodeURIComponent(result);
 };
 
+export const todayToSearchInterval = (eventDays: 1 | 3 ): number => {
+
+  const SECONDS_IN_DAY = 86_400;
+  const now = Math.floor(new Date().getTime() / 1000);
+
+  return (now / (eventDays * SECONDS_IN_DAY));
+}
+
 
 

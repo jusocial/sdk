@@ -165,7 +165,7 @@ export const createAppBuilder = (
 ): TransactionBuilder<CreateAppBuilderContext> => {
   // Data.
   const { programs, payer = ju.rpc().getDefaultFeePayer() } = options;
-  const { 
+  const {
     appName,
     data,
     externalProcessors
@@ -183,6 +183,15 @@ export const createAppBuilder = (
       programs,
     });
 
+  
+  // const developerWhitelistProof = ju
+  //   .core()
+  //   .pdas()
+  //   .developer({
+  //     authority,
+  //     programs,
+  //   });
+
   return (
     TransactionBuilder.make<CreateAppBuilderContext>()
       .setFeePayer(payer)
@@ -195,6 +204,7 @@ export const createAppBuilder = (
         instruction: createInitializeAppInstruction(
           {
             app: appPda,
+            developerWhitelistProof: toOptionalAccount(),
             registeringProcessorPda: toOptionalAccount(externalProcessors.registeringProcessor),
             connectingProcessorPda: toOptionalAccount(externalProcessors.connectingProcessor),
             publishingProcessorPda: toOptionalAccount(externalProcessors.publishingProcessor),

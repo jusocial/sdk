@@ -69,11 +69,20 @@ export type FindProfilesInput = {
   /** The Profile's user Country code (for additional filtering) */
   countryCode?: number;
 
+  /** The Profile's user Region code (for additional filtering) */
+  regionCode?: number;
+
   /** The Profile's user City code (for additional filtering) */
   cityCode?: number;
 
   /** Verified status (for additional filtering) */
   isVerified?: boolean;
+
+  /** Searchable number of 10-years-period related to birthdate (for additional filtering) */
+  age10yearsInterval?: number;
+
+  /** Searchable number of 5-years-period related to birthdate (for additional filtering) */
+  age5yearsInterval?: number;
 
   /**
    * Whether or not we should fetch the JSON Metadata.
@@ -108,8 +117,11 @@ export const findProfilesOperationHandler: OperationHandler<FindProfilesOperatio
       firstName,
       lastName,
       countryCode,
+      regionCode,
       cityCode,
       isVerified,
+      age10yearsInterval,
+      age5yearsInterval,
       loadJsonMetadata = false
     } = operation.input;
 
@@ -136,11 +148,20 @@ export const findProfilesOperationHandler: OperationHandler<FindProfilesOperatio
     if (countryCode) {
       builder.addFilter("countryCode", countryCode);
     }
+    if (regionCode) {
+      builder.addFilter("regionCode", regionCode);
+    }
     if (cityCode) {
       builder.addFilter("cityCode", cityCode);
     }
     if (isVerified !== undefined) {
       builder.addFilter("isVerified", isVerified);
+    }
+    if (age10yearsInterval) {
+      builder.addFilter("searchable10Years", Math.floor(age10yearsInterval / 10))
+    }
+    if (age5yearsInterval) {
+      builder.addFilter("searchable5Years", Math.floor(age5yearsInterval / 5))
     }
 
     const res = await builder.run(ju.connection);

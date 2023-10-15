@@ -56,8 +56,6 @@ export class GpaBuilder {
 
     this.config.filters.push(...filters);
 
-    console.log('filters :>> ', this.config.filters);
-    
     return this;
   }
 
@@ -121,5 +119,4 @@ export class GpaBuilder {
 
     return new GmaBuilder(this.ju, await this.getAndMap(cb), options);
   }
-
 }

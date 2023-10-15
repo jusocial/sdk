@@ -2,6 +2,7 @@ import type { PublicKey } from '@solana/web3.js';
 import { Reaction as ReactionCore, reactionDiscriminator , ReactionType } from '@ju-protocol/ju-core'
 import { Reaction, toReaction } from '../../models';
 import { toReactionAccount } from '../../accounts';
+import { todayToSearchInterval } from '../../helpers';
 import {
   lamports,
   Operation,
@@ -62,6 +63,13 @@ export type FindReactionsInput = {
    * Subspace = 1
   */
   reactionType?: ReactionType;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
+
 };
 
 // /**
@@ -86,7 +94,9 @@ export const findReactionsOperationHandler: OperationHandler<FindReactionsOperat
       app,
       initializer,
       target,
-      reactionType
+      reactionType,
+      isIn3Days,
+      isToday
      } = operation.input;
 
 
@@ -107,6 +117,12 @@ export const findReactionsOperationHandler: OperationHandler<FindReactionsOperat
     }
     if (reactionType) {
       builder.addFilter("reactionType", reactionType);
+    }
+    if (isIn3Days) {
+      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+    }
+    if (isToday) {
+      builder.addFilter("searchableDay", todayToSearchInterval(1))
     }
 
     const res = await builder.run(ju.connection);

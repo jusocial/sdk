@@ -2,6 +2,7 @@ import type { PublicKey } from '@solana/web3.js';
 import { Connection as ConnectionCore, connectionDiscriminator, ConnectionTargetType } from '@ju-protocol/ju-core';
 import { toConnectionAccount } from '../../accounts';
 import { Connection, toConnection } from '../../models';
+import { todayToSearchInterval } from '../../helpers';
 import {
   lamports,
   Operation,
@@ -65,6 +66,12 @@ export type FindConnectionsInput = {
 
   /** Connection status (for additional filtering) */
   approved?: boolean;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
 };
 
 /**
@@ -84,12 +91,14 @@ export const findConnectionsOperationHandler: OperationHandler<FindConnectionsOp
     scope: OperationScope
   ) => {
     // const { commitment } = scope;
-    const { 
+    const {
       app,
       initializer,
       target,
       connectionTargetType,
-      approved
+      approved,
+      isIn3Days,
+      isToday
     } = operation.input;
 
     const builder = ConnectionCore.gpaBuilder();
@@ -112,6 +121,12 @@ export const findConnectionsOperationHandler: OperationHandler<FindConnectionsOp
     }
     if (approved !== undefined) {
       builder.addFilter("approved", approved)
+    }
+    if (isIn3Days) {
+      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+    }
+    if (isToday) {
+      builder.addFilter("searchableDay", todayToSearchInterval(1))
     }
 
     const res = await builder.run(ju.connection);

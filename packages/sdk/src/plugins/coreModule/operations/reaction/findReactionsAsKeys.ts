@@ -1,5 +1,6 @@
 import type { PublicKey } from '@solana/web3.js';
 import { Reaction, reactionDiscriminator , ReactionType } from '@ju-protocol/ju-core'
+import { todayToSearchInterval } from '../../helpers';
 import {
   Operation,
   OperationHandler,
@@ -59,6 +60,13 @@ export type FindReactionsAsKeysInput = {
    * Subspace = 1
   */
   reactionType?: ReactionType;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
+
 };
 
 // /**
@@ -83,7 +91,9 @@ export const findReactionsAsKeysOperationHandler: OperationHandler<FindReactions
       app,
       initializer,
       target,
-      reactionType
+      reactionType,
+      isIn3Days,
+      isToday
      } = operation.input;
 
 
@@ -104,6 +114,12 @@ export const findReactionsAsKeysOperationHandler: OperationHandler<FindReactions
     }
     if (reactionType) {
       builder.addFilter("reactionType", reactionType);
+    }
+    if (isIn3Days) {
+      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+    }
+    if (isToday) {
+      builder.addFilter("searchableDay", todayToSearchInterval(1))
     }
 
     // Limit returned accouns data to minimum

@@ -62,6 +62,9 @@ export type FindReportsInput = {
    * Abuse = 1
   */
   reportType?: ReportType;
+
+  /** Searchable number of day  (for additional filtering) */
+  searchableDay?: number;
 };
 
 /**
@@ -82,17 +85,18 @@ export const findReportsOperationHandler: OperationHandler<FindReportsOperation>
     scope: OperationScope
   ) => {
     // const { commitment } = scope;
-    const { 
+    const {
       app,
       initializer,
       target,
-      reportType
+      reportType,
+      searchableDay
     } = operation.input;
 
-    const builder =  ReportCore.gpaBuilder();
+    const builder = ReportCore.gpaBuilder();
     // Add discriminator
     builder.addFilter("accountDiscriminator", reportDiscriminator);
-    
+
     // Add additional filters
 
     if (app) {
@@ -106,6 +110,9 @@ export const findReportsOperationHandler: OperationHandler<FindReportsOperation>
     }
     if (reportType) {
       builder.addFilter("reportType", reportType);
+    }
+    if (searchableDay) {
+      builder.addFilter("searchableDay", searchableDay)
     }
 
     const res = await builder.run(ju.connection);
@@ -136,6 +143,6 @@ export const findReportsOperationHandler: OperationHandler<FindReportsOperation>
     }
 
     return reports;
-    
+
   },
 };
