@@ -50,7 +50,7 @@ To illustrate, here is an example of how you can retrieve a Profile using its ad
 ```ts
 const profileAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const profile = await ju.core().profile.get(profileAddress);
+const profile = await ju.core().profiles.getProfile(profileAddress);
 ```
 
 You may pass an `AbortSignal` to second argument to cancel the operation before it finishes — similarly to how you would cancel an HTTP request.
@@ -74,16 +74,16 @@ Now, before we proceed to the identity and storage drivers, let's delve a bit de
 # Core module
 
 The Core module can be accessed via `ju.core()` and provides the following clients:
-- [`common`](#common-client)
-- [`app`](#app-client)
-- [`profile`](#profile-client)
-- [`subspace`](#subspace-client)
-- [`publication`](#publication-client)
-- [`connection`](#connection-client)
-- [`reaction`](#reaction-client)
-- [`report`](#report-client)
+- [`utils`](#common-client)
+- [`apps`](#app-client)
+- [`profiles`](#profile-client)
+- [`subspaces`](#subspace-client)
+- [`publications`](#publication-client)
+- [`connections`](#connection-client)
+- [`reactions`](#reaction-client)
+- [`reports`](#report-client)
 
-## `Common` client
+## `Utils` client
 The Common client can be accessed via `ju.core().common` and provides the following methods:
 - [`search`](#search)
 - [`findAliasByValue`](#findAliasByValue)
@@ -91,73 +91,72 @@ The Common client can be accessed via `ju.core().common` and provides the follow
 
 ## `App` client
 The App client can be accessed via `ju.core().app` and provides the following methods:
-- [`get`](#getApp)
-- [`create`](#createApp)
-- [`update`](#updateApp)
+- [`getApp`](#getApp)
+- [`createApp`](#createApp)
+- [`updateApp`](#updateApp)
+- [`findApps`](#findApps)
+- [`findAppsAsKeys`](#findAppsAsKeys)
+- [`getAppsByKeyList`](#getAppsByKeyList)
 
 ## `Profile` client
 The Profile client can be accessed via `ju.core().profile` and provides the following methods:
-- [`get`](#getProfile)
-- [`create`](#createProfile)
-- [`update`](#updateProfile)
-- [`delete`](#deleteProfile)
-- [`keysByFilter`](#keysByFilterProfile)
-- [`findByConnectionTarget`](#findByConnectionTargetProfile)
-- [`findByConnectionInitializer`](#findByConnectionInitializerProfile)
-- [`findByKeyList`](#findByKeyListProfile)
-- [`setName`](#setNameProfile)
-- [`setSurname`](#setSurnameProfile)
-- [`setAlias`](#setAliasProfile)
-- [`setMetadataUri`](#setMetadataUriProfile)
-- [`setStatus`](#setStatusProfile)
-- [`setBirthDate`](#setBirthDateProfile)
-- [`deleteBirthDate`](#deleteBirthDateProfile)
-- [`setCountryCode`](#setCountryCodeProfile)
-- [`setCityCode`](#setCityCodeProfile)
-- [`setCurrentLocation`](#setCurrentLocationProfile)
+- [`getProfile`](#getProfile)
+- [`createProfile`](#createProfile)
+- [`updateProfile`](#updateProfile)
+- [`deleteProfile`](#deleteProfile)
+- [`findProfiles`](#findProfiles)
+- [`findProfilesAsKeys`](#findProfilesAsKeys)
+- [`findProfilesAsKeysByConnectionTarget`](#findProfilesAsKeysByConnectionTarget)
+- [`findProfilesAsKeysByConnectionInitializer`](#findProfilesAsKeysByConnectionInitializer)
+- [`getProfilesByKeyList`](#getProfilesByKeyList)
 
 ## `Subspace` client
 The Subspace client can be accessed via `ju.core().subspace` and provides the following methods:
-- [`get`](#getSubspace)
-- [`create`](#createSubspace)
-- [`update`](#updateSubspace)
-- [`delete`](#deleteSubspace)
+- [`getSubspace`](#getSubspace)
+- [`createSubspace`](#createSubspace)
+- [`updateSubspace`](#updateSubspace)
+- [`deleteSubspace`](#deleteSubspace)
 
 ## `Publication` client
 The Publication client can be accessed via `ju.core().publication` and provides the following methods:
-- [`get`](#getPublication)
-- [`create`](#createPublication)
-- [`update`](#updatePublication)
-- [`delete`](#deletePublication)
-- [`collect`](#collectPublication)
-- [`keysByFilter`](#keysByFilterPublication)
-- [`findByKeyList`](#findByKeyListPublication)
+- [`getPublication`](#getPublication)
+- [`createPublication`](#createPublication)
+- [`updatePublication`](#updatePublication)
+- [`deletePublication`](#deletePublication)
+- [`collectPublication`](#collectPublication)
+- [`findPublications`](#findPublications)
+- [`findPublicationsAsKeys`](#findPublicationsAsKeys)
+- [`getPublicationsByKeyList`](#getPublicationsByKeyList)
 
 ## `Connection` client
 The Connection client can be accessed via `ju.core().connection` and provides the following methods:
-- [`create`](#createConnection)
-- [`update`](#updateConnection)
-- [`delete`](#deleteConnection)
-- [`keysByFilter`](#keysByFilterConnection)
-- [`findByKeyList`](#findByKeyListConnection)
+- [`createConnection`](#createConnection)
+- [`updateConnection`](#updateConnection)
+- [`deleteConnection`](#deleteConnection)
+- [`findConnections`](#findConnections)
+- [`findConnectionsAsKeys`](#findConnectionsAsKeys)
+- [`getConnectionsByKeyList`](#getConnectionsByKeyList)
+- [`isConnectionExist`](#isConnectionExist)
 
 ## `Reaction` client
 The Reaction client can be accessed via `ju.core().reaction` and provides the following methods:
-- [`create`](#createReaction)
-- [`delete`](#deleteReaction)
-- [`keysByFilter`](#keysByFilterReaction)
-- [`findByKeyList`](#findByKeyListReaction)
+- [`createReaction`](#createReaction)
+- [`deleteReaction`](#deleteReaction)
+- [`findReactions`](#keysByFilterReaction)
+- [`findReactionsAsKeys`](#findByKeyListReaction)
+- [`getReactionsByKeyList`](#getReactionsByKeyList)
 
 ## `Report` client
 The Report client can be accessed via `ju.core().report` and provides the following methods:
-- [`create`](#createReport)
-- [`keysByFilter`](#keysByFilterReport)
-- [`findByKeyList`](#findByKeyListReport)
+- [`createReport`](#createReport)
+- [`findReports`](#keysByFilterReport)
+- [`findReportsAsKeys`](#findByKeyListReport)
+- [`getReportsByKeyList`](#getReportsByKeyList)
 
 
 
-# `Common client` methods
-Detailed description of the Common client methods.
+# `Core Utils client` methods
+Detailed description of the Core Utils client methods.
 
 - [The `SearchResultItem` object](#SearchResultItem)
 
@@ -172,7 +171,7 @@ The `search` method accepts an `app` as public key and returns a [`SearchResultI
 const app = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 const requestString = 'something';
 
-const result = await ju.core().common.search(
+const result = await ju.core().utils().search(
     app,
     requestString 
 );
@@ -188,7 +187,7 @@ The `findAliasByValue` method accepts an `app` as public key and `alias` as stri
 const app = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 const alias = 'johndoe';
 
-const result = await ju.core().common.findAliasByValue(
+const result = await ju.core().utils().findAliasByValue(
     app,
     alias 
 );
@@ -204,7 +203,7 @@ The `findEntityByAliasValue` method accepts an `app` as public key and `alias` a
 const app = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 const alias = 'johndoe';
 
-const result = await ju.core().common.findEntityByAliasValue(
+const result = await ju.core().utils().findEntityByAliasValue(
     app,
     alias 
 );
@@ -217,17 +216,17 @@ The following model, either returned or used by the above methods.
 
 - The [`App` model](#the-app-model)
 
-## `get`
+## `getApp`
 
 Gets the App instance by given App address.
 
-The `get` method accepts an `app` as public key and returns an [`App` model](#App) instance.
+The `getApp` method accepts an `app` as public key and returns an [`App` model](#App) instance.
 
 
 ```ts
 const appAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const app = await ju.core().app.get(appAddress);
+const app = await ju.core().apps().getApp(appAddress);
 ```
 
 The returned `App` object will have its JSON metadata already loaded so you can, for instance, access its image URL like so (provided it is present in the downloaded metadata).
@@ -238,38 +237,38 @@ const imageUrl = app.metadata.image;
 
 You can [read more about the `App` model below](#App).
 
-## `create`
+## `createApp`
 
 Creates the App instance with given data.
 
-The `create` method accepts a [`CreateAppInput`](#CreateAppInput) object and returns an [`App` model](#App) instance.
+The `createApp` method accepts a [`CreateAppInput`](#CreateAppInput) object and returns an [`App` model](#App) instance.
 
 
 ```ts
-const { app } = await ju.core().app.create(
+const { app } = await ju.core().apps().create(
     { 
         appName: 'testApp',
         data: {
-            // TODO
+            // ...restData
         },
         externalProcessors: {
-            // TODO
+            // ...restData
         }
     }
 );
 ```
 
-## `update`
+## `updateApp`
 
 Update the existing App data.
 
-The `update` method accepts an [`App`](#App) instance and `app data` object to update current values.
+The `updateApp` method accepts an [`App`](#App) instance and `app data` object to update current values.
 
 
 ```ts
 const appAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const app = await ju.core().app.get(appAddress);
+const app = await ju.core().apps.getApp(appAddress);
 
 const result = await ju.core().app.update(
     app,
@@ -279,20 +278,70 @@ const result = await ju.core().app.update(
 );
 ```
 
+## `findApps`
+
+Finds Apps by given number of filters.
+
+The `findProfiles` method accepts [`FindAppsInput`](#FindAppsInput) type and returns[`App` array](#App) as a result.
+
+
+```ts
+const authority = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const subspaces = await ju.core().apps.findApps(
+    {
+        authority
+    }
+);
+```
+
+## `findAppsAsKeys`
+
+Finds pubkeys of Apps by given number of filters.
+
+The `findAppsAsKeys` is similar to `findApps`, but returns only PublicKey array of finded Apps. Method accepts [`FindAppsAsKeysInput`](#FindAppsAsKeysInput) type and returns[`PublicKey` array](#App) as a result.
+
+
+```ts
+const authority = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const app = await ju.core().apps().findAppsAsKeys(
+    {
+        authority
+    }
+);
+```
+
+## `getAppsByKeyList`
+
+Finds Apps by given array of prefetched PublicKey(s).
+
+The `getAppsByKeyList` is similar to `findAppsByKeyList`, but returns only PublicKey array of finded Apps. Method accepts [`FindAppsByKeyListInput`](#FindAppsByKeyListInput) type and returns[`App` array](#App) as a result.
+
+
+```ts
+const apps: App[] = await ju.core().apps().findAppsAsKeys(
+    [
+        // ...appsPubkeys
+    ]
+);
+``
+
+
 # `Profile client` methods
 Detailed description of the Profile client methods.
 
-## `get`
+## `getProfile`
 
 Gets the Profile instance by given profile address (public key).
 
-The `get` method accepts an `address` as public key and returns a [`Profile` model](#Profile) instance.
+The `getProfile` method accepts an `address` as public key and returns a [`Profile` model](#Profile) instance.
 
 
 ```ts
 const profileAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const profile = await ju.core().profile.get(profileAddress);
+const profile = await ju.core().profiles.getProfile(profileAddress);
 ```
 
 The returned `Profile` object will have its JSON metadata already loaded so you can, for instance, access its image URL like so (provided it is present in the downloaded metadata).
@@ -303,77 +352,125 @@ const imageUrl = profile.metadata.image;
 
 You can [read more about the `Profile` model below](#Profile).
 
-## `create`
+## `createProfile`
 
 Creates new Profile with given data.
 
-The `create` method accepts a [`CreateProfileInput`](#CreateProfileInput) object and returns a [`Profile` model](#Profile) instance.
+The `createProfile` method accepts a [`CreateProfileInput`](#CreateProfileInput) object and returns a [`Profile` model](#Profile) instance.
 
 
 ```ts
 const appAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const { profile } = await ju.core().profile.create(
+const { profile } = await ju.core().profiles().createProfile(
     { 
-        app: appAddress,
-        data: {
-            // TODO
-        }
+        // ..data
     }
 );
 ```
 
-## `update`
+## `updateProfile`
 
 Update the existing Profile data.
 
-The `update` method accepts a [`Profile`](#Profile) instance and `profile data` object to update current values.
+The `updateProfile` method accepts a [`Profile`](#Profile) instance and `profile data` object to update current values.
 
 
 ```ts
 const profileAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const profile = await ju.core().profile.get(profileAddress);
+const profile = await ju.core().profiles().getProfile(profileAddress);
 
-const result = await ju.core().app.update(
+const result = await ju.core().profile().updateProfile(
     profile,
     { 
-        name: 'Alice',
-        surname: 'Smith'
+        firstName: 'Alice',
+        lastName: 'Smith'
+        // ...restData
     }
 );
 ```
 
-## `delete`
+## `deleteProfile`
 
 Delete the existing Profile.
 
-The `update` method accepts a [`Profile`](#Profile) instance and returns a [`SendAndConfirmTransactionResponse`](#SendAndConfirmTransactionResponse) as a result.
+The `deleteProfile` method accepts a [`Profile`](#Profile) instance and returns a [`SendAndConfirmTransactionResponse`](#SendAndConfirmTransactionResponse) as a result.
 
 
 ```ts
 const profileAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const profile = await ju.core().profile.get(appAddress);
-
-const result = await ju.core().app.delete(profile);
+const result = await ju.core().profile().deleteProfile(profile);
 ```
+
+## `findProfiles`
+
+Finds Profiles by given number of filters.
+
+The `findProfiles` method accepts a omitted by `app` [`FindProfilesInput`](#FindProfilesInput) type and returns[`Profiles` array](#Profile) as a result.
+
+
+```ts
+const app = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const subspaces = await ju.core().profiles(app).findProfiles(
+    {
+        app,
+    }
+);
+```
+
+## `findProfilesAsKeys`
+
+Finds pubkeys of Profiles by given number of filters.
+
+The `findProfilesAsKeys` is similar to `findProfiles`, but returns only PublicKey array of finded Profiles. Method accepts a omitted by `app` [`FindProfilesAsKeysInput`](#FindProfilesAsKeysInput) type and returns[`PublicKey` array](#Profile) as a result.
+
+
+```ts
+const app = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const subspaces = await ju.core().profiles(app).findProfilesAsKeys(
+    {
+        app,
+    }
+);
+```
+
+## `getProfilesByKeyList`
+
+Finds Profiles by given array of prefetched PublicKey(s).
+
+The `getProfilesByKeyList` is similar to `findProfilesByKeyList`, but returns only PublicKey array of finded Profiles. Method accepts a omitted by `app` [`FindProfilesByKeyListInput`](#FindProfilesByKeyListInput) type and returns[`Profiles` array](#Profile) as a result.
+
+
+```ts
+const app = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const profiles: Profile[] = await ju.core().profiles(app).findSubspacesAsKeys(
+    [
+        // ...profilesPubkeys
+    ]
+);
+``
+
 
 
 # `Subspace client` methods
 Detailed description of the Subspace client methods.
 
-## `get`
+## `getSubspace`
 
 Get the Subspace instance by subspace address (public key).
 
-The `get` method accepts an `address` as public key and returns a [`Subspace` model](#Subspace) instance.
+The `getSubspace` method accepts an `address` as public key and returns a [`Subspace` model](#Subspace) instance.
 
 
 ```ts
 const subspaceAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const { subspace } = await ju.core().subspace.get(subspaceAddress);
+const { subspace } = await ju.core().subspaces().getSubspace(subspaceAddress);
 ```
 
 The returned `Subspace` object will have its JSON metadata already loaded so you can, for instance, access its image URL like so (provided it is present in the downloaded metadata).
@@ -384,76 +481,126 @@ const imageUrl = subspace.metadata.image;
 
 You can [read more about the `Subspace` model below](#Subspace).
 
-## `create`
+## `createSubspace`
 
 Creates new Subspace with given data.
 
-The `create` method accepts a [`CreateSubspaceInput`](#CreateSubspaceInput) object and returns and [`Subspace` model](#Subspace) instance.
+The `Subspace` method accepts a [`CreateSubspaceInput`](#CreateSubspaceInput) object and returns and [`Subspace` model](#Subspace) instance.
 
 
 ```ts
 const appAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const { subspace } = await ju.core().subspace.create(
+const { subspace } = await ju.core().subspaces().Subspace(
     { 
-        app: appAddress,
-        data: {
-            // TODO
-        }
+        // ...data
     }
 );
 ```
 
-## `update`
+## `updateSubspace`
 
 Update the existing Subspace data.
 
-The `update` method accepts a [`Subspace`](#Subspace) instance and `subspace data` object to update current values.
+The `updateSubspace` method accepts a [`Subspace`](#Subspace) instance and `subspace data` object to update current values.
 
 
 ```ts
 const subspaceAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const subspace = await ju.core().subspace.get(subspaceAddress);
+const subspace = await ju.core().subspaces().getSubspace(subspaceAddress);
 
-const result = await ju.core().subspace.update(
+const result = await ju.core().subspaces().updateSubspace(
     subspace,
     { 
-        name: 'Nuclear Block',
+        name: 'NuclearBlock',
+        // ...restData
     }
 );
 ```
 
-## `delete`
+## `deleteSubspace`
 
 Delete the existing Subspace.
 
-The `update` method accepts a [`Subspace`](#Subspace) instance and returns a [`SendAndConfirmTransactionResponse`](#SendAndConfirmTransactionResponse) as a result.
+The `updateSubspace` method accepts a [`Subspace`](#Subspace) instance and returns a [`SendAndConfirmTransactionResponse`](#SendAndConfirmTransactionResponse) as a result.
 
 
 ```ts
 const subspaceAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const subspace = await ju.core().subspace.get(subspaceAddress);
+const result = await ju.core().subspace.delete(subspaceAddress);
+```
 
-const result = await ju.core().subspace.delete(subspace);
+## `findSubspaces`
+
+Finds Subspaces by given number of filters.
+
+The `findSubspaces` method accepts a omitted by `app` [`FindSubspacesInput`](#FindSubspacesInput) type and returns[`Subspaces` array](#Subspaces) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const subspaces = await ju.core().subspaces().findSubspaces(
+    {
+        creator: profileAddress,
+    }
+);
+```
+
+## `findSubspacesAsKeys`
+
+Finds pubkeys of Subspaces by given number of filters.
+
+The `findSubspacesAsKeys` is similar to `findSubspacesAsKeys`, but returns only PublicKey array of finded Subspaces. Method accepts a omitted by `app` [`FindSubspacesAsKeysInput`](#FindSubspacesAsKeysInput) type and returns[`PublicKey` array](#Subspaces) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const subspaces = await ju.core().subspaces().findSubspacesAsKeys(
+    {
+        creator: profileAddress,
+    }
+);
+```
+
+## `getSubspacesByKeyList`
+
+Finds Subspaces by given array of prefetched PublicKey(s).
+
+The `getSubspacesByKeyList` is similar to `findSubspacesByKeyList`, but returns only PublicKey array of finded Subspaces. Method accepts a omitted by `app` [`FindSubspacesByKeyListInput`](#FindSubspacesByKeyListInput) type and returns[`Subspaces` array](#Connection) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const subspaces: Subspace[] = await ju.core().subspaces().findSubspacesAsKeys(
+    [
+        // ...subspacesPubkeys
+    ]
+);
 ```
 
 
 # `Publication client` methods
 Detailed description of the Publication client methods.
 
-## `get`
+## `getPublication`
 
 Gets the Publication instance by publication address (public key).
 
-The `get` method accepts an `address` as public key and returns a [`Publication` model](#Publication) instance.
+The `getPublication` method accepts an `address` as public key and returns a [`Publication` model](#Publication) instance.
 
 
 ```ts
 const publicationAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const { publication } = await ju.core().publication.get(publicationAddress);
+const { publication } = await ju.core().publications().getPublication(
+    publicationAddress,
+    loadJsonMetadata // Whether or not retrieve external Json Metadata (default `true`)
+    );
 ```
 
 The returned `Publication` object will have its JSON metadata already loaded so you can, for instance, access its image URL like so (provided it is present in the downloaded metadata).
@@ -464,47 +611,58 @@ const imageUrl = publication.metadata.image;
 
 You can [read more about the `Publication` model below](#Publication).
 
-## `create`
+## `createPublication`
 
 Creates new Publication with given data.
 
-The `create` method accepts a [`CreatePublicationInput`](#CreatePublicationInput) object and returns and [`Publication` model](#Publication) instance.
+The `createPublication` method accepts a [`CreatePublicationInput`](#CreatePublicationInput) object and returns and [`Publication` model](#Publication) instance.
 
 
 ```ts
 const publicationAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const { publication } = await ju.core().publication.create(
+const { publication } = await ju.core().publications().createPublication(
     { 
-        app: publicationAddress,
-        data: {
-            // TODO
-        }
+        // ..data
     }
 );
 ```
 
-## `update`
+## `updatePublication`
 
 Update the existing Publication data.
 
-The `update` method accepts a [`Publication`](#Publication) instance and `publication data` object to update current values.
+The `updatePublication` method accepts a [`Publication`](#Publication) instance and `publication data` object to update current values.
 
 
 ```ts
 const publicationAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const publication = await ju.core().publication.get(publicationAddress);
+const publication = await ju.core().publications().getPublication(publicationAddress);
 
 const result = await ju.core().publication.update(
     publication,
     { 
-        // TODO
+        // ...data
     }
 );
 ```
 
-## `delete`
+## `collectPublication`
+
+Collect the given Publication.
+
+The `collectPublication` method accepts a publickey of collecting Publication and additional data `externalProcessingData` that might be passed to external processor for extra validating
+
+
+```ts
+const publicationAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
+
+const response = await ju.core().publications().collectPublication(publicationAddress);
+
+```
+
+## `deletePublication`
 
 Delete the existing Publication.
 
@@ -514,10 +672,60 @@ The `delete` method accepts a [`Publication`](#Publication) instance and returns
 ```ts
 const publicationAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE");
 
-const { publication } = await ju.core().publication.get(publicationAddress);
-
-const result = await ju.core().publication.delete(publication);
+const result = await ju.core().publication.delete(publicationAddress);
 ```
+
+## `findPublications`
+
+Finds Publications by given number of filters.
+
+The `findPublications` method accepts a omitted by `app` [`FindPublicationsInput`](#FindPublicationsInput) type and returns[`Publications` array](#Publications) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const publications = await ju.core().publications().findPublications(
+    {
+        profile: profileAddress,
+    }
+);
+```
+
+## `findPublicationsAsKeys`
+
+Finds pubkeys of Publications by given number of filters.
+
+The `findPublicationsAsKeys` is similar to `findConnectionsAsKeys`, but returns only PublicKey array of finded Connections. Method accepts a omitted by `app` [`FindConnectionsAsKeysInput`](#FindConnectionsAsKeysInput) type and returns[`PublicKey` array](#Connection) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const publications = await ju.core().publications().findPublicationsAsKeys(
+    {
+        profile: profileAddress,
+    }
+);
+```
+
+## `getPublicationsByKeyList`
+
+Finds Publications by given array of prefetched PublicKey(s).
+
+The `getPublicationsByKeyList` is similar to `findPublicationsByKeyList`, but returns only PublicKey array of finded Publications. Method accepts a omitted by `app` [`FindPublicationsByKeyListInput`](#FindPublicationsByKeyListInput) type and returns[`Publications` array](#Connection) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const publications: Connection[] = await ju.core().publications().findPublicationsAsKeys(
+    [
+        // ...connectionPubkeys
+    ]
+);
+```
+
 
 
 # `Connection client` methods
@@ -526,11 +734,11 @@ Detailed description of the Connection client methods.
 
 You can [read more about the `Connection` model below](#Connection).
 
-## `create`
+## `createConnection`
 
 Creates new Connection with diven data.
 
-The `create` method accepts a `target` as a variant of  [`Profile`](#Profile) or [`Subspace`](#Subspace) instance and optional `externalProcessingData` as string and returns[`SendAndConfirmTransactionResponse` object](#SendAndConfirmTransactionResponse) as a result.
+The `createConnection` method accepts a `target` as a variant of  [`Profile`](#Profile) or [`Subspace`](#Subspace) instance and optional `externalProcessingData` as string and returns[`SendAndConfirmTransactionResponse` object](#SendAndConfirmTransactionResponse) as a result.
 
 
 ```ts
@@ -538,20 +746,22 @@ const appAddress = new PublicKey("XTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeE")
 
 const targetProfileAddress = new PublicKey("YTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeG");
 
-const targetProfile = await ju.core().profile.get(targetProfileAddress);
-
 // Optional string to pass into external Connecting processor
 const externalProcessingData = 'some-validation-string';
 
 // Create connection with given Profile
-const result = await ju.core().connection.create(targetProfile, externalProcessingData);
+const response = await ju.core().connections().createConnection(
+    targetProfileAddress,
+    externalProcessingData
+);
+
 ```
 
-## `update`
+## `updateConnection`
 
 Update existing Connection (actually approve).
 
-The `update` method accepts a `initializer` as [`Profile` model](#Profile), `target` as public key, `approveStatus` as boolean and returns[`SendAndConfirmTransactionResponse` object](#SendAndConfirmTransactionResponse) as a result.
+The `updateConnection` method accepts a `initializer` as public key, `target` as public key, `approveStatus` as boolean and returns[`SendAndConfirmTransactionResponse` object](#SendAndConfirmTransactionResponse) as a result.
 
 
 ```ts
@@ -561,28 +771,79 @@ const initializerProfileAddress = new PublicKey("YTe3DymKZadrUoqAMn7HSpraxE4gB88
 
 const targetSubspaceAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
 
-const initializerProfile = await ju.core().profile.get(initializerProfileAddress);
-
-const result = await ju.core().connection.update(
+const result = await ju.core().connections().updateConnection(
     initializerProfile,
     targetSubspaceAddress,
     true
 );
 ```
 
-## `delete`
+## `deleteConnection`
 
 Delete existing Connection.
 
-The `delete` method accepts a `target` as a variant of [`Profile` model](#Profile) or [`Subspace` model](#Subspace) instance and returns[`SendAndConfirmTransactionResponse` object](#SendAndConfirmTransactionResponse) as a result.
+The `deleteConnection` method accepts a `target` as public key and returns[`SendAndConfirmTransactionResponse` object](#SendAndConfirmTransactionResponse) as a result.
 
 
 ```ts
 const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
 
-const targetProfile = await ju.core().profile.get(profileAddress);
+const result = await ju.core().connections().deleteConnection(profileAddress);
+```
 
-const result = await ju.core().connection.delete(targetProfile);
+## `findConnections`
+
+Finds connections by given number of filters.
+
+The `findConnections` method accepts a omitted by `app` [`FindConnectionsInput`](#FindConnectionsInput) type and returns[`Connection` array](#Connection) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const connections = await ju.core().connections().findConnections(
+    {
+        initializer: profileAddress,
+        isApproved: true,
+        isToday: true,
+    }
+);
+```
+
+## `findConnectionsAsKeys`
+
+Finds pubkeys of Connections by given number of filters.
+
+The `findConnectionsAsKeys` is similar to `findConnectionsAsKeys`, but returns only PublicKey array of finded Connections. Method accepts a omitted by `app` [`FindConnectionsAsKeysInput`](#FindConnectionsAsKeysInput) type and returns[`PublicKey` array](#Connection) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const connections = await ju.core().connections().findConnectionsAsKeys(
+    {
+        initializer: profileAddress,
+        isApproved: true,
+        isToday: true,
+    }
+);
+```
+
+## `getConnectionsByKeyList`
+
+Finds Connections by given array of prefetched PublicKey(s).
+
+The `getConnectionsByKeyList` is similar to `findConnectionsByKeyList`, but returns only PublicKey array of finded Connections. Method accepts a omitted by `app` [`FindConnectionsByKeyListInput`](#FindConnectionsByKeyListInput) type and returns[`Connection` array](#Connection) as a result.
+
+
+```ts
+const profileAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
+
+const connections: Connection[] = await ju.core().connections().findConnectionsAsKeys(
+    [
+        // ...connectionPubkeys
+    ]
+);
 ```
 
 
@@ -592,37 +853,33 @@ Detailed description of the Reaction client methods.
 
 You can [read more about the `Reaction` model below](#Reaction).
 
-## `create`
+## `createReaction`
 
 Creates new Reaction to given `target` Publication.
 
-The `create` method accepts a `target` as [`Publication` model](#Publication) instance, `reactionType` as [`ReactionType`] (#ReactionType) enum variant and returns [`SendAndConfirmTransactionResponse`](#SendAndConfirmTransactionResponse) object as a result.
+The `create` method accepts a `target` as PublicKey and `reactionType` as [`ReactionType`] (#ReactionType) enum variant and returns [`SendAndConfirmTransactionResponse`](#SendAndConfirmTransactionResponse) object as a result.
 
 
 ```ts
 const targetPublicationAddress = new PublicKey("YTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeG");
 
-const targetPublication = await ju.core().publication.get(targetPublicationAddress);
-
-const result = await ju.core().reaction.create(
-    targetPublication,
+const result = await ju.core().reactions().createReactions(
+    targetPublicationAddress,
     0   // Upvote variant
 );
 ```
 
-## `delete`
+## `deleteReaction`
 
 Delete existing Reaction by given `target`.
 
-The `delete` method accepts a `target` as [`Publication` model](#Publication) instance and returns[`SendAndConfirmTransactionResponse` object](#SendAndConfirmTransactionResponse) as a result.
+The `deleteReaction` method accepts a `target` as PublicKey of Target entity and returns[`SendAndConfirmTransactionResponse` object](#SendAndConfirmTransactionResponse) as a result.
 
 
 ```ts
 const publicationAddress = new PublicKey("BTe3DymKZadrUoqAMn7HSpraxE4gB88uo1L9zLGmzJeA");
 
-const targetPublication = await ju.core().publication.get(publicationAddress);
-
-const result = await ju.core().reaction.delete(targetPublication);
+const result = await ju.core().reactions().deleteReaction(publicationAddress);
 ```
 
 # Core `Models` description
@@ -631,6 +888,7 @@ const result = await ju.core().reaction.delete(targetPublication);
 - [`Profile model`](#profile-model)
 - [`Subspace model`](#subspace-model)
 - [`Publication model`](#publication-model)
+- 
 
 ## `App` model
 
@@ -639,11 +897,20 @@ Represents protocol Application entity
 ```ts
 export type App<JsonMetadata extends object = AppJsonMetadata> = {
     /** A model identifier to distinguish models in the SDK. */
-    model: 'profile';
+    readonly model: 'app';
+
     /** A Public Keys of the App */
-    address: PublicKey;
+    readonly address: PublicKey;
+
     /** The JSON metadata associated with the metadata account. */
-    metadata: JsonMetadata | null;
+    readonly metadata: Option<JsonMetadata>;
+
+    /**
+     * Whether or not the JSON metadata was loaded in the first place.
+     * When this is `false`, the `json` property is should be ignored.
+     */
+    readonly jsonLoaded: boolean;
+
     /** A Protocol unique Name of the App */
     appName: string;
     /** App authority */
@@ -652,21 +919,8 @@ export type App<JsonMetadata extends object = AppJsonMetadata> = {
     metadataUri: string | null;
 
     /** App Settings */
-
-    /** Whether or not the App's Profiles Name field is required */
-    profileNameRequired: boolean;
-    /** Whether or not the App's Profiles Surname field is required */
-    profileSurnameRequired: boolean;
-    /** Whether or not the App's Profiles Birthdate field is required */
-    profileBirthdateRequired: boolean;
-    /** Whether or not the App's Profiles Country field is required */
-    profileCountryRequired: boolean;
-    /** Whether or not the App's Profiles City field is required */
-    profileCityRequired: boolean;
     /** Whether or not the App's Profiles external Metadata URI field is required */
     profileMetadataRequired: boolean;
-    /** Whether or not the App's Subspaces Name field is required */
-    subspaceNameRequired: boolean;
     /** Whether or not the App's Subspaces external Metadata URI field is required */
     subspaceMetadataRequired: boolean;
     /** Whether or not the App's Profiles delete action is allowed */
@@ -683,7 +937,6 @@ export type App<JsonMetadata extends object = AppJsonMetadata> = {
     publicationIndividualProcessorsAllowed: boolean;
 
     /** External Processors */
-
     /** External registering processor for additional verification */
     registeringProcessor: PublicKey | null;
     /** External connecting processor for additional verification */
@@ -704,42 +957,76 @@ Represents protocol Application's Profile entity
 ```ts
 export type Profile<JsonMetadata extends object = ProfileJsonMetadata> = {
     /** A model identifier to distinguish models in the SDK. */
-    model: 'profile';
+    readonly model: 'profile';
+
     /** A Public Keys of the Profile */
-    address: PublicKey;
+    readonly address: PublicKey;
+
     /** The JSON metadata associated with the metadata account. */
-    metadata: JsonMetadata | null;
+    readonly metadata: Option<JsonMetadata>;
+
+    /**  Because `firstName` is byte array in core program - needs to convert to string */
+    firstName: string;
+    
+    /**  Because `lastName` is byte array in core program - needs to convert to string */
+    lastName: string;
+
+    /**
+     * Whether or not the JSON metadata was loaded in the first place.
+     * When this is `false`, the `json` property is should be ignored.
+     */
+    readonly jsonLoaded: boolean;
 
     /** A parent Application */
     app: PublicKey;
     /** Profile authority */
     authority: PublicKey;
+    /** Exchange key */
+    exchangeKey: web3.PublicKey;
+    /** Whether or not the Profile is verified */
+    isVerified: boolean;
+    /** Profile country code */
+    countryCode: number;
+    /** Profile city code */
+    regionCode: number;
+    /** Profile city code */
+    cityCode: number;
+    /** Profile birth date */
+    birthDate: BN;
     /** Profile alias */
     alias: string | null;
     /** External metadata URI */
     metadataUri: string | null;
     /** Profile status text */
-    statusText: string | null;
-    /** Whether or not the Profile is verified */
-    verified: boolean;
-    /** Profile name */
-    name: string | null;
-    /** Profile surname */
-    surname: string | null;
-    /** Profile birth date */
-    birthDate: BN | null;
-    /** Profile country code */
-    countryCode: number | null;
-    /** Profile city code */
-    cityCode: number | null;
+    statusText: string;
+
+    /** Helps seach profiles bi age */
+    searchable10Years: Bn;
+    /** Helps seach profiles bi age */
+    searchable5Years: Bn;
+    /** Helps finds near birth date */
+    searchableWeek: BN;
+    /** Helps finds near birth date */
+    searchableDay: Bn;
+
+    /** Profile sgender */
+    gender: Gender | null;
+
     /** Profile current location coordinates */
     currentLocation: LocationCoordinates | null;
+
     /** Profile specified (individual) external connecting processor */
     connectingProcessor: PublicKey | null;
+
     /** Profile creation unix timestamp */
     createdAt: BN | null;
     /** Profile modification unix timestamp */
     modifiedAt: BN | null;
+
+    /** Reserved for future neeeds */
+    reserved1: number[];
+    reserved2: number[];
+    reserved3: number[];
 }
 ```
 
@@ -750,18 +1037,29 @@ Represents protocol Application's Subspace entity
 ```ts
 export type Subspace<JsonMetadata extends object = SubspaceJsonMetadata> = {
     /** A model identifier to distinguish models in the SDK. */
-    model: 'subspace';
+    readonly model: 'subspace';
     /** A Public Keys of the Subspace */
-    address: PublicKey;
+    readonly address: PublicKey;
     /** The JSON metadata associated with the metadata account. */
-    metadata: JsonMetadata | null;
+    readonly metadata: Option<JsonMetadata>;
+    /**  Because `name` is byte array in core program - needs to convert to string */
+    name: string;
+    /**
+     * Whether or not the JSON metadata was loaded in the first place.
+     * When this is `false`, the `json` property is should be ignored.
+     */
+    readonly jsonLoaded: boolean;
 
     /** A parent Application */
     app: PublicKey;
     /** Profile authority */
     authority: PublicKey;
+    /** Exchange key */
+    exchangeKey: web3.PublicKey;
     /** Subspace creator (Profile) */
     creator: PublicKey;
+    /** Publishing permission enum settings implementation */
+    publishingPermission: SubspacePublishingPermissionLevel;
     /** Subspace alias */
     alias: string | null;
     /** Subspace name */
@@ -772,7 +1070,6 @@ export type Subspace<JsonMetadata extends object = SubspaceJsonMetadata> = {
     metadataUri: string | null;
    
     /** External Processors */
-
     /** Subspace specified (individual) external connecting processor */
     connectingProcessor: PublicKey | null;
     /** Subspace specified (individual) external publishing processor */
@@ -781,6 +1078,10 @@ export type Subspace<JsonMetadata extends object = SubspaceJsonMetadata> = {
     collectingProcessor: PublicKey | null;
     /** Subspace specified (individual) external referencing processor */
     referencingProcessor: PublicKey | null;
+
+    /** Reserved for future neeeds */
+    reserved1: number[];
+    reserved2: number[];
 }
 ```
 
@@ -791,11 +1092,18 @@ Represents protocol Application's Publication entity
 ```ts
 export type Publication<JsonMetadata extends object = PublicationJsonMetadata> = {
     /** A model identifier to distinguish models in the SDK. */
-    model: 'publication';
+    readonly model: 'publication';
     /** A Public Keys of the Publication */
-    address: PublicKey;
+    readonly address: PublicKey;
     /** The JSON metadata associated with the metadata account. */
-    metadata: JsonMetadata | null;
+    readonly metadata: Option<JsonMetadata>;
+    /**  Because `tag` is byte array in core program - needs to convert to string */
+    tag: string;
+    /**
+     * Whether or not the JSON metadata was loaded in the first place.
+     * When this is `false`, the `json` property is should be ignored.
+     */
+    readonly jsonLoaded: boolean;
 
     /** A parent Application */
     app: PublicKey;
@@ -803,25 +1111,30 @@ export type Publication<JsonMetadata extends object = PublicationJsonMetadata> =
     profile: PublicKey;
     /** Profile authority */
     authority: PublicKey;
-    /** Subspace in which Publication being published */
-    subspace: PublicKey | null;
-    /** Whether or not the Publication is mirroring other existing Publication (e.g. re-post) */
+    /** Whether or not the Publication is containinf encrypted content */
+    isEncrypted: boolean;
+     /** Whether or not the Publication is mirroring other existing Publication (e.g. re-post) */
     isMirror: boolean;
     /** Whether or not the Publication is replying to other existing Publication (e.g. comment) */
     isReply: boolean;
-    /** References to existing Publication if there is a mirror or reply (optional) */
-    targetPublication: PublicKey | null;
     /** Publication main content type */
     contentType: ContentType;
     /** Publication tag */
     tag: string | null;
+    /** Helps seach publication for feeds or notifications */
+    searchable3Day: BN;
+    /** Helps seach publication for feeds or notifications */
+    searchableDay: Bn;
+    /** References to existing Publication if there is a mirror or reply (PublicKey.default in case not passed) */
+    targetPublication: PublicKey;
+    /** Subspace in which Publication being published */
+    subspace: PublicKey | null;
     /** Publication UUID */
     uuid: string;
     /** Publication external metadata URI */
     metadataUri: string | null;
-   
+
     /** External Processors */
-    
     /** Publication specified (individual) external collecting processor */
     collectingProcessor: PublicKey | null;
     /** Publication specified (individual) external referencing processor */
@@ -834,13 +1147,243 @@ export type Publication<JsonMetadata extends object = PublicationJsonMetadata> =
 }
 ```
 
-## `JsonMetadata` model
+## `AppJsonMetadata` model
 
-Object represents external metadata
+Object represents external Application metadata (that too expensive to store on-chain)
 
 ```ts
-export type JsonMetadata<Uri = string> = {
-    // TODO
+export type AppJsonMetadata<Uri = string> = {
+    appId?: string;
+
+    name?: string;
+    description?: string;
+
+    image?: Uri;
+    imageCover?: Uri;
+
+    properties?: {
+        team?: Array<{
+        title?: string;
+        description?: string;
+        image?: Uri;
+        [key: string]: unknown;
+        }>;
+
+        links?: {
+        website?: string;
+        github?: string;
+        docs?: string;
+        [key: string]: unknown;
+        }
+
+        [key: string]: unknown;
+    };
+
+    [key: string]: unknown;
+}
+```
+
+## `ProfileJsonMetadata` model
+
+Object represents external Profile metadata 
+
+```ts
+export type ProfileJsonMetadata<Uri = string> = {
+    appId?: string;
+    profileId?: string;
+
+    image?: Uri;
+    imageCover?: Uri;
+
+    bio?: string;
+
+    details?: {
+        basic?: {
+        nickname?: string;
+        nationality?: string;
+        ethnicity: string;
+        socialClass?: 'upper class' | 'middle class' | 'lower class' | 'other';
+        religion?: 'christianity' | 'islam' | 'hinduism' | 'buddhism' | 'judaism' | 'atheist' | 'other';
+        sexuality?: 'heterosexual' | 'homosexual' | 'bisexual' | 'pansexual' | 'asexual' | 'demisexual' | 'queer' | 'questioning' | 'other';
+        education?: 'high school' | 'college' | 'university' | 'postgraduate' | 'other';
+        politicalViews?: 'conservative' | 'liberal' | 'moderate' | 'anarchist' | 'socialist' | 'fascist' | 'other';
+
+        [key: string]: unknown;
+        },
+        physical?: {
+        height?: 'short' | 'average' | 'tall';
+        shape?: 'slim' | 'athletic' | 'curvy' | 'muscular' | 'heavyset' | 'other';
+        hair?: 'black' | 'brown' | 'blonde' | 'red' | 'gray' | 'other';
+        eyes?: 'brown' | 'blue' | 'green' | 'hazel' | 'gray' | 'other';
+        glassesLenses?: 'glasses' | 'lenses' | 'none';
+        additionalDescription?: string;
+
+        [key: string]: unknown;
+        },
+        personality?: {
+        positiveCharacteristics: string[];
+        negativeCharacteristics: string[];
+
+        moral?: 'always' | 'sometimes' | 'never';
+        stable?: 'always' | 'sometimes' | 'never';
+        loyal?: 'always' | 'sometimes' | 'never';
+        generous?: 'always' | 'sometimes' | 'never';
+        extravert?: 'always' | 'sometimes' | 'never';
+        compassionate?: 'always' | 'sometimes' | 'never';
+        iq?: number;
+        hobbies?: string[];
+        phobias?: string[];
+        favoriteFoods: string[];
+
+        [key: string]: unknown;
+        },
+        employment?:
+        {
+        fromYear?: number;
+        toYear?: number;
+        company?: string;
+        position?: string;
+
+        [key: string]: unknown;
+        }[]
+    }
+
+    [key: string]: unknown;
+}
+```
+
+## `SubspaceJsonMetadata` model
+
+Object represents external Subspace metadata
+
+```ts
+export type SubspaceJsonMetadata<Uri = string> = {
+    appId?: string;
+
+    title?: string;
+    description?: string;
+
+    image?: Uri;
+    imageCover?: Uri;
+
+    type?: JsonMetadataSubspaceType;
+
+    team?: JsonMetadataTeamMember<Uri>[];
+    contacts?: JsonMetadataContacts;
+
+    [key: string]: unknown;
+}
+```
+
+## `PublicationJsonMetadata` model
+
+Object represents external Publication metadata
+
+```ts
+export type PublicationJsonMetadata<Uri = string> = {
+    appId?: string;
+
+    title?: string;
+
+    description?: string;
+    intro?: string,
+
+    content?: JsonMetadataContent;
+
+    attachments?: JsonMetadataAttachment<Uri>[];
+
+    [key: string]: unknown;
+}
+```
+
+## Other nested Json types:
+
+```ts
+export type JsonMetadataTeamMember<T> = {
+  title?: string;
+  role?: string;
+  description?: string;
+  image?: T;
+  personalContacts?: JsonMetadataContacts;
+
+  [key: string]: unknown;
+};
+
+export type JsonMetadataContacts = {
+  website?: string;
+  discord?: string;
+  telegram?: string;
+  facebook?: string;
+  email?: string;
+
+  [key: string]: unknown;
+};
+
+export type JsonMetadataSubspaceType =
+  'community'
+  | 'group'
+  | 'event'
+  | 'project'
+  | 'organization'
+  | 'club'
+  | 'team'
+  | 'forum'
+  | 'network'
+  | 'space'
+  | string;
+
+
+/** @group Models */
+export type JsonMetadataEvent = {
+  title?: string;
+  description?: string;
+  datetime?: number;
+  datetimeString?: string;
+  location?: JsonMetadataLocation;
+  participantsLimit?: number;
+
+  [key: string]: unknown;
+}
+
+export type JsonMetadataLocation = {
+  description: string;
+  address?: string;
+  latitude: string;
+  longitude: string;
+  countryCode: number;
+  cityCode: number;
+
+  [key: string]: unknown;
+}
+
+export type JsonMetadataAttachmentType =
+  | 'image'
+  | 'video'
+  | 'audio'
+  | 'document'            // For documents (PDF, Word, etc.)
+  | 'link'
+  | 'code'                // For code snippets or programming content
+  | 'archive'             // For compressed archives (ZIP, RAR, etc.)    // For event data (date, time, location, etc.)             
+  | string;               // For any other types not covered by the above
+
+export type JsonMetadataAttachment<T> = {
+  type?: JsonMetadataAttachmentType;
+  description?: string;
+
+  thumbnail?: T;
+  uri?: T;
+
+  location?: JsonMetadataLocation;
+  event?: JsonMetadataEvent;
+
+  [key: string]: unknown;
+};
+
+export type JsonMetadataContent = {
+  type?: 'plainText' | 'html' | 'markdown';
+  value?: string;
+
+  [key: string]: unknown;
 }
 ```
 
@@ -854,9 +1397,9 @@ When creating or updating an App, you will need a URI pointing to some JSON Meta
 If your JSON metadata is not already uploaded, you may do this using the SDK via the `uploadMetadata` method. It accepts a metadata object and returns the URI of the uploaded metadata. Where exactly the metadata will be uploaded depends on the selected `StorageDriver`.
 
 ```ts
-const { uri } = await ju.core().common.uploadMetadata(
+const { uri } = await ju.storage().uploadMetadata<AppJsonMetadata<JuFile | string>>(
     {
-        name: "My App",
+        name: "MyApp",
         description: "My App description",
         image: "https://arweave.net/123",
     }
@@ -873,18 +1416,25 @@ To make this process easier, the `uploadMetadata` method will recognise any inst
 // Assuming the user uploaded two assets via an input field of type "file".
 const browserFiles = event.target.files;
 
-const { uri, metadata } = await ju.core().common.uploadMetadata(
+const { uri, metadata } = await ju.storage().uploadMetadata<PublicationJsonMetadata<JuFile | string>>(
     {
-        name: "My Video",
-        image: await toJuFileFromBrowser(browserFiles[0]),
-        properties: {
-            files: [
-                {
-                    type: "video/mp4",
-                    uri: await toJuFileFromBrowser(browserFiles[1]),
-                },
-            ]
-        }
+        appId: 'app public key here';
+
+        title: 'Publication title';
+
+        description: 'Some description';
+        intro: '',
+
+        attachments: [
+            {
+                type: "video",
+                description: 'my cool video';
+
+                thumbnail?: 'https://....';
+
+                uri: await toJuFileFromBrowser(browserFiles[1]),
+            },
+        ]
     }
 );
 
