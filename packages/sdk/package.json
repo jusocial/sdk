@@ -17,7 +17,8 @@
     "/dist/types"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
   },
   "license": "MIT",
   "description": "Ju SDK",
