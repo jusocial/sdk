@@ -15,14 +15,29 @@ export class CorePdasClient {
   /** Finds the Protocol Developer whitelist item. */
   developer(input: {
     /** Developer authority */
-    authority: PublicKey
+    authority?: PublicKey
+    /** An optional set of programs that override the registered ones. */
+    programs?: Program[];
+  }): Pda {
+    const authority = input.authority || this.ju.identity().publicKey;
+    const programId = this.programId(input.programs);
+    return Pda.find(programId, [
+      Buffer.from('developer', 'utf8'),
+      authority.toBuffer(),
+    ]);
+  }
+
+  /** Finds the JXP whitelist item. */
+  processor(input: {
+    /** Developer authority */
+    program: PublicKey
     /** An optional set of programs that override the registered ones. */
     programs?: Program[];
   }): Pda {
     const programId = this.programId(input.programs);
     return Pda.find(programId, [
       Buffer.from('developer', 'utf8'),
-      input.authority.toBuffer(),
+      input.program.toBuffer(),
     ]);
   }
 
