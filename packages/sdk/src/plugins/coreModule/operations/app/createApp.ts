@@ -33,8 +33,12 @@ const Key = 'CreateAppOperation' as const;
  *   .createApp(
  *      {
  *        appName: 'jutube',
- *        data: {},
- *        externalProcessors: {}
+ *        data: {
+ *          // ...data
+ *        },
+ *        externalProcessors: {
+ *          // ...processors
+ *        }
  *      }
  *    );
  * ```
@@ -184,13 +188,13 @@ export const createAppBuilder = (
     });
 
   
-  // const developerWhitelistProof = ju
-  //   .core()
-  //   .pdas()
-  //   .developer({
-  //     authority,
-  //     programs,
-  //   });
+  const developerWhitelistProof = ju
+    .core()
+    .pdas()
+    .developer({
+      authority,
+      programs,
+    });
 
   return (
     TransactionBuilder.make<CreateAppBuilderContext>()
@@ -204,7 +208,7 @@ export const createAppBuilder = (
         instruction: createInitializeAppInstruction(
           {
             app: appPda,
-            developerWhitelistProof: toOptionalAccount(),
+            developerWhitelistProof,
             registeringProcessorPda: toOptionalAccount(externalProcessors.registeringProcessor),
             connectingProcessorPda: toOptionalAccount(externalProcessors.connectingProcessor),
             publishingProcessorPda: toOptionalAccount(externalProcessors.publishingProcessor),
