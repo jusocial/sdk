@@ -1163,17 +1163,19 @@ export type AppJsonMetadata<Uri = string> = {
 
     properties?: {
         team?: Array<{
-        title?: string;
-        description?: string;
-        image?: Uri;
-        [key: string]: unknown;
+            title?: string;
+            description?: string;
+            image?: Uri;
+
+            [key: string]: unknown;
         }>;
 
         links?: {
-        website?: string;
-        github?: string;
-        docs?: string;
-        [key: string]: unknown;
+            website?: string;
+            github?: string;
+            docs?: string;
+            
+            [key: string]: unknown;
         }
 
         [key: string]: unknown;
