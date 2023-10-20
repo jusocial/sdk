@@ -1,7 +1,8 @@
 import {
-  createInitializeConnectionInstruction,
+  createInitializeConnectionInstruction, Profile, Subspace,
 } from '@ju-protocol/ju-core';
 import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
+import { toOptionalAccount } from '../../helpers';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';
 import {
   makeConfirmOptionsFinalizedOnMainnet,
@@ -84,7 +85,7 @@ export const createConnectionOperationHandler: OperationHandler<CreateConnection
     ju: Ju,
     scope: OperationScope
   ): Promise<CreateConnectionOutput> {
-    const builder = createConnectionBuilder(
+    const builder = await createConnectionBuilder(
       ju,
       operation.input,
       scope
@@ -140,14 +141,14 @@ export type CreateConnectionBuilderContext = Omit<
  * @group Transaction Builders
  * @category Constructors
  */
-export const createConnectionBuilder = (
+export const createConnectionBuilder = async (
   ju: Ju,
   params: CreateConnectionBuilderParams,
   options: TransactionBuilderOptions = {}
-): TransactionBuilder<CreateConnectionBuilderContext> => {
+): Promise<TransactionBuilder<CreateConnectionBuilderContext>> => {
   // Data.
   const { programs, payer = ju.rpc().getDefaultFeePayer() } = options;
-  const { 
+  const {
     app,
     target,
     externalProcessingData = null
@@ -176,6 +177,24 @@ export const createConnectionBuilder = (
       programs,
     });
 
+  // Get JXP from App
+  const { connectingProcessor } = await ju.core().apps().getApp(app);
+
+  // Trying to get JPX from target
+  let connectingProcessorIndividual: PublicKey | null = null;
+  try {
+    const mayBeProfile = await Profile.fromAccountAddress(ju.connection, target);
+    connectingProcessorIndividual = mayBeProfile.connectingProcessor;
+  } catch (error) {
+    // target is not a Profile ...
+    try {
+      const mayBeSubspace = await Subspace.fromAccountAddress(ju.connection, target);
+      connectingProcessorIndividual = mayBeSubspace.connectingProcessor;
+    } catch (error) {
+      // target is invalid
+    }
+  }
+
   return (
     TransactionBuilder.make<CreateConnectionBuilderContext>()
       .setFeePayer(payer)
@@ -191,6 +210,8 @@ export const createConnectionBuilder = (
             connection: connectionPda,
             initializer,
             target,
+            connectingProcessor: toOptionalAccount(connectingProcessor),
+            connectingProcessorIndividual: toOptionalAccount(connectingProcessorIndividual),
             authority: toPublicKey(authority),
           },
           {
