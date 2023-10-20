@@ -221,6 +221,57 @@ export const createSubspaceBuilder = (
     });
   }
 
+
+  // Deriving JXP PDAs
+
+  let connectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.connectingProcessor) {
+    connectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.connectingProcessor
+        }
+      )
+  }
+
+  let publishingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.publishingProcessor) {
+    publishingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.publishingProcessor
+        }
+      )
+  }
+
+  let collectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.collectingProcessor) {
+    collectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.collectingProcessor
+        }
+      )
+  }
+
+  let referencingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.referencingProcessor) {
+    referencingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.referencingProcessor
+        }
+      )
+  }
+
   return (
     TransactionBuilder.make<CreateSubspaceBuilderContext>()
       .setFeePayer(payer)
@@ -237,10 +288,10 @@ export const createSubspaceBuilder = (
             subspace: subspacePda,
             aliasPda: toOptionalAccount(aliasPda),
 
-            connectingProcessorPda: toOptionalAccount(externalProcessors.connectingProcessor),
-            publishingProcessorPda: toOptionalAccount(externalProcessors.publishingProcessor),
-            collectingProcessorPda: toOptionalAccount(externalProcessors.collectingProcessor),
-            referencingProcessorPda: toOptionalAccount(externalProcessors.referencingProcessor),
+            connectingProcessorPda,
+            publishingProcessorPda,
+            collectingProcessorPda,
+            referencingProcessorPda,
 
             authority: toPublicKey(authority),
           },

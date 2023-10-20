@@ -5,6 +5,7 @@ import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { Subspace } from '../../models/Subspace';
 import { toOptionalAccount } from '../../helpers';
 import { ExternalProcessors } from '../../types';
+import { findSubspaceByAddressOperation } from './findSubspaceByAddress';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';
 import {
   // isSigner,
@@ -19,7 +20,6 @@ import {
   useOperation,
 } from '@/types';
 import type { Ju } from '@/Ju';
-import { findSubspaceByAddressOperation } from './findSubspaceByAddress';
 // import { ExpectedSignerError } from '@/errors';
 
 // -----------------
@@ -250,6 +250,56 @@ export const updateSubspaceBuilder = (
     });
   }
 
+  // Deriving JXP PDAs
+
+  let connectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.connectingProcessor) {
+    connectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.connectingProcessor
+        }
+      )
+  }
+
+  let publishingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.publishingProcessor) {
+    publishingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.publishingProcessor
+        }
+      )
+  }
+
+  let collectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.collectingProcessor) {
+    collectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.collectingProcessor
+        }
+      )
+  }
+
+  let referencingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.referencingProcessor) {
+    referencingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.referencingProcessor
+        }
+      )
+  }
+
   return (
     TransactionBuilder.make<UpdateSubspaceBuilderContext>()
       .setFeePayer(payer)
@@ -268,10 +318,10 @@ export const updateSubspaceBuilder = (
             currentAliasPda: toOptionalAccount(currentAliasPda),
             newAliasPda: toOptionalAccount(newAliasPda),
 
-            connectingProcessorPda: toOptionalAccount(externalProcessors.connectingProcessor),
-            publishingProcessorPda: toOptionalAccount(externalProcessors.publishingProcessor),
-            collectingProcessorPda: toOptionalAccount(externalProcessors.collectingProcessor),
-            referencingProcessorPda: toOptionalAccount(externalProcessors.referencingProcessor),
+            connectingProcessorPda,
+            publishingProcessorPda,
+            collectingProcessorPda,
+            referencingProcessorPda,
 
             authority: toPublicKey(authority),
           },
