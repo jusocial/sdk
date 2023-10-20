@@ -250,6 +250,18 @@ export const updateProfileBuilder = (
     });
   }
 
+  let connectingProcessorPda: Pda | null = null;
+  if (externalProcessors.connectingProcessor) {
+    connectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.connectingProcessor
+        }
+      )
+  }
+
   return (
     TransactionBuilder.make<UpdateProfileBuilderContext>()
       .setFeePayer(payer)
@@ -267,8 +279,7 @@ export const updateProfileBuilder = (
             currentAliasPda: toOptionalAccount(currentAliasPda),
             newAliasPda: toOptionalAccount(newAliasPda),
 
-            // TODO
-            connectingProcessorPda: toOptionalAccount(externalProcessors.connectingProcessor),
+            connectingProcessorPda: toOptionalAccount(connectingProcessorPda),
 
             authority: toPublicKey(authority),
           },

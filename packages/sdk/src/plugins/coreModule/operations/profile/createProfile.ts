@@ -105,7 +105,7 @@ export const createProfileOperationHandler: OperationHandler<CreateProfileOperat
     ju: Ju,
     scope: OperationScope
   ): Promise<CreateProfileOutput> {
-    const builder = createProfileBuilder(
+    const builder = await createProfileBuilder(
       ju,
       operation.input,
       scope
@@ -169,11 +169,11 @@ export type CreateProfileBuilderContext = Omit<
  * @group Transaction Builders
  * @category Constructors
  */
-export const createProfileBuilder = (
+export const createProfileBuilder = async (
   ju: Ju,
   params: CreateProfileBuilderParams,
   options: TransactionBuilderOptions = {}
-): TransactionBuilder<CreateProfileBuilderContext> => {
+): Promise<TransactionBuilder<CreateProfileBuilderContext>> => {
   // Data.
   const { programs, payer = ju.rpc().getDefaultFeePayer() } = options;
 
@@ -208,6 +208,20 @@ export const createProfileBuilder = (
     });
   }
 
+  let connectingProcessorPda: Pda | null = null;
+  if (connectingProcessor) {
+    connectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: connectingProcessor
+        }
+      )
+  }
+
+  const { registeringProcessor } = await ju.core().apps().getApp(app); 
+
   return (
     TransactionBuilder.make<CreateProfileBuilderContext>()
       .setFeePayer(payer)
@@ -222,7 +236,8 @@ export const createProfileBuilder = (
             app,
             profile: profilePda,
             aliasPda: toOptionalAccount(aliasPda),
-            connectingProcessorPda: toOptionalAccount(connectingProcessor),
+            connectingProcessorPda: toOptionalAccount(connectingProcessorPda),
+            registeringProcessor: toOptionalAccount(registeringProcessor),
             authority: toPublicKey(authority),
           },
           {
