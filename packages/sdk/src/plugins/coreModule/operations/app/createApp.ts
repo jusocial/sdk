@@ -4,7 +4,7 @@ import {
 } from '@ju-protocol/ju-core';
 import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { App } from '../../models/App';
-import { toOptionalAccount } from '../../helpers';
+// import { toOptionalAccount } from '../../helpers';
 import { ExternalProcessors } from '../../types';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';
 import {
@@ -187,7 +187,69 @@ export const createAppBuilder = (
       programs,
     });
 
-  
+  // Deriving JXP PDAs
+
+  let registeringProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.registeringProcessor) {
+    registeringProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.registeringProcessor
+        }
+      )
+  }
+
+  let connectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.connectingProcessor) {
+    connectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.connectingProcessor
+        }
+      )
+  }
+
+  let publishingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.publishingProcessor) {
+    publishingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.publishingProcessor
+        }
+      )
+  }
+
+  let collectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.collectingProcessor) {
+    collectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.collectingProcessor
+        }
+      )
+  }
+
+  let referencingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.referencingProcessor) {
+    referencingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.referencingProcessor
+        }
+      )
+  }
+
+
   const developerWhitelistProof = ju
     .core()
     .pdas()
@@ -209,11 +271,11 @@ export const createAppBuilder = (
           {
             app: appPda,
             developerWhitelistProof,
-            registeringProcessorPda: toOptionalAccount(externalProcessors.registeringProcessor),
-            connectingProcessorPda: toOptionalAccount(externalProcessors.connectingProcessor),
-            publishingProcessorPda: toOptionalAccount(externalProcessors.publishingProcessor),
-            collectingProcessorPda: toOptionalAccount(externalProcessors.collectingProcessor),
-            referencingProcessorPda: toOptionalAccount(externalProcessors.referencingProcessor),
+            registeringProcessorPda,
+            connectingProcessorPda,
+            publishingProcessorPda,
+            collectingProcessorPda,
+            referencingProcessorPda,
             authority,
           },
           {

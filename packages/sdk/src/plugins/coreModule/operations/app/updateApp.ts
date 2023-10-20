@@ -177,6 +177,68 @@ export const updateAppBuilder = (
   // Accounts.
   const authority = ju.identity();
 
+  // Deriving JXP PDAs
+
+  let registeringProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.registeringProcessor) {
+    registeringProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.registeringProcessor
+        }
+      )
+  }
+
+  let connectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.connectingProcessor) {
+    connectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.connectingProcessor
+        }
+      )
+  }
+
+  let publishingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.publishingProcessor) {
+    publishingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.publishingProcessor
+        }
+      )
+  }
+
+  let collectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.collectingProcessor) {
+    collectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.collectingProcessor
+        }
+      )
+  }
+
+  let referencingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.referencingProcessor) {
+    referencingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.referencingProcessor
+        }
+      )
+  }
+
   return (
     TransactionBuilder.make<UpdateAppBuilderContext>()
       .setFeePayer(payer)
@@ -189,11 +251,11 @@ export const updateAppBuilder = (
         instruction: createUpdateAppInstruction(
           {
             app,
-            registeringProcessorPda: toOptionalAccount(externalProcessors.registeringProcessor),
-            connectingProcessorPda: toOptionalAccount(externalProcessors.connectingProcessor),
-            publishingProcessorPda: toOptionalAccount(externalProcessors.publishingProcessor),
-            collectingProcessorPda: toOptionalAccount(externalProcessors.collectingProcessor),
-            referencingProcessorPda: toOptionalAccount(externalProcessors.referencingProcessor),
+            registeringProcessorPda,
+            connectingProcessorPda,
+            publishingProcessorPda,
+            collectingProcessorPda,
+            referencingProcessorPda,
             authority: toPublicKey(authority),
           },
           {
