@@ -1155,31 +1155,25 @@ Object represents external Application metadata (that too expensive to store on-
 export type AppJsonMetadata<Uri = string> = {
     appId?: string;
 
-    name?: string;
+    title?: string;
     description?: string;
 
     image?: Uri;
     imageCover?: Uri;
 
-    properties?: {
-        team?: Array<{
-            title?: string;
-            description?: string;
-            image?: Uri;
+    team?: {
+        title?: string;
+        description?: string;
+        image?: Uri;
 
-            [key: string]: unknown;
-        }>;
-
-        links?: {
-            website?: string;
-            github?: string;
-            docs?: string;
-            
-            [key: string]: unknown;
-        }
+        teamMember?: JsonMetadataTeamMember<Uri>[];
 
         [key: string]: unknown;
     };
+
+    links?: JsonMetadataContacts & {
+        docs?: string;
+    }
 
     [key: string]: unknown;
 }
@@ -1200,54 +1194,14 @@ export type ProfileJsonMetadata<Uri = string> = {
     bio?: string;
 
     details?: {
-        basic?: {
-        nickname?: string;
-        nationality?: string;
-        ethnicity: string;
-        socialClass?: 'upper class' | 'middle class' | 'lower class' | 'other';
-        religion?: 'christianity' | 'islam' | 'hinduism' | 'buddhism' | 'judaism' | 'atheist' | 'other';
-        sexuality?: 'heterosexual' | 'homosexual' | 'bisexual' | 'pansexual' | 'asexual' | 'demisexual' | 'queer' | 'questioning' | 'other';
-        education?: 'high school' | 'college' | 'university' | 'postgraduate' | 'other';
-        politicalViews?: 'conservative' | 'liberal' | 'moderate' | 'anarchist' | 'socialist' | 'fascist' | 'other';
+        basic?: JsonMetadataProfileBasicDetails,
+        physical?: JsonMetadataProfilePhysicalDetails,
+        personality?: JsonMetadataProfilePersonalityDetails,
+
+        employment?:JsonMetadataProfileEmploymentItem[],
+        education?:JsonMetadataProfileEducationItem[],
 
         [key: string]: unknown;
-        },
-        physical?: {
-        height?: 'short' | 'average' | 'tall';
-        shape?: 'slim' | 'athletic' | 'curvy' | 'muscular' | 'heavyset' | 'other';
-        hair?: 'black' | 'brown' | 'blonde' | 'red' | 'gray' | 'other';
-        eyes?: 'brown' | 'blue' | 'green' | 'hazel' | 'gray' | 'other';
-        glassesLenses?: 'glasses' | 'lenses' | 'none';
-        additionalDescription?: string;
-
-        [key: string]: unknown;
-        },
-        personality?: {
-        positiveCharacteristics: string[];
-        negativeCharacteristics: string[];
-
-        moral?: 'always' | 'sometimes' | 'never';
-        stable?: 'always' | 'sometimes' | 'never';
-        loyal?: 'always' | 'sometimes' | 'never';
-        generous?: 'always' | 'sometimes' | 'never';
-        extravert?: 'always' | 'sometimes' | 'never';
-        compassionate?: 'always' | 'sometimes' | 'never';
-        iq?: number;
-        hobbies?: string[];
-        phobias?: string[];
-        favoriteFoods: string[];
-
-        [key: string]: unknown;
-        },
-        employment?:
-        {
-        fromYear?: number;
-        toYear?: number;
-        company?: string;
-        position?: string;
-
-        [key: string]: unknown;
-        }[]
     }
 
     [key: string]: unknown;
@@ -1270,7 +1224,16 @@ export type SubspaceJsonMetadata<Uri = string> = {
 
     type?: JsonMetadataSubspaceType;
 
-    team?: JsonMetadataTeamMember<Uri>[];
+    team?: {
+        title?: string;
+        description?: string;
+        image?: Uri;
+
+        teamMember?: JsonMetadataTeamMember<Uri>[];
+
+        [key: string]: unknown;
+    };
+
     contacts?: JsonMetadataContacts;
 
     [key: string]: unknown;
@@ -1290,9 +1253,11 @@ export type PublicationJsonMetadata<Uri = string> = {
     description?: string;
     intro?: string,
 
-    content?: JsonMetadataContent;
+    content?: JsonMetadataPublicationContent;
 
     attachments?: JsonMetadataAttachment<Uri>[];
+
+    tags?: string[];
 
     [key: string]: unknown;
 }
@@ -1301,11 +1266,72 @@ export type PublicationJsonMetadata<Uri = string> = {
 ## Other nested Json types:
 
 ```ts
-export type JsonMetadataTeamMember<T> = {
+export type JsonMetadataProfileBasicDetails = {
+  nickname?: string;
+  nationality?: string;
+  ethnicity: string;
+  socialClass?: 'upper class' | 'middle class' | 'lower class' | 'other';
+  religion?: 'christianity' | 'islam' | 'hinduism' | 'buddhism' | 'judaism' | 'atheist' | 'other';
+  sexuality?: 'heterosexual' | 'homosexual' | 'bisexual' | 'pansexual' | 'asexual' | 'demisexual' | 'queer' | 'questioning' | 'other';
+  education?: 'high school' | 'college' | 'university' | 'postgraduate' | 'other';
+  politicalViews?: 'conservative' | 'liberal' | 'moderate' | 'anarchist' | 'socialist' | 'fascist' | 'other';
+
+  [key: string]: unknown;
+}
+
+export type JsonMetadataProfilePhysicalDetails =  {
+  height?: 'short' | 'average' | 'tall';
+  shape?: 'slim' | 'athletic' | 'curvy' | 'muscular' | 'heavyset' | 'other';
+  hair?: 'black' | 'brown' | 'blonde' | 'red' | 'gray' | 'other';
+  eyes?: 'brown' | 'blue' | 'green' | 'hazel' | 'gray' | 'other';
+  glassesLenses?: 'glasses' | 'lenses' | 'none';
+  additionalDescription?: string;
+
+  [key: string]: unknown;
+}
+
+export type JsonMetadataProfilePersonalityDetails =  {
+  positiveCharacteristics: string[];
+  negativeCharacteristics: string[];
+
+  moral?: 'always' | 'sometimes' | 'never';
+  stable?: 'always' | 'sometimes' | 'never';
+  loyal?: 'always' | 'sometimes' | 'never';
+  generous?: 'always' | 'sometimes' | 'never';
+  extravert?: 'always' | 'sometimes' | 'never';
+  compassionate?: 'always' | 'sometimes' | 'never';
+  iq?: number;
+  hobbies?: string[];
+  phobias?: string[];
+  favoriteFoods: string[];
+
+  [key: string]: unknown;
+}
+
+export type JsonMetadataProfileEmploymentItem = {
+  fromYear?: number;
+  toYear?: number;
+  company?: string;
+  position?: string;
+
+  [key: string]: unknown;
+}
+
+export type JsonMetadataProfileEducationItem = {
+  fromYear?: number;
+  toYear?: number;
+  school?: string;
+  degree?: string;
+  fieldOfStudy?: string;
+
+  [key: string]: unknown;
+};
+
+export type JsonMetadataTeamMember<Uri> = {
   title?: string;
   role?: string;
   description?: string;
-  image?: T;
+  image?: Uri;
   personalContacts?: JsonMetadataContacts;
 
   [key: string]: unknown;
@@ -1315,6 +1341,7 @@ export type JsonMetadataContacts = {
   website?: string;
   discord?: string;
   telegram?: string;
+  twitter?: string;
   facebook?: string;
   email?: string;
 
@@ -1368,12 +1395,12 @@ export type JsonMetadataAttachmentType =
   | 'archive'             // For compressed archives (ZIP, RAR, etc.)    // For event data (date, time, location, etc.)             
   | string;               // For any other types not covered by the above
 
-export type JsonMetadataAttachment<T> = {
+export type JsonMetadataAttachment<Uri> = {
   type?: JsonMetadataAttachmentType;
   description?: string;
 
-  thumbnail?: T;
-  uri?: T;
+  thumbnail?: Uri;
+  uri?: Uri;
 
   location?: JsonMetadataLocation;
   event?: JsonMetadataEvent;
@@ -1381,7 +1408,7 @@ export type JsonMetadataAttachment<T> = {
   [key: string]: unknown;
 };
 
-export type JsonMetadataContent = {
+export type JsonMetadataPublicationContent = {
   type?: 'plainText' | 'html' | 'markdown';
   value?: string;
 
