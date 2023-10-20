@@ -1,6 +1,7 @@
 import {
   ContentType,
-  createCreatePublicationInstruction
+  createCreatePublicationInstruction,
+  Publication as PublicationCore
 } from '@ju-protocol/ju-core';
 import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { Publication } from '../../models/Publication';
@@ -255,8 +256,8 @@ export const createPublicationBuilder = async (
     });
 
 
-  let connectionProof: PublicKey | undefined = undefined;
-  let subspaceManagerProof: PublicKey | undefined = undefined;
+  let connectionProof: PublicKey | null = null;
+  let subspaceManagerProof: PublicKey | null = null;
 
   if (subspace) {
     const connectionAccount = ju
@@ -268,7 +269,7 @@ export const createPublicationBuilder = async (
         target: subspace,
         programs,
       });
-    
+
     const isConnectionExist = await ju.rpc().accountExists(connectionAccount);
 
     if (isConnectionExist) {
@@ -284,11 +285,50 @@ export const createPublicationBuilder = async (
         profile: publicationCreatorPda,
         programs,
       });
-    
+
     const isSubspaceManagerExist = await ju.rpc().accountExists(subspaceManagerAccount);
 
     if (isSubspaceManagerExist) {
       subspaceManagerProof = subspaceManagerAccount;
+    }
+  }
+
+  // Deriving JXP PDAs
+  let collectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.collectingProcessor) {
+    collectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.collectingProcessor
+        }
+      )
+  }
+
+  let referencingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.referencingProcessor) {
+    referencingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.referencingProcessor
+        }
+      )
+  }
+
+  // Get JXP from App
+  const { publishingProcessor, referencingProcessor } = await ju.core().apps().getApp(app);
+
+  // Trying to get JPX from target
+  let referencingProcessorIndividual: PublicKey | null = null;
+  if (target) {
+    try {
+      const mayBePublication = await PublicationCore.fromAccountAddress(ju.connection, target);
+      referencingProcessorIndividual = mayBePublication.referencingProcessor;
+    } catch (error) {
+      // target is invalid
     }
   }
 
@@ -314,8 +354,12 @@ export const createPublicationBuilder = async (
 
             targetPublication: toOptionalAccount(target),
 
-            collectingProcessorPda: toOptionalAccount(externalProcessors.collectingProcessor),
-            referencingProcessorPda: toOptionalAccount(externalProcessors.referencingProcessor),
+            collectingProcessorPda,
+            referencingProcessorPda,
+
+            publishingProcessor: toOptionalAccount(publishingProcessor),
+            referencingProcessor: toOptionalAccount(referencingProcessor),
+            referencingProcessorIndividual: toOptionalAccount(referencingProcessorIndividual),
 
             authority: toPublicKey(authority),
           },

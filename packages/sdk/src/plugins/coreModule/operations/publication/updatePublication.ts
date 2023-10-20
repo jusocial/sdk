@@ -204,6 +204,31 @@ export const updatePublicationBuilder = (
       programs,
     });
 
+  // Deriving JXP PDAs
+  let collectingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.collectingProcessor) {
+    collectingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.collectingProcessor
+        }
+      )
+  }
+
+  let referencingProcessorPda = ju.programs().getJuCore().address;
+  if (externalProcessors.referencingProcessor) {
+    referencingProcessorPda = ju
+      .core()
+      .pdas()
+      .processor(
+        {
+          program: externalProcessors.referencingProcessor
+        }
+      )
+  }
+
   return (
     TransactionBuilder.make<UpdatePublicationBuilderContext>()
       .setFeePayer(payer)
@@ -219,8 +244,8 @@ export const updatePublicationBuilder = (
             profile: publicationCreatorPda,
             publication,
 
-            collectingProcessorPda: toOptionalAccount(externalProcessors.collectingProcessor),
-            referencingProcessorPda: toOptionalAccount(externalProcessors.referencingProcessor),
+            collectingProcessorPda,
+            referencingProcessorPda,
 
             authority: toPublicKey(authority),
           },
