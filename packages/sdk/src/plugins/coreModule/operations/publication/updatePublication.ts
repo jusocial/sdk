@@ -4,7 +4,7 @@ import {
 } from '@ju-protocol/ju-core';
 import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { Publication } from '../../models/Publication';
-import { toOptionalAccount } from '../../helpers';
+// import { toOptionalAccount } from '../../helpers';
 import { ExternalProcessors } from '../../types';
 import { findPublicationByAddressOperation } from './findPublicationByAddress';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';

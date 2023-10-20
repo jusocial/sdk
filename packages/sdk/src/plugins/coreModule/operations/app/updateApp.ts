@@ -5,7 +5,7 @@ import {
 import { PublicKey } from '@solana/web3.js';
 import { SendAndConfirmTransactionResponse } from '../../../rpcModule';
 import { App } from '../../models/App';
-import { toOptionalAccount } from '../../helpers';
+// import { toOptionalAccount } from '../../helpers';
 import { ExternalProcessors } from '../../types';
 import { TransactionBuilder, TransactionBuilderOptions } from '@/utils';
 import {
