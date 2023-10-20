@@ -36,7 +36,7 @@ export class CorePdasClient {
   }): Pda {
     const programId = this.programId(input.programs);
     return Pda.find(programId, [
-      Buffer.from('developer', 'utf8'),
+      Buffer.from('processor', 'utf8'),
       input.program.toBuffer(),
     ]);
   }
