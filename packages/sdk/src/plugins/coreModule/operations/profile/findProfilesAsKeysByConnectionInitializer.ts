@@ -60,6 +60,12 @@ export type FindProfilesAsKeysByConnectionInitializerInput = {
 
   /** Approved Profiles only */
   approved?: boolean;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
 };
 
 /**
@@ -84,11 +90,13 @@ export const findProfilesAsKeysByConnectionInitializerOperationHandler: Operatio
       app,
       initializer,
       approved,
+      isIn3Days,
+      isToday
     } = operation.input;
 
     const connections = await ju
       .operations()
-      .execute(findConnectionsOperation({ app, initializer, approved }), scope);
+      .execute(findConnectionsOperation({ app, initializer, approved, isIn3Days, isToday }), scope);
     scope.throwIfCanceled();
 
 

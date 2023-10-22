@@ -13,6 +13,8 @@ import {
   findProfilesAsKeysByConnectionTargetOperation,
   findProfilesAsKeysOperation,
   FindProfilesAsKeysInput,
+  FindProfilesAsKeysByConnectionTargetInput,
+  FindProfilesAsKeysByConnectionInitializerInput,
 } from '../operations';
 import { Profile } from '../models';
 import { ExternalProcessors } from '../types';
@@ -171,11 +173,7 @@ export class ProfileClient {
 
   /** {@inheritDoc findProfilesByConnectionTargetOperation} */
   findProfilesAsKeysByConnectionTarget(
-    /** The address (Profile Pubkey) of the Connection target */
-    target: PublicKey,
-
-    /** Approved Profiles only */
-    approved?: boolean,
+    filter: Omit<FindProfilesAsKeysByConnectionTargetInput, 'app'>,
 
     options?: OperationOptions
   ) {
@@ -184,19 +182,14 @@ export class ProfileClient {
       .execute(findProfilesAsKeysByConnectionTargetOperation(
         {
           app: this.app,
-          target,
-          approved
+          ...filter
         }
       ), options);
   }
 
   /** {@inheritDoc findProfilesByConnectionInitializerOperation} */
   findProfilesAsKeysByConnectionInitializer(
-    /** The address (Profile Pubkey) of the Connection initializer */
-    initializer?: PublicKey,
-
-    /** Approved Profiles only */
-    approved?: boolean,
+    filter: Omit<FindProfilesAsKeysByConnectionInitializerInput, 'app'>,
 
     options?: OperationOptions
   ) {
@@ -205,8 +198,7 @@ export class ProfileClient {
       .execute(findProfilesAsKeysByConnectionInitializerOperation(
         {
           app: this.app,
-          initializer,
-          approved
+          ...filter
         }
       ), options);
   }
