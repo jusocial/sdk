@@ -250,13 +250,13 @@ export const createAppBuilder = (
   }
 
 
-  // const developerWhitelistProof = ju
-  //   .core()
-  //   .pdas()
-  //   .developer({
-  //     authority,
-  //     programs,
-  //   });
+  const developerWhitelistProof = ju
+    .core()
+    .pdas()
+    .developer({
+      authority,
+      programs,
+    });
 
   return (
     TransactionBuilder.make<CreateAppBuilderContext>()
@@ -270,7 +270,7 @@ export const createAppBuilder = (
         instruction: createInitializeAppInstruction(
           {
             app: appPda,
-            developerWhitelistProof: ju.programs().getJuCore().address,
+            developerWhitelistProof,
             registeringProcessorPda,
             connectingProcessorPda,
             publishingProcessorPda,
