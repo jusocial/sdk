@@ -49,20 +49,17 @@ export const createApp = async (
   const { uri } = await ju.storage().uploadMetadata(input ?? {});
   const { app } = await ju.core().apps().createApp(
     {
-      appName: 'testApp',
+      appDomainName: 'testApp',
       data: {
         metadataUri: uri,
-        
-        profileMetadataRequired: true,
-        subspaceMetadataRequired: true,
 
-        profileDeleteAllowed: false,
-        subspaceDeleteAllowed: false,
-        publicationDeleteAllowed: false,
+        isProfileDeleteAllowed: false,
+        isSubspaceDeleteAllowed: false,
+        isPublicationDeleteAllowed: false,
 
-        profileIndividualProcessorsAllowed: false,
-        subspaceIndividualProcessorsAllowed: false,
-        publicationIndividualProcessorsAllowed: false,
+        isProfileIndividualProcessorsAllowed: false,
+        isSubspaceIndividualProcessorsAllowed: false,
+        isPublicationIndividualProcessorsAllowed: false,
       },
       externalProcessors: {
         registeringProcessor: null,

@@ -53,13 +53,16 @@ export type FindProfilesAsKeysByConnectionInitializerOperation = Operation<
  */
 export type FindProfilesAsKeysByConnectionInitializerInput = {
   /** The address of the Application. */
-  app: PublicKey;
+  app?: PublicKey;
 
   /** The address (Profile Pubkey) of the Connection initializer */
   initializer?: PublicKey;
 
   /** Approved Profiles only */
-  approved?: boolean;
+  isApproved?: boolean;
+
+  /** Is event happens in 7-day-period  (for additional filtering) */
+  isIn7Days?: boolean;
 
   /** Is event happens in 3-day-period  (for additional filtering) */
   isIn3Days?: boolean;
@@ -89,14 +92,15 @@ export const findProfilesAsKeysByConnectionInitializerOperationHandler: Operatio
     const {
       app,
       initializer,
-      approved,
+      isApproved,
+      isIn7Days,
       isIn3Days,
       isToday
     } = operation.input;
 
     const connections = await ju
       .operations()
-      .execute(findConnectionsOperation({ app, initializer, approved, isIn3Days, isToday }), scope);
+      .execute(findConnectionsOperation({ app, initializer, isApproved, isIn7Days ,isIn3Days, isToday }), scope);
     scope.throwIfCanceled();
 
 

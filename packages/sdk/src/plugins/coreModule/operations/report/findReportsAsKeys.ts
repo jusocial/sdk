@@ -7,6 +7,7 @@ import {
   useOperation,
 } from '@/types';
 import type { Ju } from '@/Ju';
+import { todayToSearchInterval } from '../../helpers';
 
 // -----------------
 // Operation
@@ -60,8 +61,14 @@ export type FindReportsAsKeysInput = {
   */
   reportType?: ReportType;
   
-  /** Searchable number of day  (for additional filtering) */
-  searchableDay?: number;
+  /** Is event happens in 7-day-period  (for additional filtering) */
+  isIn7Days?: boolean;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
 };
 
 /**
@@ -87,7 +94,9 @@ export const findReportsAsKeysOperationHandler: OperationHandler<FindReportsAsKe
       initializer,
       target,
       reportType,
-      searchableDay
+      isIn7Days,
+      isIn3Days,
+      isToday
     } = operation.input;
 
     const builder = Report.gpaBuilder();
@@ -108,8 +117,14 @@ export const findReportsAsKeysOperationHandler: OperationHandler<FindReportsAsKe
     if (reportType) {
       builder.addFilter("reportType", reportType);
     }
-    if (searchableDay) {
-      builder.addFilter("searchableDay", searchableDay)
+    if (isIn7Days) {
+      builder.addFilter("creationWeek", todayToSearchInterval(7))
+    }
+    if (isIn3Days) {
+      builder.addFilter("creation3Day", todayToSearchInterval(3))
+    }
+    if (isToday) {
+      builder.addFilter("creationDay", todayToSearchInterval(1))
     }
 
     // Limit returned accouns data to minimum

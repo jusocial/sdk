@@ -2,6 +2,7 @@ import type { PublicKey } from '@solana/web3.js';
 import { ReportType, Report as ReportCore, reportDiscriminator } from '@ju-protocol/ju-core';
 import { toReportAccount } from '../../accounts';
 import { Report, toReport } from '../../models';
+import { todayToSearchInterval } from '../../helpers';
 import {
   lamports,
   Operation,
@@ -63,8 +64,14 @@ export type FindReportsInput = {
   */
   reportType?: ReportType;
 
-  /** Searchable number of day  (for additional filtering) */
-  searchableDay?: number;
+  /** Is event happens in 7-day-period  (for additional filtering) */
+  isIn7Days?: boolean;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
 };
 
 /**
@@ -90,7 +97,9 @@ export const findReportsOperationHandler: OperationHandler<FindReportsOperation>
       initializer,
       target,
       reportType,
-      searchableDay
+      isIn7Days,
+      isIn3Days,
+      isToday
     } = operation.input;
 
     const builder = ReportCore.gpaBuilder();
@@ -111,8 +120,14 @@ export const findReportsOperationHandler: OperationHandler<FindReportsOperation>
     if (reportType) {
       builder.addFilter("reportType", reportType);
     }
-    if (searchableDay) {
-      builder.addFilter("searchableDay", searchableDay)
+    if (isIn7Days) {
+      builder.addFilter("creationWeek", todayToSearchInterval(7))
+    }
+    if (isIn3Days) {
+      builder.addFilter("creation3Day", todayToSearchInterval(3))
+    }
+    if (isToday) {
+      builder.addFilter("creationDay", todayToSearchInterval(1))
     }
 
     const res = await builder.run(ju.connection);

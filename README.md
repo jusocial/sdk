@@ -247,7 +247,7 @@ The `createApp` method accepts a [`CreateAppInput`](#CreateAppInput) object and 
 ```ts
 const { app } = await ju.core().apps().create(
     { 
-        appName: 'testApp',
+        appDomainName: 'testApp',
         data: {
             // ...restData
         },
@@ -912,7 +912,7 @@ export type App<JsonMetadata extends object = AppJsonMetadata> = {
     readonly jsonLoaded: boolean;
 
     /** A Protocol unique Name of the App */
-    appName: string;
+    appDomainName: string;
     /** App authority */
     authority: PublicKey;
     /** External metadata URI */
@@ -924,17 +924,17 @@ export type App<JsonMetadata extends object = AppJsonMetadata> = {
     /** Whether or not the App's Subspaces external Metadata URI field is required */
     subspaceMetadataRequired: boolean;
     /** Whether or not the App's Profiles delete action is allowed */
-    profileDeleteAllowed: boolean;
+    isProfileDeleteAllowed: boolean;
     /** Whether or not the App's Subspaces delete action is allowed */
-    subspaceDeleteAllowed: boolean;
+    isSubspaceDeleteAllowed: boolean;
     /** Whether or not the App's Publication delete action is allowed */
-    publicationDeleteAllowed: boolean;
+    isPublicationDeleteAllowed: boolean;
     /** Whether or not the App's Profiles individual external processors is allowed */
-    profileIndividualProcessorsAllowed: boolean;
+    isProfileIndividualProcessorsAllowed: boolean;
     /** Whether or not the App's Subspace individual external processors is allowed */
-    subspaceIndividualProcessorsAllowed: boolean;
+    isSubspaceIndividualProcessorsAllowed: boolean;
     /** Whether or not the App's Publication individual external processors is allowed */
-    publicationIndividualProcessorsAllowed: boolean;
+    isPublicationIndividualProcessorsAllowed: boolean;
 
     /** External Processors */
     /** External registering processor for additional verification */
@@ -1001,13 +1001,13 @@ export type Profile<JsonMetadata extends object = ProfileJsonMetadata> = {
     statusText: string;
 
     /** Helps seach profiles bi age */
-    searchable10Years: Bn;
+    creation10Years: Bn;
     /** Helps seach profiles bi age */
-    searchable5Years: Bn;
+    creation5Years: Bn;
     /** Helps finds near birth date */
-    searchableWeek: BN;
+    creationWeek: BN;
     /** Helps finds near birth date */
-    searchableDay: Bn;
+    creationDay: Bn;
 
     /** Profile sgender */
     gender: Gender | null;
@@ -1122,9 +1122,9 @@ export type Publication<JsonMetadata extends object = PublicationJsonMetadata> =
     /** Publication tag */
     tag: string | null;
     /** Helps seach publication for feeds or notifications */
-    searchable3Day: BN;
+    creation3Day: BN;
     /** Helps seach publication for feeds or notifications */
-    searchableDay: Bn;
+    creationDay: Bn;
     /** References to existing Publication if there is a mirror or reply (PublicKey.default in case not passed) */
     targetPublication: PublicKey;
     /** Subspace in which Publication being published */

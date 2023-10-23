@@ -1,11 +1,10 @@
-import { SubspaceData, SubspaceManagementRoleType } from '@ju-protocol/ju-core';
+import { SubspaceData, SubspaceManagementRoleType, SubspacePublishingPermissionLevel } from '@ju-protocol/ju-core';
 import {
   FindSubspacesInput,
   findSubspacesOperation,
   FindSubspacesByKeyListInput,
   findSubspacesByKeyListOperation,
   findSubspaceByAddressOperation,
-  CreateSubspaceInput,
   createSubspaceOperation,
   updateSubspaceOperation,
   deleteSubspaceOperation,
@@ -68,7 +67,16 @@ export class SubspaceClient {
 
   /** {@inheritDoc createSubspaceOperation} */
   createSubspace(
-    input: Omit<CreateSubspaceInput, 'app'>,
+    input: {
+      alias?: string,
+      metadataUri?: string,
+      name: string,
+      publishingPermission?: SubspacePublishingPermissionLevel,
+      connectingProcessor?: PublicKey, 
+      publishingProcessor?: PublicKey, 
+      collectingProcessor?: PublicKey, 
+      referencingProcessor?: PublicKey, 
+    },
     options?: OperationOptions
   ) {
     return this.ju
@@ -76,7 +84,19 @@ export class SubspaceClient {
       .execute(createSubspaceOperation(
         {
           app: this.app,
-          ...input
+          data: {
+            alias: input.alias === undefined ? null : input.alias,
+            metadataUri: input.metadataUri === undefined ? null : input.metadataUri,
+            name: input.name,
+            publishingPermission: input.publishingPermission || 0,
+          },
+          externalProcessors: {
+            connectingProcessor: input.connectingProcessor === undefined ? null : input.connectingProcessor,
+            publishingProcessor: input.publishingProcessor === undefined ? null : input.publishingProcessor,
+            collectingProcessor: input.collectingProcessor === undefined ? null : input.collectingProcessor,
+            referencingProcessor: input.referencingProcessor === undefined ? null : input.referencingProcessor,
+          },
+          loadJsonMetadata: true,
         }
       ), options);
   }
@@ -235,7 +255,7 @@ export class SubspaceClient {
       .operations()
       .execute(findSubspaceManagersOperation(
         {
-          app: this.app,
+          app: (filter.subspace || filter.profile) ? undefined : this.app,
           ...filter
         }
       ), options);
@@ -250,7 +270,7 @@ export class SubspaceClient {
       .operations()
       .execute(findSubspacesOperation(
         {
-          app: this.app,
+          app: filter.creator ? undefined : this.app,
           ...filter
         }
       ), options);
@@ -265,7 +285,7 @@ export class SubspaceClient {
       .operations()
       .execute(findSubspacesAsKeysOperation(
         {
-          app: this.app,
+          app: filter.creator ? undefined : this.app,
           ...filter
         }
       ), options);
@@ -273,32 +293,22 @@ export class SubspaceClient {
 
   /** {@inheritDoc findSubspacesByConnectionTargetOperation} */
   findSubspacesAsKeysByConnectionTarget(
-    input: Omit<FindSubspacesAsKeysByConnectionTargetInput, 'app'>,
+    filter: Omit<FindSubspacesAsKeysByConnectionTargetInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findSubspacesAsKeysByConnectionTargetOperation(
-        {
-          app: this.app,
-          ...input
-        }
-      ), options);
+      .execute(findSubspacesAsKeysByConnectionTargetOperation(filter), options);
   }
 
   /** {@inheritDoc findSubspacesByConnectionInitializerOperation} */
   findSubspacesAsKeysByConnectionInitializer(
-    input: Omit<FindSubspacesAsKeysByConnectionInitializerInput, 'app'>,
+    filter: Omit<FindSubspacesAsKeysByConnectionInitializerInput, 'app'>,
     options?: OperationOptions
   ) {
     return this.ju
       .operations()
-      .execute(findSubspacesAsKeysByConnectionInitializerOperation(
-        {
-          app: this.app,
-          ...input
-        }
-      ), options);
+      .execute(findSubspacesAsKeysByConnectionInitializerOperation(filter), options);
   }
 
   /** {@inheritDoc findSubspacesByKeyListOperation} */

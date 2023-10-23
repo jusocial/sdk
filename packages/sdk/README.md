@@ -248,7 +248,7 @@ The `create` method accepts a [`CreateAppInput`](#CreateAppInput) object and ret
 ```ts
 const { app } = await ju.core().app.create(
     { 
-        appName: 'testApp',
+        appDomainName: 'testApp',
         data: {
             // TODO
         },
@@ -645,7 +645,7 @@ export type App<JsonMetadata extends object = AppJsonMetadata> = {
     /** The JSON metadata associated with the metadata account. */
     metadata: JsonMetadata | null;
     /** A Protocol unique Name of the App */
-    appName: string;
+    appDomainName: string;
     /** App authority */
     authority: PublicKey;
     /** External metadata URI */
@@ -670,17 +670,17 @@ export type App<JsonMetadata extends object = AppJsonMetadata> = {
     /** Whether or not the App's Subspaces external Metadata URI field is required */
     subspaceMetadataRequired: boolean;
     /** Whether or not the App's Profiles delete action is allowed */
-    profileDeleteAllowed: boolean;
+    isProfileDeleteAllowed: boolean;
     /** Whether or not the App's Subspaces delete action is allowed */
-    subspaceDeleteAllowed: boolean;
+    isSubspaceDeleteAllowed: boolean;
     /** Whether or not the App's Publication delete action is allowed */
-    publicationDeleteAllowed: boolean;
+    isPublicationDeleteAllowed: boolean;
     /** Whether or not the App's Profiles individual external processors is allowed */
-    profileIndividualProcessorsAllowed: boolean;
+    isProfileIndividualProcessorsAllowed: boolean;
     /** Whether or not the App's Subspace individual external processors is allowed */
-    subspaceIndividualProcessorsAllowed: boolean;
+    isSubspaceIndividualProcessorsAllowed: boolean;
     /** Whether or not the App's Publication individual external processors is allowed */
-    publicationIndividualProcessorsAllowed: boolean;
+    isPublicationIndividualProcessorsAllowed: boolean;
 
     /** External Processors */
 

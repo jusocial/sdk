@@ -47,7 +47,7 @@ export type FindReactionsAsKeysOperation = Operation<
  */
 export type FindReactionsAsKeysInput = {
   /** The address of the Application. */
-  app: PublicKey;
+  app?: PublicKey;
 
   /** Reaction initializer address (for additional filtering) */
   initializer?: PublicKey;
@@ -56,10 +56,14 @@ export type FindReactionsAsKeysInput = {
   target?: PublicKey;
 
   /** Reaction type 
-   * Profile = 0,
-   * Subspace = 1
+  * { __kind: "UpVote" }
+  * { __kind: "UpVote" }
+  * { __kind: "CustomVote", code: 123 }
   */
   reactionType?: ReactionType;
+
+  /** Is event happens in 7-day-period  (for additional filtering) */
+  isIn7Days?: boolean;
 
   /** Is event happens in 3-day-period  (for additional filtering) */
   isIn3Days?: boolean;
@@ -92,6 +96,7 @@ export const findReactionsAsKeysOperationHandler: OperationHandler<FindReactions
       initializer,
       target,
       reactionType,
+      isIn7Days,
       isIn3Days,
       isToday
      } = operation.input;
@@ -115,11 +120,14 @@ export const findReactionsAsKeysOperationHandler: OperationHandler<FindReactions
     if (reactionType) {
       builder.addFilter("reactionType", reactionType);
     }
+    if (isIn7Days) {
+      builder.addFilter("creationWeek", todayToSearchInterval(7))
+    }
     if (isIn3Days) {
-      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+      builder.addFilter("creation3Day", todayToSearchInterval(3))
     }
     if (isToday) {
-      builder.addFilter("searchableDay", todayToSearchInterval(1))
+      builder.addFilter("creationDay", todayToSearchInterval(1))
     }
 
     // Limit returned accouns data to minimum

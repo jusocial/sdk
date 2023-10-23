@@ -51,22 +51,86 @@ export const toBirthDate = (year: number, month: number, day: number) => {
 export const bytesArrToStr = (bytes: number[]): string => {
   let result = '';
   for (let i = 0; i < bytes.length; ++i) {
-      const byte = bytes[i];
-      if (byte === 0) {
-          continue; // TODO: Stop if a null byte is encountered ?
-      }
-      const text = byte.toString(16);
-      result += (byte < 16 ? '%0' : '%') + text;
+    const byte = bytes[i];
+    if (byte === 0) {
+      continue; // TODO: Stop if a null byte is encountered ?
+    }
+    const text = byte.toString(16);
+    result += (byte < 16 ? '%0' : '%') + text;
   }
   return decodeURIComponent(result);
 };
 
-export const todayToSearchInterval = (eventDays: 1 | 3 ): number => {
+// export const newUtcDate = () => {
+// let newDate = new Date();
+// newDate.setUTCFullYear(year);
+// newDate.setUTCMonth(month);
+// newDate.setUTCDate(day);
+// newDate.setUTCHours(0);
+// newDate.setUTCMinutes(0);
+// newDate.setUTCSeconds(0);
+// newDate.setUTCMilliseconds(0);
+// const unixTimestamp = Math.floor(newDate.getTime() / 1000).toString();
+// }?
+
+export const ageToSearchInterval = (
+  age: number,
+  years: number
+): number => {
+  const now = new Date();
+  const nowYear = now.getFullYear();
+
+  const birthYear = nowYear - age;
+
+  const birthDate = new Date();
+  birthDate.setUTCFullYear(birthYear);
+  birthDate.setUTCMonth(0);
+  birthDate.setUTCDate(1);
+  birthDate.setUTCHours(0);
+  birthDate.setUTCMinutes(0);
+  birthDate.setUTCSeconds(0);
+  birthDate.setUTCMilliseconds(0);
+
+  const SECONDS_IN_YEAR = 31_536_000;
+
+  const nowSeconds = Math.floor(now.getTime() / 1000);
+  const birthSeconds = Math.floor(birthDate.getTime() / 1000);
+
+  const result = Math.floor((nowSeconds - birthSeconds) / (SECONDS_IN_YEAR * years));
+  return result;
+}
+
+export const dateToSearchInterval = (
+  eventDays: 1 | 3 | 7,
+  date?: {
+    year: number,
+    month: number,
+    day: number
+  }
+): number => {
+
+  const newDate = new Date();
+  if (date) {
+    newDate.setUTCFullYear(date.year);
+    newDate.setUTCMonth(date.month);
+    newDate.setUTCDate(date.day);
+    newDate.setUTCHours(0);
+    newDate.setUTCMinutes(0);
+    newDate.setUTCSeconds(0);
+    newDate.setUTCMilliseconds(0);
+  }
 
   const SECONDS_IN_DAY = 86_400;
-  const now = Math.floor(new Date().getTime() / 1000);
+  const seconds = Math.floor(newDate.getTime() / 1000);
 
-  return (now / (eventDays * SECONDS_IN_DAY));
+  return (seconds / (eventDays * SECONDS_IN_DAY));
+}
+
+export const todayToSearchInterval = (eventDays: 1 | 3 | 7): number => {
+  const SECONDS_IN_DAY = 86_400;
+  const seconds = Math.floor(new Date().getTime() / 1000);
+
+  return (seconds / (eventDays * SECONDS_IN_DAY));
 }
 
 

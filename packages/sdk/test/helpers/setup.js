@@ -94,7 +94,7 @@ var createApp = function (ju, input) {
                 case 1:
                     uri = (_a.sent()).uri;
                     return [4 /*yield*/, ju.core().createApp({
-                            appName: 'testApp',
+                            appDomainName: 'testApp',
                             data: { metadataUri: uri }
                         })];
                 case 2:

@@ -50,7 +50,7 @@ export type FindConnectionsOperation = Operation<
  */
 export type FindConnectionsInput = {
   /** The address of the Application. */
-  app: PublicKey;
+  app?: PublicKey;
 
   /** Connection initializer address (for additional filtering) */
   initializer?: PublicKey;
@@ -65,7 +65,10 @@ export type FindConnectionsInput = {
   connectionTargetType?: ConnectionTargetType;
 
   /** Connection status (for additional filtering) */
-  approved?: boolean;
+  isApproved?: boolean;
+
+  /** Is event happens in 7-day-period  (for additional filtering) */
+  isIn7Days?: boolean;
 
   /** Is event happens in 3-day-period  (for additional filtering) */
   isIn3Days?: boolean;
@@ -96,7 +99,8 @@ export const findConnectionsOperationHandler: OperationHandler<FindConnectionsOp
       initializer,
       target,
       connectionTargetType,
-      approved,
+      isApproved,
+      isIn7Days,
       isIn3Days,
       isToday
     } = operation.input;
@@ -119,14 +123,17 @@ export const findConnectionsOperationHandler: OperationHandler<FindConnectionsOp
     if (connectionTargetType) {
       builder.addFilter("connectionTargetType", connectionTargetType)
     }
-    if (approved !== undefined) {
-      builder.addFilter("approved", approved)
+    if (isApproved !== undefined) {
+      builder.addFilter("isApproved", isApproved)
+    }
+    if (isIn7Days) {
+      builder.addFilter("creationWeek", todayToSearchInterval(7))
     }
     if (isIn3Days) {
-      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+      builder.addFilter("creation3Day", todayToSearchInterval(3))
     }
     if (isToday) {
-      builder.addFilter("searchableDay", todayToSearchInterval(1))
+      builder.addFilter("creationDay", todayToSearchInterval(1))
     }
 
     const res = await builder.run(ju.connection);

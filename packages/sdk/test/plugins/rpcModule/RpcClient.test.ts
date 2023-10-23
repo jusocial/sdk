@@ -10,20 +10,17 @@ test('[rpcModule] it parses program errors when sending transactions', async (t:
 
   // When we try to create an App with a name that's too long.
   const promise = jp.core().apps().createApp({
-    appName: 'x'.repeat(101), // Name is too long.
+    appDomainName: 'x'.repeat(101), // Name is too long.
     data: {
       metadataUri: 'http://example.com/jutestapp',
 
-      profileMetadataRequired: true,
-      subspaceMetadataRequired: true,
+      isProfileDeleteAllowed: false,
+      isSubspaceDeleteAllowed: false,
+      isPublicationDeleteAllowed: false,
 
-      profileDeleteAllowed: false,
-      subspaceDeleteAllowed: false,
-      publicationDeleteAllowed: false,
-
-      profileIndividualProcessorsAllowed: false,
-      subspaceIndividualProcessorsAllowed: false,
-      publicationIndividualProcessorsAllowed: false,
+      isProfileIndividualProcessorsAllowed: false,
+      isSubspaceIndividualProcessorsAllowed: false,
+      isPublicationIndividualProcessorsAllowed: false,
     },
     externalProcessors: {
       registeringProcessor: null,

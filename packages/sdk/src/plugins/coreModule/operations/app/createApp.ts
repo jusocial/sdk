@@ -32,7 +32,7 @@ const Key = 'CreateAppOperation' as const;
  *   .core()
  *   .createApp(
  *      {
- *        appName: 'jutube',
+ *        appDomainName: 'jutube',
  *        data: {
  *          // ...data
  *        },
@@ -64,8 +64,8 @@ export type CreateAppOperation = Operation<
  * @category Inputs
  */
 export type CreateAppInput = {
-  /** The name of the App */
-  appName: string;
+  /** The domain name of the App */
+  appDomainName: string;
 
   /** App Instruction data */
   data: AppData;
@@ -170,7 +170,7 @@ export const createAppBuilder = (
   // Data.
   const { programs, payer = ju.rpc().getDefaultFeePayer() } = options;
   const {
-    appName,
+    appDomainName,
     data,
     externalProcessors
   } = params;
@@ -183,7 +183,7 @@ export const createAppBuilder = (
     .core()
     .pdas()
     .app({
-      appName,
+      appDomainName,
       programs,
     });
 
@@ -250,13 +250,13 @@ export const createAppBuilder = (
   }
 
 
-  const developerWhitelistProof = ju
-    .core()
-    .pdas()
-    .developer({
-      authority,
-      programs,
-    });
+  // const developerWhitelistProof = ju
+  //   .core()
+  //   .pdas()
+  //   .developer({
+  //     authority,
+  //     programs,
+  //   });
 
   return (
     TransactionBuilder.make<CreateAppBuilderContext>()
@@ -270,7 +270,7 @@ export const createAppBuilder = (
         instruction: createInitializeAppInstruction(
           {
             app: appPda,
-            developerWhitelistProof,
+            developerWhitelistProof: ju.programs().getJuCore().address,
             registeringProcessorPda,
             connectingProcessorPda,
             publishingProcessorPda,
@@ -279,7 +279,7 @@ export const createAppBuilder = (
             authority,
           },
           {
-            appName,
+            appDomainName,
             data
           }
         ),

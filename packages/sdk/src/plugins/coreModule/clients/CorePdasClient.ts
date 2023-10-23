@@ -44,14 +44,14 @@ export class CorePdasClient {
   /** Finds the protocol Application. */
   app(input: {
     /** Applications name */
-    appName: string;
+    appDomainName: string;
     /** An optional set of programs that override the registered ones. */
     programs?: Program[];
   }): Pda {
     const programId = this.programId(input.programs);
     return Pda.find(programId, [
       Buffer.from('app', 'utf8'),
-      Buffer.from(input.appName, 'utf8'),
+      Buffer.from(input.appDomainName, 'utf8'),
     ]);
   }
  

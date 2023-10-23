@@ -47,6 +47,12 @@ export type FindAppsAsKeysOperation = Operation<
 export type FindAppsAsKeysInput = {
   /** The authority of the Application. */
   authority?: PublicKey;
+
+  /** Creation year (for additional filtering) */
+  creationYear?: number;
+
+  /** Creation month (for additional filtering) */
+  creationMonth?: number;
 };
 
 /**
@@ -67,22 +73,33 @@ export const findAppsAsKeysOperationHandler: OperationHandler<FindAppsAsKeysOper
     scope: OperationScope
   ) => {
     // const { commitment } = scope;
-    const { 
-      authority
+    const {
+      authority,
+      creationYear,
+      creationMonth,
     } = operation.input;
 
-    const builder =  App.gpaBuilder();
+    const builder = App.gpaBuilder();
     // Add discriminator
     builder.addFilter("accountDiscriminator", appDiscriminator);
-    
+
     // Add additional filters
 
     if (authority) {
       builder.addFilter("authority", authority);
     }
+    if (authority) {
+      builder.addFilter("authority", authority);
+    }
+    if (creationYear) {
+      builder.addFilter("creationYear", creationYear)
+    }
+    if (creationMonth) {
+      builder.addFilter("creationMonth", creationMonth)
+    }
 
     // Limit returned accouns data to minimum
-    builder.config.dataSlice = {offset: 0, length: 0};
+    builder.config.dataSlice = { offset: 0, length: 0 };
 
     const res = await builder.run(ju.connection);
 

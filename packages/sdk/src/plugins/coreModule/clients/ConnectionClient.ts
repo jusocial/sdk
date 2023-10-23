@@ -109,7 +109,7 @@ export class ConnectionClient {
       .operations()
       .execute(findConnectionsOperation(
         {
-          app: this.app,
+          app: (filter.initializer || filter.target) ? undefined : this.app,
           ...filter
         }
       ), options);
@@ -125,7 +125,7 @@ export class ConnectionClient {
       .operations()
       .execute(findConnectionsAsKeysOperation(
         {
-          app: this.app,
+          app: (filter.initializer || filter.target) ? undefined : this.app,
           ...filter
         }
       ), options);

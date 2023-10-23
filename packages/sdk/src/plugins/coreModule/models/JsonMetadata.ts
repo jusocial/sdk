@@ -1,3 +1,12 @@
+export type ProcessorJsonMetadata = {
+  title?: string;
+  description?: string;
+
+  code?: string;
+
+  [key: string]: unknown;
+};
+
 export type AppJsonMetadata<Uri = string> = {
   appId?: string;
 
@@ -34,6 +43,8 @@ export type ProfileJsonMetadata<Uri = string> = {
   imageCover?: Uri;
 
   bio?: string;
+
+  status?: string;
 
   details?: {
     basic?: JsonMetadataProfileBasicDetails,

@@ -83,7 +83,7 @@ export class ReactionClient {
       .operations()
       .execute(findReactionsOperation(
         {
-          app: this.app,
+          app: (filter.initializer || filter.target) ? undefined : this.app,
           ...filter
         }
       ), options);
@@ -98,7 +98,7 @@ export class ReactionClient {
       .operations()
       .execute(findReactionsAsKeysOperation(
         {
-          app: this.app,
+          app: (filter.initializer || filter.target) ? undefined : this.app,
           ...filter
         }
       ), options);

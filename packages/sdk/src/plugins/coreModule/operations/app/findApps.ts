@@ -52,6 +52,12 @@ export type FindAppsInput = {
   /** The authority of the Application. */
   authority?: PublicKey;
 
+  /** Creation year (for additional filtering) */
+  creationYear?: number;
+
+  /** Creation month (for additional filtering) */
+  creationMonth?: number;
+
   /**
    * Whether or not we should fetch the JSON Metadata.
    *
@@ -79,6 +85,8 @@ export const findAppsOperationHandler: OperationHandler<FindAppsOperation> = {
     // const { commitment } = scope;
     const {
       authority,
+      creationYear,
+      creationMonth,
       loadJsonMetadata = false
     } = operation.input;
 
@@ -90,6 +98,12 @@ export const findAppsOperationHandler: OperationHandler<FindAppsOperation> = {
 
     if (authority) {
       builder.addFilter("authority", authority);
+    }
+    if (creationYear) {
+      builder.addFilter("creationYear", creationYear)
+    }
+    if (creationMonth) {
+      builder.addFilter("creationMonth", creationMonth)
     }
 
     const res = await builder.run(ju.connection);

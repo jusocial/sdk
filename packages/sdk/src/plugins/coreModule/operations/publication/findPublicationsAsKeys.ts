@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
 import { ContentType, Publication, publicationDiscriminator } from '@ju-protocol/ju-core'
+import { todayToSearchInterval } from '../../helpers';
 import {
   Operation,
   OperationHandler,
@@ -7,7 +8,6 @@ import {
   useOperation,
 } from '@/types';
 import type { Ju } from '@/Ju';
-import { todayToSearchInterval } from '../../helpers';
 
 // -----------------
 // Operation
@@ -90,6 +90,9 @@ export type FindPublicationsAsKeysInput = {
   /** Publication Tag  (for additional filtering) */
   tag?: string,
 
+  /** Is event happens in 7-day-period  (for additional filtering) */
+  isIn7Days?: boolean;
+
   /** Is event happens in 3-day-period  (for additional filtering) */
   isIn3Days?: boolean;
 
@@ -125,8 +128,9 @@ export const findPublicationsAsKeysOperationHandler: OperationHandler<FindPublic
       targetPublication,
       contentType,
       tag,
+      isIn7Days,
       isIn3Days,
-      isToday
+      isToday,
     } = operation.input;
 
     // Building GPA
@@ -168,11 +172,14 @@ export const findPublicationsAsKeysOperationHandler: OperationHandler<FindPublic
     if (tag) {
       builder.addFilter("tag", tag)
     }
+    if (isIn7Days) {
+      builder.addFilter("creationWeek", todayToSearchInterval(7))
+    }
     if (isIn3Days) {
-      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+      builder.addFilter("creation3Day", todayToSearchInterval(3))
     }
     if (isToday) {
-      builder.addFilter("searchableDay", todayToSearchInterval(1))
+      builder.addFilter("creationDay", todayToSearchInterval(1))
     }
 
     // Limit returned accouns data to minimum

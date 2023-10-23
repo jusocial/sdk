@@ -81,16 +81,13 @@ export class AppClient {
           data: {
             metadataUri: data.metadataUri === undefined ? app.metadataUri : data.metadataUri,
 
-            profileMetadataRequired: data.profileMetadataRequired === undefined ? app.profileMetadataRequired : data.profileMetadataRequired,
-            subspaceMetadataRequired: data.subspaceMetadataRequired === undefined ? app.subspaceMetadataRequired : data.subspaceMetadataRequired,
+            isProfileDeleteAllowed: data.isProfileDeleteAllowed === undefined ? app.isProfileDeleteAllowed : data.isProfileDeleteAllowed,
+            isSubspaceDeleteAllowed: data.isSubspaceDeleteAllowed === undefined ? app.isSubspaceDeleteAllowed : data.isSubspaceDeleteAllowed,
+            isPublicationDeleteAllowed: data.isPublicationDeleteAllowed === undefined ? app.isPublicationDeleteAllowed : data.isPublicationDeleteAllowed,
 
-            profileDeleteAllowed: data.profileDeleteAllowed === undefined ? app.profileDeleteAllowed : data.profileDeleteAllowed,
-            subspaceDeleteAllowed: data.subspaceDeleteAllowed === undefined ? app.subspaceDeleteAllowed : data.subspaceDeleteAllowed,
-            publicationDeleteAllowed: data.publicationDeleteAllowed === undefined ? app.publicationDeleteAllowed : data.publicationDeleteAllowed,
-
-            profileIndividualProcessorsAllowed: data.profileIndividualProcessorsAllowed === undefined ? app.profileIndividualProcessorsAllowed : data.profileIndividualProcessorsAllowed,
-            subspaceIndividualProcessorsAllowed: data.subspaceIndividualProcessorsAllowed === undefined ? app.subspaceIndividualProcessorsAllowed : data.subspaceIndividualProcessorsAllowed,
-            publicationIndividualProcessorsAllowed: data.publicationIndividualProcessorsAllowed === undefined ? app.publicationIndividualProcessorsAllowed : data.publicationIndividualProcessorsAllowed,
+            isProfileIndividualProcessorsAllowed: data.isProfileIndividualProcessorsAllowed === undefined ? app.isProfileIndividualProcessorsAllowed : data.isProfileIndividualProcessorsAllowed,
+            isSubspaceIndividualProcessorsAllowed: data.isSubspaceIndividualProcessorsAllowed === undefined ? app.isSubspaceIndividualProcessorsAllowed : data.isSubspaceIndividualProcessorsAllowed,
+            isPublicationIndividualProcessorsAllowed: data.isPublicationIndividualProcessorsAllowed === undefined ? app.isPublicationIndividualProcessorsAllowed : data.isPublicationIndividualProcessorsAllowed,
           },
           externalProcessors: {
             registeringProcessor: data.registeringProcessor === undefined ? app.registeringProcessor : data.registeringProcessor,

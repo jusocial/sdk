@@ -6,6 +6,7 @@ import { ContentType,
 import { toPublicationAccount } from '../../accounts';
 import { Publication, PublicationJsonMetadata, toPublication } from '../../models';
 // import { PublicationGpaBuilder } from '../../gpaBuilders';
+import { todayToSearchInterval } from '../../helpers';
 import {
   lamports,
   Operation,
@@ -15,7 +16,6 @@ import {
 } from '@/types';
 import type { Ju } from '@/Ju';
 import { Option } from '@/utils';
-import { todayToSearchInterval } from '../../helpers';
 
 // -----------------
 // Operation
@@ -85,18 +85,22 @@ export type FindPublicationsInput = {
   targetPublication?: PublicKey;
 
   /** Publication Content type (for additional filtering)
-  * Article = 0,
-  * Image = 1,
-  * Video = 2,
-  * ShortVideo = 3,
-  * Audio = 4,
-  * Text = 5,
-  * Link = 6 
+  * 0. NotSpecified
+  * 1. Article,
+  * 2. Image,
+  * 3. Video,
+  * 4. ShortVideo,
+  * 5. Audio,
+  * 6. Text,
+  * 6. Link 
   */
   contentType?: ContentType;
 
   /** Publication Tag  (for additional filtering) */
   tag?: string;
+
+  /** Is event happens in 7-day-period  (for additional filtering) */
+  isIn7Days?: boolean;
 
   /** Is event happens in 3-day-period  (for additional filtering) */
   isIn3Days?: boolean;
@@ -140,6 +144,7 @@ export const findPublicationsOperationHandler: OperationHandler<FindPublications
       targetPublication,
       contentType,
       tag,
+      isIn7Days,
       isIn3Days,
       isToday,
       loadJsonMetadata = false
@@ -222,11 +227,14 @@ export const findPublicationsOperationHandler: OperationHandler<FindPublications
     if (tag) {
       builder.addFilter("tag", tag)
     }
+    if (isIn7Days) {
+      builder.addFilter("creationWeek", todayToSearchInterval(7))
+    }
     if (isIn3Days) {
-      builder.addFilter("searchable3Day", todayToSearchInterval(3))
+      builder.addFilter("creation3Day", todayToSearchInterval(3))
     }
     if (isToday) {
-      builder.addFilter("searchableDay", todayToSearchInterval(1))
+      builder.addFilter("creationDay", todayToSearchInterval(1))
     }
 
     const res = await builder.run(ju.connection);

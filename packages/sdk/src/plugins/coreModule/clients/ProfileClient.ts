@@ -2,7 +2,6 @@ import { ProfileData } from '@ju-protocol/ju-core';
 import {
   FindProfilesByKeyListInput,
   findProfilesByKeyListOperation,
-  CreateProfileInput,
   createProfileOperation,
   findProfileByAddressOperation,
   updateProfileOperation,
@@ -62,7 +61,8 @@ export class ProfileClient {
 
   /** {@inheritDoc createProfileOperation} */
   createProfile(
-    input: Omit<CreateProfileInput, 'app'>,
+    input: Partial<ProfileData> & { connectingProcessor?: PublicKey },
+    externalProcessingData?: string,
     options?: OperationOptions
   ) {
     return this.ju
@@ -70,7 +70,28 @@ export class ProfileClient {
       .execute(createProfileOperation(
         {
           app: this.app,
-          ...input
+          data: {
+            alias: input.alias === undefined ? null : input.alias,
+            metadataUri: input.metadataUri === undefined ? null : input.metadataUri,
+            gender: input.gender === undefined ? null : input.gender,
+            firstName: input.firstName === undefined ? null : input.firstName,
+            lastName: input.lastName === undefined ? null : input.lastName,
+            birthDate: input.birthDate === undefined ? null : input.birthDate,
+            countryCode: input.countryCode === undefined ? null : input.countryCode,
+            regionCode: input.regionCode === undefined ? null : input.regionCode,
+            cityCode: input.cityCode === undefined ? null : input.cityCode,
+            personalData1: input.personalData1 === undefined ? null : input.personalData1,
+            personalData2: input.personalData2 === undefined ? null : input.personalData2,
+            personalData3: input.personalData3 === undefined ? null : input.personalData3,
+            personalData4: input.personalData4 === undefined ? null : input.personalData4,
+            personalData5: input.personalData5 === undefined ? null : input.personalData5,
+            personalData6: input.personalData6 === undefined ? null : input.personalData6,
+            personalData7: input.personalData7 === undefined ? null : input.personalData7,
+            personalData8: input.personalData8 === undefined ? null : input.personalData8,
+          },
+          externalProcessingData,
+          connectingProcessor: input.connectingProcessor,
+          loadJsonMetadata: true,
         }
       ), options);
   }
@@ -97,7 +118,6 @@ export class ProfileClient {
           data: {
             alias: data.alias === undefined ? profile.alias : data.alias,
             metadataUri: data.metadataUri === undefined ? profile.metadataUri : data.metadataUri,
-            statusText: data.statusText === undefined ? profile.statusText : data.statusText,
             gender: data.gender === undefined ? profile.gender : data.gender,
             firstName: data.firstName === undefined ? profile.firstName : data.firstName,
             lastName: data.lastName === undefined ? profile.lastName : data.lastName,
@@ -105,7 +125,14 @@ export class ProfileClient {
             countryCode: data.countryCode === undefined ? profile.countryCode : data.countryCode,
             regionCode: data.regionCode === undefined ? profile.regionCode : data.regionCode,
             cityCode: data.cityCode === undefined ? profile.cityCode : data.cityCode,
-            currentLocation: data.currentLocation === undefined ? profile.currentLocation : data.currentLocation
+            personalData1: data.personalData1 === undefined ? profile.personalData1 : data.personalData1,
+            personalData2: data.personalData2 === undefined ? profile.personalData2 : data.personalData2,
+            personalData3: data.personalData3 === undefined ? profile.personalData3 : data.personalData3,
+            personalData4: data.personalData4 === undefined ? profile.personalData4 : data.personalData4,
+            personalData5: data.personalData5 === undefined ? profile.personalData5 : data.personalData5,
+            personalData6: data.personalData6 === undefined ? profile.personalData6 : data.personalData6,
+            personalData7: data.personalData7 === undefined ? profile.personalData7 : data.personalData7,
+            personalData8: data.personalData8 === undefined ? profile.personalData8 : data.personalData8,
           },
           currentAlias: profile.alias,
           externalProcessors: {
@@ -179,12 +206,7 @@ export class ProfileClient {
   ) {
     return this.ju
       .operations()
-      .execute(findProfilesAsKeysByConnectionTargetOperation(
-        {
-          app: this.app,
-          ...filter
-        }
-      ), options);
+      .execute(findProfilesAsKeysByConnectionTargetOperation(filter), options);
   }
 
   /** {@inheritDoc findProfilesByConnectionInitializerOperation} */
@@ -195,12 +217,7 @@ export class ProfileClient {
   ) {
     return this.ju
       .operations()
-      .execute(findProfilesAsKeysByConnectionInitializerOperation(
-        {
-          app: this.app,
-          ...filter
-        }
-      ), options);
+      .execute(findProfilesAsKeysByConnectionInitializerOperation(filter), options);
   }
 
   /** {@inheritDoc findProfilesByKeyListOperation} */

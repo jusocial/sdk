@@ -46,13 +46,22 @@ export type FindSubspacesAsKeysByConnectionInitializerOperation = Operation<
  */
 export type FindSubspacesAsKeysByConnectionInitializerInput = {
   /** The address of the Application. */
-  app: PublicKey;
+  app?: PublicKey;
 
   /** The address (Subspace Pubkey) of the Connection initializer */
   initializer?: PublicKey;
 
   /** Approved Subspaces only */
-  approved?: boolean;
+  isApproved?: boolean;
+
+  /** Is event happens in 7-day-period  (for additional filtering) */
+  isIn7Days?: boolean;
+
+  /** Is event happens in 3-day-period  (for additional filtering) */
+  isIn3Days?: boolean;
+
+  /** Is event happens today  (for additional filtering) */
+  isToday?: boolean;
 };
 
 /**
@@ -76,12 +85,15 @@ export const findSubspacesAsKeysByConnectionInitializerOperationHandler: Operati
     const {
       app,
       initializer,
-      approved
+      isApproved,
+      isIn7Days,
+      isIn3Days,
+      isToday
     } = operation.input;
 
     const connections = await ju
       .operations()
-      .execute(findConnectionsOperation({ app, initializer, approved }), scope);
+      .execute(findConnectionsOperation({ app, initializer, isApproved, isIn7Days ,isIn3Days, isToday }), scope);
     scope.throwIfCanceled();
 
     const targets = connections.map((connection) => connection.target);
