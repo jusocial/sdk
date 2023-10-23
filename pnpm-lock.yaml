@@ -164,8 +164,8 @@ importers:
         specifier: ^0.8.8
         version: 0.8.8(debug@4.3.4)
       '@ju-protocol/ju-core':
-        specifier: 0.3.2
-        version: 0.3.2
+        specifier: 0.3.3
+        version: 0.3.3
       '@metaplex-foundation/beet':
         specifier: 0.7.1
         version: 0.7.1
@@ -2078,8 +2078,8 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
 
-  /@ju-protocol/ju-core@0.3.2:
-    resolution: {integrity: sha512-F0At4aZN3oYeVihgtOwSt7eCp74gFUSh/8c0EPfo3B9yGx7ifSY/jsKtzJCmG9YaM4Syjd34qA2GL9gRWwYn/A==}
+  /@ju-protocol/ju-core@0.3.3:
+    resolution: {integrity: sha512-j0Z2bP5slzP8GbudSvFJfjlfdRO64OLCUkDClor8dVRFLi0GPiMuQLZ11RxhkK+owxLhco4784Jc8hZDa/Xl0A==}
     dependencies:
       '@metaplex-foundation/beet': 0.7.1
       '@metaplex-foundation/beet-solana': 0.4.0
