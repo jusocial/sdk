@@ -41,7 +41,7 @@ export class CoreUtilsClient {
    */
   async search(
     request: string,
-    loadJsonMetadata: false,
+    loadJsonMetadata = false,
     options?: OperationOptions
   ): Promise<SearchResultItem[]> {
 
