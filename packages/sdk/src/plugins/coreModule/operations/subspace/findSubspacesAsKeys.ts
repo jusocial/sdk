@@ -53,6 +53,18 @@ export type FindSubspacesAsKeysInput = {
 
   /** The creator of the Subspace. */
   creator?: PublicKey;
+
+  /** Creation year (for additional filtering) */
+  creationYear?: number;
+
+  /** Creation month (for additional filtering) */
+  creationMonth?: number;
+
+  /** Creation week (for additional filtering) */
+  creationWeek?: number;
+
+  /** Creation day (for additional filtering) */
+  creationDay?: number;
 };
 
 /**
@@ -72,7 +84,11 @@ export const findSubspacesAsKeysOperationHandler: OperationHandler<FindSubspaces
     const {
       app,
       authority,
-      creator
+      creator,
+      creationYear,
+      creationMonth,
+      creationWeek,
+      creationDay,
     } = operation.input;
 
     const builder = Subspace.gpaBuilder();
@@ -90,6 +106,19 @@ export const findSubspacesAsKeysOperationHandler: OperationHandler<FindSubspaces
     if (creator) {
       builder.addFilter("creator", creator)
     }
+    if (creationYear) {
+      builder.addFilter("creationYear", creationYear)
+    }
+    if (creationMonth) {
+      builder.addFilter("creationMonth", creationMonth)
+    }
+    if (creationWeek) {
+      builder.addFilter("creationWeek", creationWeek)
+    }
+    if (creationDay) {
+      builder.addFilter("creationDay", creationDay)
+    }
+
     const res = await builder.run(ju.connection);
     scope.throwIfCanceled();
 

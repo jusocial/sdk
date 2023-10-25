@@ -58,6 +58,18 @@ export type FindSubspacesInput = {
   /** The creator of the Subspace. */
   creator?: PublicKey;
 
+  /** Creation year (for additional filtering) */
+  creationYear?: number;
+
+  /** Creation month (for additional filtering) */
+  creationMonth?: number;
+
+  /** Creation week (for additional filtering) */
+  creationWeek?: number;
+
+  /** Creation day (for additional filtering) */
+  creationDay?: number;
+
   /**
    * Whether or not we should fetch the JSON Metadata.
    *
@@ -84,6 +96,10 @@ export const findSubspacesOperationHandler: OperationHandler<FindSubspacesOperat
       app,
       authority,
       creator,
+      creationYear,
+      creationMonth,
+      creationWeek,
+      creationDay,
       loadJsonMetadata = false
     } = operation.input;
 
@@ -101,6 +117,18 @@ export const findSubspacesOperationHandler: OperationHandler<FindSubspacesOperat
     }
     if (creator) {
       builder.addFilter("creator", creator)
+    }
+    if (creationYear) {
+      builder.addFilter("creationYear", creationYear)
+    }
+    if (creationMonth) {
+      builder.addFilter("creationMonth", creationMonth)
+    }
+    if (creationWeek) {
+      builder.addFilter("creationWeek", creationWeek)
+    }
+    if (creationDay) {
+      builder.addFilter("creationDay", creationDay)
     }
    
     const res = await builder.run(ju.connection);
